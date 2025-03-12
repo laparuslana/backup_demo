@@ -1,0 +1,7 @@
+com/example/demo/Controller/ContentController.class
+com/example/demo/Controller/RegistrationController.class
+com/example/demo/Model/MyAppUserRepository.class
+com/example/demo/DemoApplication.class
+com/example/demo/Security/SecurityConfig.class
+com/example/demo/Model/MyAppUser.class
+com/example/demo/Model/MyAppUserService.class
