@@ -32,7 +32,12 @@
           <ion-icon name="lock-closed-outline"></ion-icon>
           <input type="password" id="passwordcon" name="passwordcon" required>
           <label for="">Confirm Password</label>
-      </div>  
+      </div>
+
+<label>
+    <input type="checkbox" id="isAdmin" name="isAdmin"/>Register as Admin
+</label>
+
         <button id= "submit" type="submit">Sign Up</button>
       <div class="register">
         <p>Already have an account? <a href="">Log In</a></p>
@@ -46,16 +51,19 @@
   submitButttom.addEventListener('click',(event)=>{
       event.preventDefault();
 
+    const isAdmin = document.getElementById("isAdmin").checked;
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('passwordcon').value;
     const email = document.getElementById('email').value;
+
     const data ={
       username,
       email,
-      password
+      password,
+      isAdmin
     }
-    
+
     if(password === confirmPassword){
       const jsonData = JSON.stringify(data);
       fetch('/req/signup', {

@@ -8,14 +8,15 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.demo.Model.MyAppUserService;
-
 import lombok.AllArgsConstructor;
+import java.util.Set;
 
 @Configuration
 @AllArgsConstructor
@@ -43,22 +44,28 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity
             .csrf(AbstractHttpConfigurer::disable)
-            .formLogin(httpForm ->{
-                httpForm.loginPage("/req/login").permitAll();
-                httpForm.defaultSuccessUrl("/index");
-                
-            })
-    
-            
-            .authorizeHttpRequests(registry ->{
-                registry.requestMatchers("/req/signup","/css/**","/js/**").permitAll();
-                registry.anyRequest().authenticated();
-            })
+            .formLogin(httpForm -> httpForm
+                            .loginPage("/req/login").permitAll()
+        .successHandler((request, response, authentication) -> {
+            Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+            if (roles.contains("ADMIN")) {
+                response.sendRedirect("/admin");
+            } else {
+                response.sendRedirect("/index");
+            }
+        })
+                        )
+
+            .authorizeHttpRequests(registry -> registry
+                    .requestMatchers("/req/signup","/css/**","/js/**").permitAll()
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
+            )
             .build();
     }
     

@@ -1,5 +1,6 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Model.SignupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +20,14 @@ public class RegistrationController {
     private PasswordEncoder passwordEncoder;
     
     @PostMapping(value = "/req/signup", consumes = "application/json")
-    public MyAppUser createUser(@RequestBody MyAppUser user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public MyAppUser createUser(@RequestBody SignupRequest signupRequest){
+        MyAppUser user = new MyAppUser();
+        user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        user.setUsername(signupRequest.getUsername());
+        user.setEmail(signupRequest.getEmail());
+
+        String role = signupRequest.isAdmin() ? "ADMIN" : "USER";
+        user.setRole(role);
         return myAppUserRepository.save(user);
     }
     
