@@ -53,7 +53,7 @@ public class SecurityConfig {
                             .loginPage("/req/login").permitAll()
         .successHandler((request, response, authentication) -> {
             Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-            if (roles.contains("ADMIN")) {
+            if (roles.contains("ROLE_ADMIN")) {
                 response.sendRedirect("/admin");
             } else {
                 response.sendRedirect("/index");
