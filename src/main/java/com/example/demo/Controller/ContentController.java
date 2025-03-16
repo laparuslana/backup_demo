@@ -25,5 +25,14 @@ public class ContentController {
     public String admin(){
         return "admin";
     }
-    
+
+//    @GetMapping("/req/backup_history")
+//    public String history(){
+//        return "backup_history";
+//    }
+//
+//    @GetMapping("/download")
+//    public String download(){
+//        return "download";
+//    }
 }

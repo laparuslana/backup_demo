@@ -3,72 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Home Page</title>
+    <title>User Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background: linear-gradient(to right, #0f172a, #1e3a8a);
+            color: white;
+            text-align: center;
         }
 
         header {
+            background-color: #333;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
             background-color: #4CAF50;
             color: white;
-            padding: 15px 10px;
-            text-align: center;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #333;
-        }
-
-        nav a {
-            color: white;
-            padding: 14px 20px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        nav a:hover {
-            background-color: #ddd;
-            color: black;
         }
 
         main {
+            margin: 30px auto;
+            width: 80%;
+            background: rgba(255,255,255,0.1);
             padding: 20px;
+            color: black;
         }
 
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
+
+        input[type="text"] {
             padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+            width: 300px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
         }
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #e68900;
+        }
+
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Home Page</h1>
-    </header>
-    <nav>
+<header>
+    <h1>User Dashboard</h1>
+    <div class="menu">
         <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <main>
-        <h2>About Me</h2>
-        <p>This is a paragraph about me. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque nisl ut sapien interdum, nec ullamcorper velit dapibus. Sed ac vestibulum libero, nec tempor felis.</p>
-        <h2>Services</h2>
-        <p>These are the services I offer. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque nisl ut sapien interdum, nec ullamcorper velit dapibus. Sed ac vestibulum libero, nec tempor felis.</p>
-    </main>
-    <footer>
-        <p>Footer Content &copy; 2024</p>
-    </footer>
+        <a href="#settings">Settings</a>
+        <a href="#logout">Logout</a>
+    </div>
+</header>
+<main>
+    <input type="text" placeholder="Enter text here...">
+    <h2>Backup history statistics</h2>
+    <table id="backupTable">
+<tr>
+    <th>Status</th>
+    <th>Date</th>
+    <th>Database Name</th>
+</tr>
+    </table>
+        <a href="http://localhost:8080/req/backup-history/download" class="button">Download History</a>
+        <button class="button">Contact Admin</button>
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("http://localhost:8080/req/backup-history")
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById("backupTable");
+
+                data.forEach(backup => {
+                    let row = table.insertRow(-1);
+                    let cell1 = row.insertCell(0);
+                    let cell2 = row.insertCell(1);
+                    let cell3 = row.insertCell(2);
+
+                    cell1.textContent = backup.status;
+                    cell2.textContent = new Date(backup.backup_time).toLocaleString();
+                    cell3.textContent = backup.database_name;
+                });
+            })
+            .catch(error => console.error("Error fetching backup history:", error));
+    });
+
+</script>
 </body>
 </html>
