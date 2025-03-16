@@ -80,6 +80,17 @@
             cursor: pointer;
             transition: background 0.3s;
         }
+        .button a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .button a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
         button:hover {
             background: #e68900;
         }
@@ -105,8 +116,10 @@
     <th>Database Name</th>
 </tr>
     </table>
-        <a href="http://localhost:8080/req/backup-history/download" class="button">Download History</a>
-        <button class="button">Contact Admin</button>
+    <div class="button">
+        <a href="http://localhost:8080/req/backup-history/download" >Download History</a>
+        <button>Contact Admin</button>
+    </div>
 </main>
 <script>
     document.addEventListener("DOMContentLoaded", function() {

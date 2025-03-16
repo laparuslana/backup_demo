@@ -44,6 +44,31 @@
             border-radius: 5px;
         }
 
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #004080;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: white;
+            padding: 10px;
+            display: block;
+            text-decoration: none;
+        }
+        .dropdown-content a:hover {
+            background-color: #0056b3;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         main {
             display: flex;
             flex-direction: column;
@@ -84,6 +109,7 @@
 
         .btn-danger { background: #f44336; color: white; }
         .btn-danger:hover { background: #da190b; }
+
     </style>
 </head>
 <body>
@@ -91,8 +117,15 @@
     <h1>Admin Panel</h1>
     <div class="menu">
         <a href="#home">Home</a>
+        <div class="dropdown">
+            <a href="#control">Control Panel</a>
+            <div class="dropdown-content">
+                <a href="#" onclick="addUser()">Add User</a>
+                <a href="#" onclick="editUser()">Edit User</a>
+                <a href="#" onclick="deleteUser()">Delete User</a>
+            </div>
+        </div>
         <a href="#history">Backup history</a>
-        <a href="#control">Control Panel</a>
         <a href="#logout">Logout</a>
     </div>
 </header>
@@ -104,5 +137,53 @@
         <button class="btn-danger">Restore the copy</button>
     </div>
 </main>
+<script>
+    function addUser() {
+        let username = prompt("Enter new username:");
+        let email = prompt("Enter user email:");
+        let password = prompt("Enter user password:");
+        let role = prompt("Enter ADMIN or USER:");
+
+        if (username && email && password && role) {
+            fetch('/req/users/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, role })
+            }).then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => alert("Error: " + error));
+        } else {
+            alert("All fields are required!");
+        }
+    }
+
+    function editUser() {
+        let userId = prompt("Enter User ID to edit:");
+        let newUsername = prompt("Enter new username:");
+        let newEmail = prompt("Enter user email:");
+        let newPassword = prompt("Enter user password:");
+        let newRole = prompt("Enter ADMIN or USER:");
+        if (userId && newUsername && newEmail && newPassword && newRole) {
+            fetch(`/req/users/edit/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: newUsername, email: newEmail, password: newPassword, role: newRole})
+            }).then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => alert("Error: " + error));
+        }
+    }
+
+    function deleteUser() {
+        let userId = prompt("Enter User ID to delete:");
+        if (userId) {
+            fetch(`/req/users/delete/${userId}`, {
+                method: 'DELETE'
+            }).then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => alert("Error: " + error));
+        }
+    }
+</script>
 </body>
 </html>
