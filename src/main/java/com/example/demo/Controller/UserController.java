@@ -22,6 +22,10 @@ public class UserController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody MyAppUser user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", "Username already exists"));
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return ResponseEntity.ok(Collections.singletonMap("message", "User added successfully"));
@@ -30,14 +34,20 @@ public class UserController {
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody MyAppUser updateduser) {
         return userRepository.findById(id).map(user -> {
+            if (!user.getUsername().equals(updateduser.getUsername()) &&
+                userRepository.findByUsername(updateduser.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", "Username already exists"));
+            }
+
             user.setUsername(updateduser.getUsername());
             user.setEmail(updateduser.getEmail());
             user.setRole(updateduser.getRole());
+
             if (updateduser.getPassword() != null && !updateduser.getPassword().isEmpty()) {
-                System.out.println("Hashing password: " + updateduser.getPassword());
                 user.setPassword(passwordEncoder.encode(updateduser.getPassword()));
             }
-            userRepository.save(updateduser);
+            userRepository.save(user);
             return ResponseEntity.ok(Collections.singletonMap("message", "User updated successfully"));
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "User not found")));
     }

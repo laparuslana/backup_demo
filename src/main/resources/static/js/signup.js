@@ -12,12 +12,15 @@ document.addEventListener('DOMContentLoaded', function () {
       const emailInput = document.querySelector('input[type="email"]');
       const passwordInput = document.querySelector('input[type="password"]');
       const confirmPasswordInput = document.querySelector('input[type="password"][name="confirm-password"]');
-      const roleInput = document.querySelector('input[type="checkbox"][name="role"]');
 
-        // Check for a valid email and password (you can add your validation logic here)
-      const isValid = emailInput.checkValidity() && passwordInput.checkValidity() && confirmPasswordInput.checkValidity();
-  
-      if (!isValid) {
+      function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+      function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+      if (!validateEmail(emailInput) && !validatePassword(passwordInput) && !validatePassword(confirmPasswordInput))  {
         signupForm.classList.add('shake');
   
         setTimeout(() => {

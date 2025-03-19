@@ -30,6 +30,7 @@
         .menu {
             display: flex;
             gap: 20px;
+            align-items: center;
         }
 
         .menu a {
@@ -38,6 +39,16 @@
             font-size: 16px;
             padding: 10px;
         }
+
+        .menu a, .dropdown {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px;
+        }
+
 
         .menu a:hover {
             background-color: rgba(255, 255, 255, 0.2);
@@ -116,7 +127,7 @@
 <header>
     <h1>Admin Panel</h1>
     <div class="menu">
-        <a href="#home">Home</a>
+        <a href="/admin">Home</a>
         <div class="dropdown">
             <a href="#control">Control Panel</a>
             <div class="dropdown-content">
@@ -125,8 +136,8 @@
                 <a href="#" onclick="deleteUser()">Delete User</a>
             </div>
         </div>
-        <a href="#history">Backup history</a>
-        <a href="#logout">Logout</a>
+        <a href="http://localhost:8080/req/backup-history/download">Backup history</a>
+        <a href="/logout">Logout</a>
     </div>
 </header>
 <main>
@@ -138,40 +149,94 @@
     </div>
 </main>
 <script>
-    function addUser() {
-        let username = prompt("Enter new username:");
-        let email = prompt("Enter user email:");
-        let password = prompt("Enter user password:");
-        let role = prompt("Enter ADMIN or USER:");
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
 
-        if (username && email && password && role) {
-            fetch('/req/users/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password, role })
-            }).then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => alert("Error: " + error));
-        } else {
-            alert("All fields are required!");
+    function validatePassword(password) {
+        return password.length >= 6;
+    }
+    function addUser() {
+        let username, email, password, role;
+
+        while (!username) {
+            username = prompt("Enter new username:");
+            if (username === null) return;
         }
+
+        while (!email || !email.includes("@")) {
+            email = prompt("Enter user email:");
+            if (email === null) return;
+            if (!validateEmail(email)) alert("Invalid email! Please enter a valid email.");
+        }
+
+        while (!password || password.length < 6) {
+            password = prompt("Enter user password (at least 6 characters):");
+            if (password === null) return;
+            if (!validatePassword(password)) alert("Password must be at least 6 characters long!");
+        }
+
+        while (true) {
+            role = prompt("Enter role (USER or ADMIN):");
+            if (role === null) return;
+            role = role.toUpperCase();
+            if (role === "USER" || role === "ADMIN") break;
+            alert("Invalid role! Only USER or ADMIN allowed.");
+        }
+
+        fetch('/req/users/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, role })
+        })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert("Error: " + error));
     }
 
     function editUser() {
-        let userId = prompt("Enter User ID to edit:");
-        let newUsername = prompt("Enter new username:");
-        let newEmail = prompt("Enter user email:");
-        let newPassword = prompt("Enter user password:");
-        let newRole = prompt("Enter ADMIN or USER:");
-        if (userId && newUsername && newEmail && newPassword && newRole) {
-            fetch(`/req/users/edit/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: newUsername, email: newEmail, password: newPassword, role: newRole})
-            }).then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => alert("Error: " + error));
+        let userId, newUsername, newEmail, newPassword, newRole;
+
+        while (!userId) {
+            userId = prompt("Enter User ID to edit:");
+            if (userId === null) return;
         }
+
+        while (!newUsername) {
+            newUsername = prompt("Enter new username:");
+            if (newUsername === null) return;
+        }
+
+        while (!newEmail || !newEmail.includes("@")) {
+            newEmail = prompt("Enter new email:");
+            if (newEmail === null) return;
+            if (!newEmail.includes("@")) alert("Invalid email! Please enter a valid email.");
+        }
+
+        while (true) {
+            newPassword = prompt("Enter new password (leave empty to keep current):");
+            if (newPassword === null) return;
+            if (newPassword === "") break;
+            if (newPassword.length < 6) alert("Password must be at least 6 characters long!");
+            else break;
+        }
+
+        while (true) {
+            newRole = prompt("Enter new role (USER or ADMIN):");
+            if (newRole === null) return;
+            newRole = newRole.toUpperCase();
+            if (newRole === "USER" || newRole === "ADMIN") break;
+            alert("Invalid role! Only USER or ADMIN allowed.");
+        }
+
+        fetch(`/req/users/edit/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: newUsername, email: newEmail, password: newPassword, role: newRole })
+        })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert("Error: " + error));
     }
 
     function deleteUser() {

@@ -60,6 +60,13 @@ public class SecurityConfig {
             }
         })
                         )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/req/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
 
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/req/signup","/css/**","/js/**").permitAll()
