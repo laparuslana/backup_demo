@@ -40,7 +40,7 @@
 
         <button id= "submit" type="submit">Sign Up</button>
       <div class="register">
-        <p>Already have an account? <a href="req/login">Log In</a></p>
+        <p>Already have an account? <a href="/login">Log In</a></p>
       </div>
     </form>
   </section>
@@ -77,6 +77,8 @@
               .then(data => {
                   if (data.message === "Username already exists") {
                       alert("Error: Username already exists! Please choose another one.");
+                  } else if (data.message === "Email already exists") {
+                      alert("Error: Email already exists! Please use another email.");
                   } else {
                       alert("Success: " + data.message);
                       window.location.href = "/login";

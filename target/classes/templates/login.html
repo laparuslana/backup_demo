@@ -9,7 +9,6 @@
   <script src="/js/signup.js" defer></script>
 </head>
 <body>
-<body>
     <section>
         
         <form action="/req/login" method="post">
@@ -28,13 +27,55 @@
                 <label for="">Password</label>
             </div>
             <div class="register">
-                <p><a href="#">Forget Password ?</a></p>
+                <button onclick="forgotPassword()">Forget Password?</button>
             </div>
             <button>Log in</button>
             <div class="register">
-                <p>Don't have a account ?<a href="/req/signup"> Register!!</a></p>
+                <p>Don't have a account?<a href="/req/signup"> Register!!</a></p>
             </div>
         </form>
     </section>
+
+    <div id="resetLinkContainer"></div>
+
+    <script>
+        function forgotPassword() {
+            let email = prompt("email");
+            let container = document.getElementById("resetLinkContainer");
+            container.innerHTML = "<p>Generating token...</p>";
+if (email) {
+            fetch("/req/login/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.resetLink) {
+                        container.innerHTML = `
+                    <p>Copy and paste this link:</p>
+                    <input type="text" value="${data.resetLink}" id="resetLink" readonly>
+                    <button onclick="copyResetLink()">Copy</button>
+                `;
+                    } else {
+                        container.innerHTML = `<p style="color: red;">ERROR: ${data.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error", error);
+                    container.innerHTML = `<p style="color: red;">Something went wrong.Check logs</p>`;
+                });
+        }
+        }
+
+        function copyResetLink() {
+            let linkInput = document.getElementById("resetLink");
+            linkInput.select();
+            document.execCommand("copy");
+            alert("Reset link copied!");
+        }
+    </script>
+
 </body>
+</html>
   
