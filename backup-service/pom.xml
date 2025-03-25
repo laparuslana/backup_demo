@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>backup-service</artifactId>
-    <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>

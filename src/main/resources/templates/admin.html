@@ -121,6 +121,38 @@
         .btn-danger { background: #f44336; color: white; }
         .btn-danger:hover { background: #da190b; }
 
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+        }
+        .popup input, .popup select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+        .popup button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -148,6 +180,45 @@
         <button class="btn-danger">Restore the copy</button>
     </div>
 </main>
+
+<button onclick="openPopup()">Створити бекап</button>
+
+<div class="popup" id="backupPopup">
+    <div class="popup-content">
+        <h3>Одноразовий Бекап</h3>
+        <form action="/api/backup/execute" method="post" id="backupForm">
+
+            <label for="databaseName">Виберіть базу даних:</label>
+            <select id="databaseName" name="databaseName">
+                <option value="test2">test2</option>
+                <option value="test">db1</option>
+<!--                Example for now -->
+            </select>
+
+            <label for="clusterServer">Cluster Server:</label>
+            <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
+
+            <label for="dbServer">Місце збереження:</label>
+            <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
+
+            <label for="dbUser">Місце збереження:</label>
+            <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
+
+            <label for="backupLocation">Місце збереження:</label>
+            <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>
+
+            <label for="dbPassword">Місце збереження:</label>
+            <input type="text" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
+
+<!--            <label for="daysKeep">Місце збереження:</label>-->
+<!--            <input type="text" id="daysKeep" name="daysKeep" placeholder="Days To Keep" required>-->
+
+            <button type="submit" id="submit">Do backup</button>
+        </form>
+        <button onclick="closePopup()">Close</button>
+    </div>
+</div>
+
 <script>
     function validateEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -249,6 +320,46 @@
                 .catch(error => alert("Error: " + error));
         }
     }
+
+
+    function openPopup() {
+        document.getElementById('backupPopup').style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('backupPopup').style.display = 'none';
+    }
+
+    const submitButttom = document.getElementById("submit");
+    submitButttom.addEventListener('click',(event)=> {
+        event.preventDefault();
+
+        let backupData = {
+            clusterServer: document.getElementById("clusterServer").value,
+            databaseName: document.getElementById("databaseName").value,
+            dbServer: document.getElementById("dbServer").value,
+            dbUser: document.getElementById("dbUser").value,
+            dbPassword: document.getElementById("dbPassword").value,
+            backupLocation: document.getElementById("backupLocation").value
+            };
+
+        fetch("/api/backup/execute", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(backupData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server returned error");
+                }
+                return response.text();
+            })
+            .then(data => alert("✅ Backup started successfully!"))
+            .catch(error => alert("❌ Error starting backup: " + error));
+    });
+
 </script>
 </body>
 </html>
