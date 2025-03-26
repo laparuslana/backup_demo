@@ -1,14 +1,10 @@
-package com.example.demo;
+package com.example.demo.Model;
 
 import jakarta.persistence.*;
 
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 @Entity
 @Table(name = "backup_settings")
-public class ScheduledBackup {
+public class BackupSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +20,7 @@ public class ScheduledBackup {
     private String day;
 
     @Column(name = "time")
-    private LocalTime time;
+    private String time;
 
     @Column(name = "cluster_server")
     private String clusterServer;
@@ -73,11 +69,11 @@ public class ScheduledBackup {
         this.day = day;
     }
 
-    public LocalTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

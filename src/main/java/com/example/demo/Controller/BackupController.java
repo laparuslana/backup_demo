@@ -19,11 +19,13 @@ package com.example.demo.Controller;
 //    }
 //}
 
-import com.example.demo.Model.BackupService;
+import com.example.demo.Model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import com.example.demo.Model.BackupRequest;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,4 +47,11 @@ public class BackupController {
         backupService.startBackup(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping(value = "/api/backup/save", consumes = "application/json")
+    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule){
+        backupService.save(backupSchedule);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Created user"));
+    }
+
 }

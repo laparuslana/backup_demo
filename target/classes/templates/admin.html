@@ -125,10 +125,12 @@
         .popup {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 400px;
-            max-height: 500px;
+            hight: auto;
+            max-height: 400px;
             overflow-y: auto;
             background-color: rgba(0, 0, 0, 0.5);
             justify-content: center;
@@ -137,6 +139,7 @@
         .popup-content {
             background-color: white;
             padding: 20px;
+            margin: 0 auto;
             border-radius: 5px;
             width: 400px;
         }
@@ -175,13 +178,11 @@
 <main>
     <input type="text" placeholder="Enter text here...">
     <div class="buttons">
-        <button class="btn-primary">Automatic backup settings</button>
-        <button class="btn-secondary">Manually backup</button>
+        <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
+        <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
         <button class="btn-danger">Restore the copy</button>
     </div>
 </main>
-
-<button onclick="openPopup()">Створити бекап</button>
 
 <div class="popup" id="backupPopup">
     <div class="popup-content">
@@ -192,7 +193,7 @@
             <select id="databaseName" name="databaseName">
                 <option value="test2">test2</option>
                 <option value="test">db1</option>
-                <!-- Додати всі інші бази даних -->
+<!--                Example for now -->
             </select>
 
             <label for="clusterServer">Cluster Server:</label>
@@ -213,9 +214,60 @@
 <!--            <label for="daysKeep">Місце збереження:</label>-->
 <!--            <input type="text" id="daysKeep" name="daysKeep" placeholder="Days To Keep" required>-->
 
-            <button type="submit" id="submit">Виконати бекап</button>
+            <button type="submit" id="submit">Do backup</button>
         </form>
-        <button onclick="closePopup()">Закрити</button>
+        <button onclick="closePopup()">Close</button>
+    </div>
+</div>
+
+<div class="popup" id="autoBackupPopup">
+    <div class="popup-content">
+        <h3>Auto Backup</h3>
+        <form action="/api/backup/save" method="post" id="autoBackupForm">
+
+            <label for="databaseName">Виберіть базу даних:</label>
+            <select id="databaseName2" name="databaseName">
+                <option value="test2">test2</option>
+                <option value="test">db1</option>
+                <!--                Example for now -->
+            </select>
+
+            <label for="clusterServer">Cluster Server:</label>
+            <input type="text" id="clusterServer2" name="clusterServer" placeholder="Cluster Server" required>
+
+            <label for="dbServer">Місце збереження:</label>
+            <input type="text" id="dbServer2" name="dbServer" placeholder="DB Server" required>
+
+            <label for="dbUser">Місце збереження:</label>
+            <input type="text" id="dbUser2" name="dbUser" placeholder="DB User" required>
+
+            <label for="backupLocation">Місце збереження:</label>
+            <input type="text" id="backupLocation2" name="backupLocation" placeholder="backupLocation" required>
+
+            <label for="dbPassword">Місце збереження:</label>
+            <input type="text" id="dbPassword2" name="dbPassword" placeholder="DB Password" required>
+
+            <!--            <label for="daysKeep">Місце збереження:</label>-->
+            <!--            <input type="text" id="daysKeep" name="daysKeep" placeholder="Days To Keep" required>-->
+
+                <label for="frequency">Частота:</label>
+                <select id="frequency" name="frequency">
+                    <option value="daily">Каждый день</option>
+                    <option value="weekly">Каждую неделю</option>
+                    <option value="monthly">Каждый месяц</option>
+                </select>
+
+                <div id="daySelection" style="display: none;">
+                    <label for="day">День:</label>
+                    <select id="day" name="day"></select>
+                </div>
+
+                <label for="time">Время:</label>
+                <input type="time" id="time" name="time" required>
+
+            <button type="submit" id="autosubmit">Do backup</button>
+        </form>
+        <button onclick="closeAutoPopup()">Close</button>
     </div>
 </div>
 
@@ -360,6 +412,76 @@
             .catch(error => alert("❌ Error starting backup: " + error));
     });
 
+
+    function openAutoPopup() {
+        document.getElementById('autoBackupPopup').style.display = 'flex';
+    }
+
+    function closeAutoPopup() {
+        document.getElementById('autoBackupPopup').style.display = 'none';
+    }
+
+    document.getElementById("frequency").addEventListener("change", function() {
+        let daySelection = document.getElementById("daySelection");
+        let dayDropdown = document.getElementById("day");
+
+        dayDropdown.innerHTML = "";
+
+        if (this.value === "weekly") {
+            daySelection.style.display = "block";
+            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].forEach(day => {
+                let option = document.createElement("option");
+                option.value = day;
+                option.textContent = day;
+                dayDropdown.appendChild(option);
+            });
+        } else if (this.value === "monthly") {
+            daySelection.style.display = "block";
+            for (let i = 1; i <= 31; i++) {
+                let option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                dayDropdown.appendChild(option);
+            }
+        } else {
+            daySelection.style.display = "none";
+        }
+    });
+
+
+    const submitButtom = document.getElementById("autosubmit");
+    submitButtom.addEventListener('click',(event)=> {
+        event.preventDefault();
+
+        let backupData = {
+            clusterServer: document.getElementById("clusterServer2").value,
+            databaseName: document.getElementById("databaseName2").value,
+            dbServer: document.getElementById("dbServer2").value,
+            dbUser: document.getElementById("dbUser2").value,
+            dbPassword: document.getElementById("dbPassword2").value,
+            backupLocation: document.getElementById("backupLocation2").value,
+            frequency: document.getElementById("frequency").value,
+            day: document.getElementById("day").value,
+            time: document.getElementById("time").value
+
+        };
+
+        fetch("/api/backup/save", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(backupData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server returned error");
+                }
+                return response.text();
+            })
+            .then(data => alert("✅ Backup started successfully!"))
+            .catch(error => alert("❌ Error starting backup: " + error));
+    });
 </script>
 </body>
 </html>

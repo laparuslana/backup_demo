@@ -4,50 +4,156 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BackupScheduler {
 
     @Autowired
-    private BackupRepository backupRepository;
+    private BackupRepository backupScheduleRepository;
 
-    @Scheduled(fixedRate = 60000) // Runs every minute
-    public void checkAndExecuteBackups() {
-        List<ScheduledBackup> backups = backupRepository.findAll();
-        LocalDateTime now = LocalDateTime.now();
+    @Scheduled(fixedRate = 60000)
+    public void scheduleBackups() {
+        System.out.println("Checking schedule");
+        List<ScheduledBackup> schedules = backupScheduleRepository.findAll();
 
-        for (ScheduledBackup backup : backups) {
-            if (backup.getNextBackupTime().isBefore(now)) {
-                executeBackup(backup);
-                backup.setNextBackupTime(calculateNextBackupTime(backup.getFrequency()));
-                backupRepository.save(backup);
+        for (ScheduledBackup schedule : schedules) {
+            scheduleBackup(schedule);
+        }
+    }
+
+    private void scheduleBackup(ScheduledBackup schedule) {
+        String cronExpression = convertToCron(schedule.getFrequency(), schedule.getDay(), schedule.getTime());
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Runnable backupTask = () -> executeBackup(schedule);
+
+        long initialDelay = calculateInitialDelay(schedule.getDay(), schedule.getTime());
+        long period = calculatePeriod(schedule.getFrequency());
+
+        scheduler.scheduleAtFixedRate(backupTask, initialDelay, period, TimeUnit.MILLISECONDS);
+        System.out.println("Task " + schedule.getDatabaseName() + " с cron: " + cronExpression);
+
+        try {
+            Process process = Runtime.getRuntime().exec("crontab -l");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            StringBuilder existingCronJobs = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                existingCronJobs.append(line).append("\n");
+            }
+
+            String cronJob = String.format("%s /bin/bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s",
+                    cronExpression, schedule.getDatabaseName(), schedule.getDbServer(), schedule.getBackupLocation());
+
+            existingCronJobs.append(cronJob).append("\n");
+
+            Files.write(Paths.get("/tmp/my_cron_jobs"), existingCronJobs.toString().getBytes(),
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            Runtime.getRuntime().exec("crontab /tmp/my_cron_jobs");
+
+            System.out.println("Backup task scheduled: " + cronJob);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static long calculateInitialDelay(String day, LocalTime time) {
+        LocalDate now = LocalDate.now();
+
+        DayOfWeek targetDay;
+        if (day == null || day.isBlank()) {
+            targetDay = now.getDayOfWeek();
+        } else {
+            try {
+                targetDay = DayOfWeek.valueOf(day.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid day value: " + day, e);
             }
         }
+
+        LocalDate targetDate = now.with(TemporalAdjusters.nextOrSame(targetDay));
+
+        LocalDateTime scheduledTime = LocalDateTime.of(targetDate, time);
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        long delay = Duration.between(currentTime, scheduledTime).toSeconds();
+        return delay > 0 ? delay : 0;
     }
 
-    private void executeBackup(ScheduledBackup backup) {
-        try {
-            // Replace with actual backup command
-            String command = "mysqldump -u root -pYourPassword " + backup.getDatabaseName() + " > /backups/" + backup.getDatabaseName() + ".sql";
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
-            process.waitFor();
-            System.out.println("Backup completed for database: " + backup.getDatabaseName());
-        } catch (Exception e) {
-            System.err.println("Backup failed: " + e.getMessage());
-        }
-    }
-
-    private LocalDateTime calculateNextBackupTime(String frequency) {
-        LocalDateTime now = LocalDateTime.now();
-        switch (frequency) {
-            case "DAILY":
-                return now.plusDays(1);
-            case "WEEKLY":
-                return now.plusWeeks(1);
+    public static long calculatePeriod(String frequency) {
+        switch (frequency.toLowerCase()) {
+            case "hourly":
+                return 3600;
+            case "daily":
+                return 86400;
+            case "weekly":
+                return 604800;
             default:
-                return now.plusHours(24);
+                throw new IllegalArgumentException("Unsupported frequency: " + frequency);
         }
+    }
+    private void executeBackup(ScheduledBackup schedule) {
+        String command = String.format(
+                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s",
+                schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation()
+        );
+
+        try {
+            Runtime.getRuntime().exec(command);
+            System.out.println("Backup done: " + schedule.getDatabaseName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String convertToCron(String frequency, String day, LocalTime time) {
+        System.out.println("DEBUG: " + time);
+        String timestr = time.format(DateTimeFormatter.ofPattern("mm:HH"));
+        String[] timeParts = timestr.split(":");
+        String minutes = timeParts[0];
+        String hours = timeParts[1];
+
+        System.out.println("DEBUG: " + hours + minutes);
+        switch (frequency) {
+            case "daily":
+                return String.format("%s %s * * *", minutes, hours);
+            case "weekly":
+                return String.format("%s %s * * %s", minutes, hours, convertDayToCron(day));
+            case "monthly":
+                return String.format("%s %s %s * *", minutes, hours, day);
+            default:
+                throw new IllegalArgumentException("Unknown frequency: " + frequency);
+        }
+    }
+
+    private String convertDayToCron(String day) {
+        Map<String, String> daysMap = Map.of(
+                "Monday", "1",
+                "Tuesday", "2",
+                "Wednesday", "3",
+                "Thursday", "4",
+                "Friday", "5",
+                "Saturday", "6",
+                "Sunday", "7"
+        );
+        return daysMap.getOrDefault(day, "*");
     }
 }
+
