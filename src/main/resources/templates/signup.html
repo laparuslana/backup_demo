@@ -34,9 +34,9 @@
           <label for="">Confirm Password</label>
       </div>
 
-<label>
-    <input type="checkbox" id="isAdmin" name="isAdmin"/>Register as Admin
-</label>
+<!--<label>-->
+<!--    <input type="checkbox" id="isAdmin" name="isAdmin"/>Register as Admin-->
+<!--</label>-->
 
         <button id= "submit" type="submit">Sign Up</button>
       <div class="register">
@@ -51,7 +51,7 @@
   submitButttom.addEventListener('click',(event)=> {
       event.preventDefault();
 
-      const isAdmin = document.getElementById("isAdmin").checked;
+      // const isAdmin = document.getElementById("isAdmin").checked;
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('passwordcon').value;
@@ -60,8 +60,8 @@
       const data = {
           username,
           email,
-          password,
-          isAdmin
+          password
+          // isAdmin
       }
 
       if (password === confirmPassword) {
