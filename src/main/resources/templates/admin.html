@@ -608,8 +608,8 @@
         document.getElementById('backupPopup').style.display = 'none';
     }
 
-    document.getElementById("clusterAdmin2").addEventListener("change", function() {
-        const clusterCredentials = document.getElementById("clusterCredentials2");
+    document.getElementById("clusterAdmin").addEventListener("change", function() {
+        const clusterCredentials = document.getElementById("clusterCredentials");
         clusterCredentials.style.display = this.checked ? "block" : "none";
     });
 
@@ -658,8 +658,8 @@
         document.getElementById('autoBackupPopup').style.display = 'none';
     }
 
-    document.getElementById("clusterAdmin").addEventListener("change", function() {
-        const clusterCredentials = document.getElementById("clusterCredentials");
+    document.getElementById("clusterAdmin2").addEventListener("change", function() {
+        const clusterCredentials = document.getElementById("clusterCredentials2");
         clusterCredentials.style.display = this.checked ? "block" : "none";
     });
 
