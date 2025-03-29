@@ -1,4 +1,4 @@
-package com.example.demo.Model;
+package com.example.demo;
 
 import jakarta.persistence.*;
 
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "backup_history")
-public class BackupHistory {
+public class HistoryTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

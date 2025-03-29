@@ -129,17 +129,17 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 400px;
-            hight: auto;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: white;
             justify-content: center;
             align-items: center;
         }
         .popup-content {
             background-color: white;
+            max-height: 500px;
             padding: 20px;
-            margin: 0 auto;
+            margin: 0;
             border-radius: 5px;
             width: 400px;
         }
@@ -199,16 +199,16 @@
             <label for="clusterServer">Cluster Server:</label>
             <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
 
-            <label for="dbServer">Місце збереження:</label>
+            <label for="dbServer">DB Server:</label>
             <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
 
-            <label for="dbUser">Місце збереження:</label>
+            <label for="dbUser">DB User:</label>
             <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
 
-            <label for="backupLocation">Місце збереження:</label>
+            <label for="backupLocation">Backup Location:</label>
             <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>
 
-            <label for="dbPassword">Місце збереження:</label>
+            <label for="dbPassword">DB Password:</label>
             <input type="text" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
 
 <!--            <label for="daysKeep">Місце збереження:</label>-->
@@ -225,7 +225,7 @@
         <h3>Auto Backup</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
 
-            <label for="databaseName">Виберіть базу даних:</label>
+            <label for="databaseName">Choose database:</label>
             <select id="databaseName2" name="databaseName">
                 <option value="test2">test2</option>
                 <option value="test">db1</option>
@@ -235,34 +235,34 @@
             <label for="clusterServer">Cluster Server:</label>
             <input type="text" id="clusterServer2" name="clusterServer" placeholder="Cluster Server" required>
 
-            <label for="dbServer">Місце збереження:</label>
+            <label for="dbServer">DB Server:</label>
             <input type="text" id="dbServer2" name="dbServer" placeholder="DB Server" required>
 
-            <label for="dbUser">Місце збереження:</label>
+            <label for="dbUser">DB User:</label>
             <input type="text" id="dbUser2" name="dbUser" placeholder="DB User" required>
 
-            <label for="backupLocation">Місце збереження:</label>
+            <label for="backupLocation">Backup Location:</label>
             <input type="text" id="backupLocation2" name="backupLocation" placeholder="backupLocation" required>
 
-            <label for="dbPassword">Місце збереження:</label>
+            <label for="dbPassword">DB Password:</label>
             <input type="text" id="dbPassword2" name="dbPassword" placeholder="DB Password" required>
 
             <!--            <label for="daysKeep">Місце збереження:</label>-->
             <!--            <input type="text" id="daysKeep" name="daysKeep" placeholder="Days To Keep" required>-->
 
-                <label for="frequency">Частота:</label>
+                <label for="frequency">Frequency:</label>
                 <select id="frequency" name="frequency">
-                    <option value="daily">Каждый день</option>
-                    <option value="weekly">Каждую неделю</option>
-                    <option value="monthly">Каждый месяц</option>
+                    <option value="daily">Every Day</option>
+                    <option value="weekly">Every Week</option>
+                    <option value="monthly">Every Month</option>
                 </select>
 
                 <div id="daySelection" style="display: none;">
-                    <label for="day">День:</label>
+                    <label for="day">Day:</label>
                     <select id="day" name="day"></select>
                 </div>
 
-                <label for="time">Время:</label>
+                <label for="time">Time:</label>
                 <input type="time" id="time" name="time" required>
 
             <button type="submit" id="autosubmit">Do backup</button>

@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,9 @@ public class BackupScheduler {
 
     @Autowired
     private BackupRepository backupScheduleRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
 
     @Scheduled(fixedRate = 60000)
     public void scheduleBackups() {
@@ -114,13 +116,44 @@ public class BackupScheduler {
                 "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s",
                 schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation()
         );
+        StringBuilder output = new StringBuilder();
+        String status;
 
         try {
-            Runtime.getRuntime().exec(command);
-            System.out.println("Backup done: " + schedule.getDatabaseName());
-        } catch (IOException e) {
-            e.printStackTrace();
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+            while ((line = stdError.readLine()) != null) {
+                output.append("ERROR: ").append(line).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                status = "Backup executed successfully!\n";
+            } else {
+                status = "Backup failed with exit code: " + exitCode;
+            }
+
+            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation());
+
+        } catch (IOException | InterruptedException e) {
+            status = "❌ Error executing backup: " + e.getMessage();
+            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation());
         }
+        }
+
+    private void logBackup(String databaseName, String status, String backup_location) {
+        HistoryTask backupHistory = new HistoryTask();
+        backupHistory.setDatabase_name(databaseName);
+        backupHistory.setStatus(status);
+        backupHistory.setBackup_time(LocalDateTime.now());
+        backupHistory.setBackup_location(backup_location);
+        historyRepository.save(backupHistory);
     }
 
     private String convertToCron(String frequency, String day, LocalTime time) {
