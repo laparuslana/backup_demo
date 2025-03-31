@@ -2,6 +2,9 @@ package com.example.demo.Model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalTime;
+import java.util.Base64;
+
 @Entity
 @Table(name = "backup_settings")
 public class BackupSchedule {
@@ -11,7 +14,7 @@ public class BackupSchedule {
     private Long id;
 
     @Column(name = "database_name")
-    private String databaseName;
+    private String databaseName2;
 
     @Column(name = "frequency")
     private String frequency;
@@ -20,22 +23,43 @@ public class BackupSchedule {
     private String day;
 
     @Column(name = "time")
-    private String time;
+    private LocalTime time;
 
     @Column(name = "cluster_server")
-    private String clusterServer;
+    private String clusterServer2;
 
     @Column(name = "db_server")
-    private String dbServer;
+    private String dbServer2;
 
     @Column(name = "db_user")
-    private String dbUser;
+    private String dbUser2;
 
     @Column(name = "db_password")
-    private String dbPassword;
+    private String dbPassword2;
 
     @Column(name = "backup_location")
-    private String backupLocation;
+    private String backupLocation2;
+
+    @Column(name = "retention_period")
+    private String daysKeep2;
+
+    @Column(name = "cluster_admin")
+    private boolean clusterAdmin2;
+
+    @Column(name = "cluster_username")
+    private String clusterUsername2;
+
+    @Column(name = "cluster_password")
+    private String clusterPassword2;
+
+
+    private String encrypt(String data) {
+        return Base64.getEncoder().encodeToString(data.getBytes());
+    }
+
+    private String decrypt(String encryptedData) {
+        return new String(Base64.getDecoder().decode(encryptedData));
+    }
 
     public Long getId() {
         return id;
@@ -45,12 +69,12 @@ public class BackupSchedule {
         this.id = id;
     }
 
-    public String getDatabaseName() {
-        return databaseName;
+    public String getDatabaseName2() {
+        return databaseName2;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public void setDatabaseName2(String databaseName2) {
+        this.databaseName2 = databaseName2;
     }
 
     public String getFrequency() {
@@ -69,51 +93,83 @@ public class BackupSchedule {
         this.day = day;
     }
 
-    public String getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
-    public String getClusterServer() {
-        return clusterServer;
+    public String getClusterServer2() {
+        return clusterServer2;
     }
 
-    public void setClusterServer(String clusterServer) {
-        this.clusterServer = clusterServer;
+    public void setClusterServer2(String clusterServer2) {
+        this.clusterServer2 = clusterServer2;
     }
 
-    public String getDbServer() {
-        return dbServer;
+    public String getDbServer2() {
+        return dbServer2;
     }
 
-    public void setDbServer(String dbServer) {
-        this.dbServer = dbServer;
+    public void setDbServer2(String dbServer2) {
+        this.dbServer2 = dbServer2;
     }
 
-    public String getDbUser() {
-        return dbUser;
+    public String getDbUser2() {
+        return dbUser2;
     }
 
-    public void setDbUser(String dbUser) {
-        this.dbUser = dbUser;
+    public void setDbUser2(String dbUser2) {
+        this.dbUser2 = dbUser2;
     }
 
-    public String getDbPassword() {
-        return dbPassword;
+    public String getDbPassword2() {
+        return dbPassword2;
     }
 
-    public void setDbPassword(String dbPassword) {
-        this.dbPassword = dbPassword;
+    public void setDbPassword2(String dbPassword2) {
+        this.dbPassword2 = dbPassword2;
     }
 
-    public String getBackupLocation() {
-        return backupLocation;
+    public String getBackupLocation2() {
+        return backupLocation2;
     }
 
-    public void setBackupLocation(String backupLocation) {
-        this.backupLocation = backupLocation;
+    public void setBackupLocation2(String backupLocation2) {
+        this.backupLocation2 = backupLocation2;
+    }
+
+    public String getDaysKeep2() {
+        return daysKeep2;
+    }
+
+    public void setDaysKeep2(String daysKeep2) {
+        this.daysKeep2 = daysKeep2;
+    }
+
+    public boolean isClusterAdmin2() {
+        return clusterAdmin2;
+    }
+
+    public void setClusterAdmin2(boolean clusterAdmin2) {
+        this.clusterAdmin2 = clusterAdmin2;
+    }
+
+    public String getClusterUsername2() {
+        return clusterUsername2;
+    }
+
+    public void setClusterUsername2(String clusterUsername2) {
+        this.clusterUsername2 = clusterUsername2;
+    }
+
+    public String getClusterPassword2() {
+        return clusterPassword2;
+    }
+
+    public void setClusterPassword2(String clusterPassword2) {
+        this.clusterPassword2 = clusterPassword2;
     }
 }

@@ -35,10 +35,10 @@ public class BackupHistoryController {
         response.setHeader("Content-Disposition", "attachment; filename=backup_history.csv");
 
         PrintWriter writer = response.getWriter();
-        writer.println("Status,Date,Database Name");
+        writer.println("Status,Date,Database Name, Backup Location, Retention Period");
 
         for (BackupHistory backup : backups) {
-            writer.println(backup.getStatus()+ "," + backup.getBackup_time() + "," + backup.getDatabase_name());
+            writer.println(backup.getStatus()+ "," + backup.getBackup_time() + "," + backup.getDatabase_name() + "," + backup.getBackup_location() + "," + backup.getRetention_period());
         }
 
         writer.flush();

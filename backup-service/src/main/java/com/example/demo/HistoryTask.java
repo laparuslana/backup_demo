@@ -21,6 +21,17 @@ public class HistoryTask {
     @Column(name = "database_name")
     private String database_name;
 
+    @Column(name = "retention_period")
+    private String retention_period;
+
+    public String getRetention_period() {
+        return retention_period;
+    }
+
+    public void setRetention_period(String retention_period) {
+        this.retention_period = retention_period;
+    }
+
     public String getBackup_location() {
         return backup_location;
     }

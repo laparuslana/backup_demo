@@ -14,25 +14,33 @@ public class BackupService {
     @Autowired
     private BackupHistoryRepository backupHistoryRepository;
 
-    public String startBackup(BackupRequest request) {
+    public void startBackup(BackupRequest request) {
+        String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
+
         String command = buildBackupCommand(
                 request.getClusterServer(),
                 request.getDatabaseName(),
                 request.getDbServer(),
                 request.getDbUser(),
                 request.getDbPassword(),
-                request.getBackupLocation()
+                request.getBackupLocation(),
+                retentionPeriod,
+                request.isClusterAdmin(),
+                request.getClusterUsername(),
+                request.getClusterPassword()
         );
 
-        return executeBackupCommand(command, request.getDatabaseName(), request.getBackupLocation());
+        executeBackupCommand(command, request.getDatabaseName(), request.getBackupLocation(), retentionPeriod);
     }
 
-    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation) {
-        return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s ",
-                clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation);
+    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword) {
+        return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %b %s %s",
+                clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, clusterAdmin,
+                clusterUsername != null ? clusterUsername : "",
+                clusterPassword != null ? clusterPassword : "");
     }
 
-    private String executeBackupCommand(String command, String databaseName, String backup_location) {
+    private void executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -56,21 +64,20 @@ public class BackupService {
                 status = "Backup failed with exit code: " + exitCode;
             }
 
-            logBackup(databaseName, status, backup_location);
-            return status + "/n" + output;
+            logBackup(databaseName, status, backup_location, retentionPeriod);
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logBackup(databaseName, status, backup_location);
-            return status;
+            logBackup(databaseName, status, backup_location, retentionPeriod);
         }
     }
- private void logBackup(String databaseName, String status, String backup_location) {
+ private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
         BackupHistory backupHistory = new BackupHistory();
         backupHistory.setDatabase_name(databaseName);
         backupHistory.setStatus(status);
         backupHistory.setBackup_time(LocalDateTime.now());
         backupHistory.setBackup_location(backup_location);
+        backupHistory.setRetention_period(retentionPeriod);
         backupHistoryRepository.save(backupHistory);
  }
 

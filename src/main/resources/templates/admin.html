@@ -204,159 +204,6 @@
             margin-bottom: 5px;
         }
 </style>
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--            background: linear-gradient(to right, #0f172a, #1e3a8a);-->
-<!--            color: white;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            align-items: center;-->
-<!--            height: 100vh;-->
-<!--        }-->
-
-<!--        header {-->
-<!--            background-color: #333;-->
-<!--            color: white;-->
-<!--            padding: 15px 20px;-->
-<!--            width: 100%;-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: center;-->
-<!--        }-->
-
-<!--        .menu {-->
-<!--            display: flex;-->
-<!--            gap: 20px;-->
-<!--            align-items: center;-->
-<!--        }-->
-
-<!--        .menu a {-->
-<!--            color: white;-->
-<!--            text-decoration: none;-->
-<!--            font-size: 16px;-->
-<!--            padding: 10px;-->
-<!--        }-->
-
-<!--        .menu a, .dropdown {-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            text-decoration: none;-->
-<!--            color: white;-->
-<!--            font-size: 16px;-->
-<!--            padding: 10px;-->
-<!--        }-->
-
-
-<!--        .menu a:hover {-->
-<!--            background-color: rgba(255, 255, 255, 0.2);-->
-<!--            border-radius: 5px;-->
-<!--        }-->
-
-<!--        .dropdown {-->
-<!--            position: relative;-->
-<!--            display: inline-block;-->
-<!--        }-->
-<!--        .dropdown-content {-->
-<!--            display: none;-->
-<!--            position: absolute;-->
-<!--            background-color: #004080;-->
-<!--            min-width: 150px;-->
-<!--            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);-->
-<!--            z-index: 1;-->
-<!--        }-->
-<!--        .dropdown-content a {-->
-<!--            color: white;-->
-<!--            padding: 10px;-->
-<!--            display: block;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-<!--        .dropdown-content a:hover {-->
-<!--            background-color: #0056b3;-->
-<!--        }-->
-<!--        .dropdown:hover .dropdown-content {-->
-<!--            display: block;-->
-<!--        }-->
-
-<!--        main {-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            align-items: center;-->
-<!--            justify-content: center;-->
-<!--            flex-grow: 1;-->
-<!--        }-->
-
-<!--        input[type="text"] {-->
-<!--            padding: 10px;-->
-<!--            font-size: 16px;-->
-<!--            margin-bottom: 20px;-->
-<!--            width: 300px;-->
-<!--            border: none;-->
-<!--            border-radius: 5px;-->
-<!--            outline: none;-->
-<!--        }-->
-
-<!--        .buttons {-->
-<!--            display: flex;-->
-<!--            gap: 10px;-->
-<!--        }-->
-
-<!--        button {-->
-<!--            padding: 10px 20px;-->
-<!--            font-size: 16px;-->
-<!--            border: none;-->
-<!--            border-radius: 5px;-->
-<!--            cursor: pointer;-->
-<!--            transition: background 0.3s;-->
-<!--        }-->
-
-<!--        .btn-primary { background: #4CAF50; color: white; }-->
-<!--        .btn-primary:hover { background: #45a049; }-->
-
-<!--        .btn-secondary { background: #008CBA; color: white; }-->
-<!--        .btn-secondary:hover { background: #007bb5; }-->
-
-<!--        .btn-danger { background: #f44336; color: white; }-->
-<!--        .btn-danger:hover { background: #da190b; }-->
-
-
-<!--        .popup {-->
-<!--            display: none;-->
-<!--            position: fixed;-->
-<!--            top: 50%;-->
-<!--            left: 50%;-->
-<!--            transform: translate(-50%, -50%);-->
-<!--            width: 400px;-->
-<!--            max-height: 500px;-->
-<!--            overflow-y: auto;-->
-<!--            background-color: white;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--        }-->
-<!--        .popup-content {-->
-<!--            background-color: white;-->
-<!--            max-height: 500px;-->
-<!--            padding: 20px;-->
-<!--            margin: 0;-->
-<!--            border-radius: 5px;-->
-<!--            width: 400px;-->
-<!--        }-->
-<!--        .popup input, .popup select {-->
-<!--            width: 100%;-->
-<!--            padding: 8px;-->
-<!--            margin: 10px 0;-->
-<!--        }-->
-<!--        .popup button {-->
-<!--            padding: 10px;-->
-<!--            background-color: #28a745;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-
-<!--    </style>-->
 </head>
 <body>
 <header>
@@ -411,9 +258,6 @@
             <label for="dbPassword">DB Password:</label>
             <input type="text" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
 
-            <label for="daysKeep">Days to keep backup:</label>
-            <input type="text" id="daysKeep" name="daysKeep" placeholder="Days To Keep" required>
-
             <div class="checkbox-group">
                 <input type="checkbox" id="clusterAdmin">
             <label for="clusterAdmin">Do you have cluster admin?</label>
@@ -438,30 +282,30 @@
         <h3>Auto Backup</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
 
-            <label for="databaseName">Choose database:</label>
-            <select id="databaseName2" name="databaseName">
+            <label for="databaseName2">Choose database:</label>
+            <select id="databaseName2" name="databaseName2">
                 <option value="test2">test2</option>
                 <option value="test">db1</option>
                 <!--                Example for now -->
             </select>
 
-            <label for="clusterServer">Cluster Server:</label>
-            <input type="text" id="clusterServer2" name="clusterServer" placeholder="Cluster Server" required>
+            <label for="clusterServer2">Cluster Server:</label>
+            <input type="text" id="clusterServer2" name="clusterServer2" placeholder="Cluster Server" required>
 
-            <label for="dbServer">DB Server:</label>
-            <input type="text" id="dbServer2" name="dbServer" placeholder="DB Server" required>
+            <label for="dbServer2">DB Server:</label>
+            <input type="text" id="dbServer2" name="dbServer2" placeholder="DB Server" required>
 
-            <label for="dbUser">DB User:</label>
-            <input type="text" id="dbUser2" name="dbUser" placeholder="DB User" required>
+            <label for="dbUser2">DB User:</label>
+            <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
 
-            <label for="backupLocation">Backup Location:</label>
-            <input type="text" id="backupLocation2" name="backupLocation" placeholder="backupLocation" required>
+            <label for="backupLocation2">Backup Location:</label>
+            <input type="text" id="backupLocation2" name="backupLocation2" placeholder="backupLocation" required>
 
-            <label for="dbPassword">DB Password:</label>
-            <input type="text" id="dbPassword2" name="dbPassword" placeholder="DB Password" required>
+            <label for="dbPassword2">DB Password:</label>
+            <input type="text" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
 
-            <label for="daysKeep">Days to keep backup:</label>
-            <input type="text" id="daysKeep2" name="daysKeep" placeholder="Days To Keep" required>
+            <label for="daysKeep2">Days to keep backup:</label>
+            <input type="text" id="daysKeep2" name="daysKeep2" placeholder="Days To Keep" required>
 
                 <label for="frequency">Frequency:</label>
                 <select id="frequency" name="frequency">
@@ -484,11 +328,11 @@
             </div>
 
             <div id="clusterCredentials2" style="display: none;">
-                <label for="clusterUsername">Cluster Username:</label>
-                <input type="text" id="clusterUsername2" placeholder="Cluster Username"><br>
+                <label for="clusterUsername2">Cluster Username:</label>
+                <input type="text" id="clusterUsername2" placeholder="Cluster Username2"><br>
 
-                <label for="clusterPassword">Cluster Password:</label>
-                <input type="text" id="clusterPassword2" placeholder="Cluster Password"><br>
+                <label for="clusterPassword2">Cluster Password:</label>
+                <input type="text" id="clusterPassword2" placeholder="Cluster Password2"><br>
             </div>
 
             <button type="submit" id="autosubmit">Do backup</button>
@@ -695,22 +539,23 @@
     submitButtom.addEventListener('click',(event)=> {
         event.preventDefault();
 
-        let backupData = {
-            clusterServer: document.getElementById("clusterServer2").value,
-            databaseName: document.getElementById("databaseName2").value,
-            dbServer: document.getElementById("dbServer2").value,
-            dbUser: document.getElementById("dbUser2").value,
-            dbPassword: document.getElementById("dbPassword2").value,
-            backupLocation: document.getElementById("backupLocation2").value,
+        let backupData2 = {
+            clusterServer2: document.getElementById("clusterServer2").value,
+            databaseName2: document.getElementById("databaseName2").value,
+            dbServer2: document.getElementById("dbServer2").value,
+            dbUser2: document.getElementById("dbUser2").value,
+            dbPassword2: document.getElementById("dbPassword2").value,
+            backupLocation2: document.getElementById("backupLocation2").value,
             frequency: document.getElementById("frequency").value,
             day: document.getElementById("day").value,
             time: document.getElementById("time").value,
-            clusterAdmin: document.getElementById("clusterAdmin2").checked
+            daysKeep2: document.getElementById("daysKeep2").value,
+            clusterAdmin2: document.getElementById("clusterAdmin2").checked
         };
 
-        if (backupData.clusterAdmin) {
-            backupData.clusterUsername = document.getElementById("clusterUsername2").value;
-            backupData.clusterPassword = document.getElementById("clusterPassword2").value;
+        if (backupData2.clusterAdmin2) {
+            backupData2.clusterUsername2 = document.getElementById("clusterUsername2").value;
+            backupData2.clusterPassword2 = document.getElementById("clusterPassword2").value;
         }
 
         fetch("/api/backup/save", {
@@ -718,7 +563,7 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(backupData)
+            body: JSON.stringify(backupData2)
         })
             .then(response => {
                 if (!response.ok) {

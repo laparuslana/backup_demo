@@ -7,40 +7,108 @@ public class BackupRequest {
     private String dbUser;
     private String dbPassword;
     private String backupLocation;
-//    private String daysKeep;
+    private String retentionPeriod;
+    private boolean clusterAdmin;
+    private String clusterUsername;
+    private String clusterPassword;
 
-    public BackupRequest() {}
 
-    public BackupRequest(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation) {
+    public String getRetentionPeriod() {
+        return retentionPeriod;
+    }
+
+    public void setRetentionPeriod(String retentionPeriod) {
+        this.retentionPeriod = retentionPeriod;
+    }
+
+    public boolean isClusterAdmin() {
+        return clusterAdmin;
+    }
+
+    public void setClusterAdmin(boolean clusterAdmin) {
+        this.clusterAdmin = clusterAdmin;
+    }
+
+    public String getClusterUsername() {
+        return clusterUsername;
+    }
+
+    public void setClusterUsername(String clusterUsername) {
+        this.clusterUsername = clusterUsername;
+    }
+
+    public String getClusterPassword() {
+        return clusterPassword;
+    }
+
+    public void setClusterPassword(String clusterPassword) {
+        this.clusterPassword = clusterPassword;
+    }
+
+
+    public BackupRequest() {
+    }
+
+    public BackupRequest(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword) {
         this.clusterServer = clusterServer;
         this.databaseName = databaseName;
         this.dbServer = dbServer;
         this.dbUser = dbUser;
         this.dbPassword = dbPassword;
         this.backupLocation = backupLocation;
-//        this.daysKeep = daysKeep;
+        this.retentionPeriod = retentionPeriod;
+        this.clusterAdmin = clusterAdmin;
+        this.clusterUsername = clusterUsername;
+        this.clusterPassword = clusterPassword;
     }
 
     // Getters and Setters
-    public String getClusterServer() { return clusterServer; }
-    public void setClusterServer(String clusterServer) { this.clusterServer = clusterServer; }
+    public String getClusterServer() {
+        return clusterServer;
+    }
 
-    public String getDatabaseName() { return databaseName; }
-    public void setDatabaseName(String databaseName) { this.databaseName = databaseName; }
+    public void setClusterServer(String clusterServer) {
+        this.clusterServer = clusterServer;
+    }
 
-    public String getDbServer() { return dbServer; }
-    public void setDbServer(String dbServer) { this.dbServer = dbServer; }
+    public String getDatabaseName() {
+        return databaseName;
+    }
 
-    public String getDbUser() { return dbUser; }
-    public void setDbUser(String dbUser) { this.dbUser = dbUser; }
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
-    public String getDbPassword() { return dbPassword; }
-    public void setDbPassword(String dbPassword) { this.dbPassword = dbPassword; }
+    public String getDbServer() {
+        return dbServer;
+    }
 
-    public String getBackupLocation() { return backupLocation; }
-    public void setBackupLocation(String backupLocation) { this.backupLocation = backupLocation; }
-//
-//    public String getDaysKeep() { return daysKeep; }
-//    public void setDaysKeep(String daysKeep) { this.daysKeep = daysKeep; }
+    public void setDbServer(String dbServer) {
+        this.dbServer = dbServer;
+    }
+
+    public String getDbUser() {
+        return dbUser;
+    }
+
+    public void setDbUser(String dbUser) {
+        this.dbUser = dbUser;
+    }
+
+    public String getDbPassword() {
+        return dbPassword;
+    }
+
+    public void setDbPassword(String dbPassword) {
+        this.dbPassword = dbPassword;
+    }
+
+    public String getBackupLocation() {
+        return backupLocation;
+    }
+
+    public void setBackupLocation(String backupLocation) {
+        this.backupLocation = backupLocation;
+    }
 }
 

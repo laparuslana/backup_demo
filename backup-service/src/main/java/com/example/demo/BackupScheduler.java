@@ -113,9 +113,13 @@ public class BackupScheduler {
     }
     private void executeBackup(ScheduledBackup schedule) {
         String command = String.format(
-                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s",
-                schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation()
+                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s %s %b %s %s",
+                schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation(), schedule.getDaysKeep(),
+                schedule.isClusterAdmin(),
+                schedule.getClusterUsername() != null ? schedule.getClusterUsername() : "",
+                schedule.getClusterPassword() != null ? schedule.getClusterPassword() : ""
         );
+
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -139,20 +143,21 @@ public class BackupScheduler {
                 status = "Backup failed with exit code: " + exitCode;
             }
 
-            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation());
+            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation(), schedule.getDaysKeep());
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation());
+            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation(), schedule.getDaysKeep());
         }
         }
 
-    private void logBackup(String databaseName, String status, String backup_location) {
+    private void logBackup(String databaseName, String status, String backup_location, String retention_days) {
         HistoryTask backupHistory = new HistoryTask();
         backupHistory.setDatabase_name(databaseName);
         backupHistory.setStatus(status);
         backupHistory.setBackup_time(LocalDateTime.now());
         backupHistory.setBackup_location(backup_location);
+        backupHistory.setRetention_period(retention_days);
         historyRepository.save(backupHistory);
     }
 
