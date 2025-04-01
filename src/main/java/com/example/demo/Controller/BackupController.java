@@ -1,13 +1,19 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.*;
+import lombok.Getter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 public class BackupController {
@@ -33,4 +39,10 @@ public class BackupController {
         return ResponseEntity.ok(Collections.singletonMap("message", "Created user"));
     }
 
-}
+    @GetMapping("/api/backup/listDatabases")
+    public List<String> listDatabases(@RequestParam String dbServer,
+                                      @RequestParam String dbUser,
+                                      @RequestParam String dbPassword) {
+        return backupService.getDatabases(dbServer, dbUser, dbPassword);
+        }
+    }

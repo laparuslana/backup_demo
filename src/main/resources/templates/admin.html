@@ -236,13 +236,6 @@
         <h3 style="color: #0f172a">Manually backup</h3>
         <form action="/api/backup/execute" method="post" id="backupForm">
 
-            <label for="databaseName">Choose database:</label>
-            <select id="databaseName" name="databaseName">
-                <option value="test2">test2</option>
-                <option value="test">db1</option>
-<!--                Example for now -->
-            </select>
-
             <label for="clusterServer">Cluster Server:</label>
             <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
 
@@ -252,15 +245,12 @@
             <label for="dbUser">DB User:</label>
             <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
 
-            <label for="backupLocation">Backup Location:</label>
-            <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>
-
             <label for="dbPassword">DB Password:</label>
             <input type="text" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
 
             <div class="checkbox-group">
                 <input type="checkbox" id="clusterAdmin">
-            <label for="clusterAdmin">Do you have cluster admin?</label>
+                <label for="clusterAdmin">Do you have cluster admin?</label>
             </div>
 
             <div id="clusterCredentials" style="display: none;">
@@ -270,6 +260,14 @@
                 <label for="clusterPassword">Cluster Password:</label>
                 <input type="text" id="clusterPassword" placeholder="Cluster Password"><br>
             </div>
+
+            <label for="databaseName">Choose database:</label>
+            <select id="databaseName" name="databaseName">
+                <option value="">Loading...</option>
+            </select>
+
+            <label for="backupLocation">Backup Location:</label>
+            <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>
 
             <button type="submit" id="submit">Do backup</button>
         </form>
@@ -282,13 +280,6 @@
         <h3>Auto Backup</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
 
-            <label for="databaseName2">Choose database:</label>
-            <select id="databaseName2" name="databaseName2">
-                <option value="test2">test2</option>
-                <option value="test">db1</option>
-                <!--                Example for now -->
-            </select>
-
             <label for="clusterServer2">Cluster Server:</label>
             <input type="text" id="clusterServer2" name="clusterServer2" placeholder="Cluster Server" required>
 
@@ -298,11 +289,29 @@
             <label for="dbUser2">DB User:</label>
             <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
 
-            <label for="backupLocation2">Backup Location:</label>
-            <input type="text" id="backupLocation2" name="backupLocation2" placeholder="backupLocation" required>
-
             <label for="dbPassword2">DB Password:</label>
             <input type="text" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="clusterAdmin2">
+                <label for="clusterAdmin2">Do you have cluster admin?</label>
+            </div>
+
+            <div id="clusterCredentials2" style="display: none;">
+                <label for="clusterUsername2">Cluster Username:</label>
+                <input type="text" id="clusterUsername2" placeholder="Cluster Username2"><br>
+
+                <label for="clusterPassword2">Cluster Password:</label>
+                <input type="text" id="clusterPassword2" placeholder="Cluster Password2"><br>
+            </div>
+
+            <label for="databaseName2">Choose database:</label>
+            <select id="databaseName2" name="databaseName2">
+                <option value="">Loading...</option>
+            </select>
+
+            <label for="backupLocation2">Backup Location:</label>
+            <input type="text" id="backupLocation2" name="backupLocation2" placeholder="backupLocation" required>
 
             <label for="daysKeep2">Days to keep backup:</label>
             <input type="text" id="daysKeep2" name="daysKeep2" placeholder="Days To Keep" required>
@@ -322,18 +331,6 @@
                 <label for="time">Time:</label>
                 <input type="time" id="time" name="time" required>
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="clusterAdmin2">
-                <label for="clusterAdmin2">Do you have cluster admin?</label>
-            </div>
-
-            <div id="clusterCredentials2" style="display: none;">
-                <label for="clusterUsername2">Cluster Username:</label>
-                <input type="text" id="clusterUsername2" placeholder="Cluster Username2"><br>
-
-                <label for="clusterPassword2">Cluster Password:</label>
-                <input type="text" id="clusterPassword2" placeholder="Cluster Password2"><br>
-            </div>
 
             <button type="submit" id="autosubmit">Do backup</button>
         </form>
@@ -349,6 +346,7 @@
     function validatePassword(password) {
         return password.length >= 6;
     }
+
     function addUser() {
         let username, email, password, role;
 
@@ -379,8 +377,8 @@
 
         fetch('/req/users/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password, role })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, email, password, role})
         })
             .then(response => response.json())
             .then(data => alert(data.message))
@@ -424,8 +422,8 @@
 
         fetch(`/req/users/edit/${userId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: newUsername, email: newEmail, password: newPassword, role: newRole })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: newUsername, email: newEmail, password: newPassword, role: newRole})
         })
             .then(response => response.json())
             .then(data => alert(data.message))
@@ -452,13 +450,13 @@
         document.getElementById('backupPopup').style.display = 'none';
     }
 
-    document.getElementById("clusterAdmin").addEventListener("change", function() {
+    document.getElementById("clusterAdmin").addEventListener("change", function () {
         const clusterCredentials = document.getElementById("clusterCredentials");
         clusterCredentials.style.display = this.checked ? "block" : "none";
     });
 
     const submitButttom = document.getElementById("submit");
-    submitButttom.addEventListener('click',(event)=> {
+    submitButttom.addEventListener('click', (event) => {
         event.preventDefault();
 
         let backupData = {
@@ -474,7 +472,8 @@
         if (backupData.clusterAdmin) {
             backupData.clusterUsername = document.getElementById("clusterUsername").value;
             backupData.clusterPassword = document.getElementById("clusterPassword").value;
-        };
+        }
+        ;
 
         fetch("/api/backup/execute", {
             method: "POST",
@@ -502,12 +501,12 @@
         document.getElementById('autoBackupPopup').style.display = 'none';
     }
 
-    document.getElementById("clusterAdmin2").addEventListener("change", function() {
+    document.getElementById("clusterAdmin2").addEventListener("change", function () {
         const clusterCredentials = document.getElementById("clusterCredentials2");
         clusterCredentials.style.display = this.checked ? "block" : "none";
     });
 
-    document.getElementById("frequency").addEventListener("change", function() {
+    document.getElementById("frequency").addEventListener("change", function () {
         let daySelection = document.getElementById("daySelection");
         let dayDropdown = document.getElementById("day");
 
@@ -536,7 +535,7 @@
 
 
     const submitButtom = document.getElementById("autosubmit");
-    submitButtom.addEventListener('click',(event)=> {
+    submitButtom.addEventListener('click', (event) => {
         event.preventDefault();
 
         let backupData2 = {
@@ -574,6 +573,88 @@
             .then(data => alert("✅ Backup started successfully!"))
             .catch(error => alert("❌ Error starting backup: " + error));
     });
+
+        document.addEventListener("DOMContentLoaded", () => {
+        const dbServerInput = document.getElementById("dbServer");
+        const dbUserInput = document.getElementById("dbUser");
+        const dbPasswordInput = document.getElementById("dbPassword");
+        const databaseNameSelect = document.getElementById("databaseName");
+
+        dbServerInput.addEventListener("change", loadDatabases);
+        dbUserInput.addEventListener("change", loadDatabases);
+        dbPasswordInput.addEventListener("change", loadDatabases);
+
+        function loadDatabases() {
+        const dbServer = dbServerInput.value;
+        const dbUser = dbUserInput.value;
+        const dbPassword = dbPasswordInput.value;
+
+        if (!dbServer || !dbUser || !dbPassword) return;
+
+        fetch(`/api/backup/listDatabases?dbServer=${encodeURIComponent(dbServer)}&dbUser=${encodeURIComponent(dbUser)}&dbPassword=${encodeURIComponent(dbPassword)}`)
+        .then(response => response.json())
+        .then(data => {
+        databaseNameSelect.innerHTML = "";
+        if (Array.isArray(data)) {
+        data.forEach(db => {
+        const option = document.createElement("option");
+        option.value = db;
+        option.textContent = db;
+        databaseNameSelect.appendChild(option);
+    });
+    } else {
+        databaseNameSelect.innerHTML = `<option value="">${data[0]}</option>`;
+    }
+    })
+        .catch(err => {
+        console.error("Error fetching databases:", err);
+        databaseNameSelect.innerHTML = `<option value="">Error loading databases</option>`;
+    });
+    }
+    loadDatabases();
+    })
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const dbServerInput2 = document.getElementById("dbServer2");
+        const dbUserInput2 = document.getElementById("dbUser2");
+        const dbPasswordInput2 = document.getElementById("dbPassword2");
+        const databaseNameSelect2 = document.getElementById("databaseName2");
+
+        dbServerInput2.addEventListener("change", loadDatabases);
+        dbUserInput2.addEventListener("change", loadDatabases);
+        dbPasswordInput2.addEventListener("change", loadDatabases);
+
+        function loadDatabases() {
+            const dbServer2 = dbServerInput2.value;
+            const dbUser2 = dbUserInput2.value;
+            const dbPassword2 = dbPasswordInput2.value;
+
+            if (!dbServer2 || !dbUser2 || !dbPassword2) return;
+
+            fetch(`/api/backup/listDatabases?dbServer=${encodeURIComponent(dbServer2)}&dbUser=${encodeURIComponent(dbUser2)}&dbPassword=${encodeURIComponent(dbPassword2)}`)
+                .then(response => response.json())
+                .then(data => {
+                    databaseNameSelect2.innerHTML = "";
+                    if (Array.isArray(data)) {
+                        data.forEach(db => {
+                            const option = document.createElement("option");
+                            option.value = db;
+                            option.textContent = db;
+                            databaseNameSelect2.appendChild(option);
+                        });
+                    } else {
+                        databaseNameSelect2.innerHTML = `<option value="">${data[0]}</option>`;
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching databases:", err);
+                    databaseNameSelect2.innerHTML = `<option value="">Error loading databases</option>`;
+                });
+        }
+        loadDatabases();
+    })
+
 </script>
 </body>
 </html>

@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BackupService {
@@ -86,6 +88,31 @@ public class BackupService {
 
     public void save(BackupSchedule schedule) {
         backupScheduleRepository.save(schedule);
+    }
+
+    public List<String> getDatabases(String dbServer, String dbUser, String dbPassword) {
+    List<String> databases = new ArrayList<>();
+   try {
+       String[] command = {
+               "/bin/bash", "src/main/resources/scripts/retrieveDatabases.sh",
+               dbServer, dbUser, dbPassword
+       };
+
+       ProcessBuilder processBuilder = new ProcessBuilder(command);
+       processBuilder.redirectErrorStream(true);
+       Process process = processBuilder.start();
+
+       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+       String line;
+       while ((line = reader.readLine()) != null) {
+           databases.add(line);
+       }
+
+       process.waitFor();
+   } catch (Exception e) {
+       e.printStackTrace();
+   }
+   return databases;
     }
 }
 
