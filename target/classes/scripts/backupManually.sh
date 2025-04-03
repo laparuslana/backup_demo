@@ -10,6 +10,11 @@ DAYS_TO_KEEP=$7
 CLUSTER_ADMIN=$8
 CLUSTER_USERNAME=$9
 CLUSTER_PASSWORD=${10}
+STORAGE_TYPE=${11}
+FTP_SERVER=${12}
+FTP_USER=${13}
+FTP_PASSWORD=${14}
+FTP_DIRECTORY=${15}
 DATA=$(date +"%Y%m%d")
 
 mkdir -p "$BACKUP_DIR"
@@ -30,9 +35,34 @@ else
     echo "❌ Error during backup for database: $DATABASE_NAME"
     exit 1
 fi
+if [ "$STORAGE_TYPE" = "ftp" ]; then
+    echo "🌐 Uploading to FTP server via Rsync: $FTP_SERVER"
+    RSYNC_PASSWORD="$FTP_PASSWORD" rsync -av --progress "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup" "$FTP_USER@$FTP_SERVER:$FTP_DIRECTORY/"
+    if [ $? -eq 0 ]; then
+        echo "✅ FTP upload successful: $FTP_SERVER/$FTP_DIRECTORY/$DATABASE_NAME_$DATA.backup"
 
-find "$BACKUP_DIR/" -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*.backup" -type f -exec rm -rf '{}' ';'
+        rm -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup"
+    else
+        echo "❌ FTP upload failed"
+        exit 1
+    fi
+fi
+
+BACKUP_COUNT=$(find "$BACKUP_DIR" -type f -name "*.backup" | wc -l)
+if [ "$BACKUP_COUNT" -gt 3 ]; then
+    find "$BACKUP_DIR/" -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*.backup" -type f -exec rm -rf '{}' ';'
+    echo "🗑️  Old backups deleted (older than $DAYS_TO_KEEP days)"
+else
+    echo "ℹ️  Keeping minimum of 3 backups"
+fi
 
 ls -l "$BACKUP_DIR/"
 
 echo "✅ Backup process completed."
+
+#
+#find "$BACKUP_DIR/" -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*.backup" -type f -exec rm -rf '{}' ';'
+#
+#ls -l "$BACKUP_DIR/"
+#
+#echo "✅ Backup process completed."

@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
@@ -51,6 +52,13 @@ public class BackupSchedule {
 
     @Column(name = "cluster_password")
     private String clusterPassword2;
+
+    @Column(name = "storage_params", columnDefinition = "json")
+    @Convert(converter = JsonNodeConverter.class)
+    private JsonNode storageParams;
+
+    @Column(name = "storage_type", nullable = false)
+    private String storageType;
 
 
     private String encrypt(String data) {
@@ -130,7 +138,7 @@ public class BackupSchedule {
     }
 
     public void setDbPassword2(String dbPassword2) {
-        this.dbPassword2 = dbPassword2;
+        this.dbPassword2 = encrypt(dbPassword2);
     }
 
     public String getBackupLocation2() {
@@ -170,6 +178,24 @@ public class BackupSchedule {
     }
 
     public void setClusterPassword2(String clusterPassword2) {
-        this.clusterPassword2 = clusterPassword2;
+        this.clusterPassword2 = encrypt(clusterPassword2);
     }
+
+    public JsonNode getStorageParams() {
+        return storageParams;
+    }
+
+    public void setStorageParams(JsonNode storageParams) {
+        this.storageParams = storageParams;
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = storageType;
+    }
+
+
 }

@@ -290,7 +290,7 @@
             <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
 
             <label for="dbPassword2">DB Password:</label>
-            <input type="text" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
+            <input type="password" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
 
             <div class="checkbox-group">
                 <input type="checkbox" id="clusterAdmin2">
@@ -302,16 +302,35 @@
                 <input type="text" id="clusterUsername2" placeholder="Cluster Username2"><br>
 
                 <label for="clusterPassword2">Cluster Password:</label>
-                <input type="text" id="clusterPassword2" placeholder="Cluster Password2"><br>
+                <input type="password" id="clusterPassword2" placeholder="Cluster Password2"><br>
             </div>
+
+            <label for="storageType">Storage Type:</label>
+            <select id="storageType" name="storageType" required>
+                <option value="local">Local</option>
+                <option value="ftp">FTP</option>
+            </select>
 
             <label for="databaseName2">Choose database:</label>
             <select id="databaseName2" name="databaseName2">
                 <option value="">Loading...</option>
             </select>
 
+            <div id="localPathContainer">
             <label for="backupLocation2">Backup Location:</label>
             <input type="text" id="backupLocation2" name="backupLocation2" placeholder="backupLocation" required>
+            </div>
+
+            <div id="ftpContainer" style="display: none;">
+                <label for="ftpServer">FTP Server:</label>
+                <input type="text" id="ftpServer" name="ftpServer" placeholder="ftp.example.com" required>
+                <label for="ftpUser">FTP User:</label>
+                <input type="text" id="ftpUser" name="ftpUser" placeholder="username" required>
+                <label for="ftpPassword">FTP Password:</label>
+                <input type="password" id="ftpPassword" name="ftpPassword" placeholder="password" required>
+                <label for="ftpDirectory">FTP Directory:</label>
+                <input type="text" id="ftpDirectory" name="ftpDirectory" placeholder="/backups" required>
+            </div>
 
             <label for="daysKeep2">Days to keep backup:</label>
             <input type="text" id="daysKeep2" name="daysKeep2" placeholder="Days To Keep" required>
@@ -544,17 +563,30 @@
             dbServer2: document.getElementById("dbServer2").value,
             dbUser2: document.getElementById("dbUser2").value,
             dbPassword2: document.getElementById("dbPassword2").value,
-            backupLocation2: document.getElementById("backupLocation2").value,
             frequency: document.getElementById("frequency").value,
             day: document.getElementById("day").value,
             time: document.getElementById("time").value,
             daysKeep2: document.getElementById("daysKeep2").value,
-            clusterAdmin2: document.getElementById("clusterAdmin2").checked
+            clusterAdmin2: document.getElementById("clusterAdmin2").checked,
+            storageType: document.getElementById("storageType").value,
+            storageParams: {}
         };
 
         if (backupData2.clusterAdmin2) {
             backupData2.clusterUsername2 = document.getElementById("clusterUsername2").value;
             backupData2.clusterPassword2 = document.getElementById("clusterPassword2").value;
+        }
+
+        if (backupData2.storageType ==="local") {
+            backupData2.backupLocation2 = document.getElementById("backupLocation2").value;
+        }
+        if (backupData2.storageType === "ftp") {
+            backupData2.storageParams = {
+                ftpServer: document.getElementById("ftpServer").value,
+                ftpUser: document.getElementById("ftpUser").value,
+                ftpPassword: document.getElementById("ftpPassword").value,
+                ftpDirectory: document.getElementById("ftpDirectory").value
+            };
         }
 
         fetch("/api/backup/save", {
@@ -655,6 +687,17 @@
         loadDatabases();
     })
 
+    const storageTypeSelect = document.getElementById("storageType");
+    const localPathContainer = document.getElementById("localPathContainer");
+    const ftpContainer = document.getElementById("ftpContainer");
+
+    storageTypeSelect.addEventListener("change", () => {
+        const selectedType = storageTypeSelect.value;
+
+        localPathContainer.style.display = selectedType === "local" ? "block" : "none";
+        ftpContainer.style.display = selectedType === "ftp" ? "block" : "none";
+
+        });
 </script>
 </body>
 </html>
