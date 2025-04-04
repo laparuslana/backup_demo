@@ -1,4 +1,4 @@
-package com.example.demo.Model;
+package com.example.demo.Security;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +26,7 @@ public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
             return dbData == null ? null : objectMapper.readTree(dbData);
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error coonverting String", e);
+            throw new IllegalArgumentException("Error converting String", e);
         }
     }
 }

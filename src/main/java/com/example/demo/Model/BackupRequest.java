@@ -1,5 +1,7 @@
 package com.example.demo.Model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class BackupRequest {
     private String clusterServer;
     private String databaseName;
@@ -11,7 +13,25 @@ public class BackupRequest {
     private boolean clusterAdmin;
     private String clusterUsername;
     private String clusterPassword;
+    private String storageType;
+    private JsonNode storageParams;
 
+
+    public JsonNode getStorageParams() {
+        return storageParams;
+    }
+
+    public void setStorageParams(JsonNode storageParams) {
+        this.storageParams = storageParams;
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = storageType;
+    }
 
     public String getRetentionPeriod() {
         return retentionPeriod;

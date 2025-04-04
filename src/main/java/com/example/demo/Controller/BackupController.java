@@ -29,12 +29,13 @@ public class BackupController {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Backup started");
 
-        backupService.startBackup(request);
+        System.out.println(backupService.startBackup(request));
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/api/backup/save", consumes = "application/json")
     public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule){
+
         backupService.save(backupSchedule);
         return ResponseEntity.ok(Collections.singletonMap("message", "Created user"));
     }

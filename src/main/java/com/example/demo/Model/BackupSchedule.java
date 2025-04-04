@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import com.example.demo.Security.JsonNodeConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 
@@ -55,10 +56,26 @@ public class BackupSchedule {
 
     @Column(name = "storage_params", columnDefinition = "json")
     @Convert(converter = JsonNodeConverter.class)
-    private JsonNode storageParams;
+    private JsonNode storageParams2;
+
+    public String getStorageType2() {
+        return storageType2;
+    }
+
+    public void setStorageType2(String storageType2) {
+        this.storageType2 = storageType2;
+    }
+
+    public JsonNode getStorageParams2() {
+        return storageParams2;
+    }
+
+    public void setStorageParams2(JsonNode storageParams2) {
+        this.storageParams2 = storageParams2;
+    }
 
     @Column(name = "storage_type", nullable = false)
-    private String storageType;
+    private String storageType2;
 
 
     private String encrypt(String data) {
@@ -182,20 +199,13 @@ public class BackupSchedule {
     }
 
     public JsonNode getStorageParams() {
-        return storageParams;
+        return storageParams2;
     }
 
-    public void setStorageParams(JsonNode storageParams) {
-        this.storageParams = storageParams;
+    public void setStorageParams(JsonNode storageParams2) {
+        this.storageParams2 = storageParams2;
     }
 
-    public String getStorageType() {
-        return storageType;
-    }
-
-    public void setStorageType(String storageType) {
-        this.storageType = storageType;
-    }
 
 
 }

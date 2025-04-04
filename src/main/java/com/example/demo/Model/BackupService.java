@@ -1,5 +1,7 @@
 package com.example.demo.Model;
 
+
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,8 @@ import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 
 @Service
 public class BackupService {
@@ -16,7 +20,8 @@ public class BackupService {
     @Autowired
     private BackupHistoryRepository backupHistoryRepository;
 
-    public void startBackup(BackupRequest request) {
+
+    public String startBackup(BackupRequest request) {
         String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
 
         String command = buildBackupCommand(
@@ -29,20 +34,41 @@ public class BackupService {
                 retentionPeriod,
                 request.isClusterAdmin(),
                 request.getClusterUsername(),
-                request.getClusterPassword()
+                request.getClusterPassword(),
+                request.getStorageType(),
+                request.getStorageParams()
         );
+        String storagePath;
+        if (Objects.equals(request.getStorageType(), "local")) {
+            storagePath = request.getBackupLocation();
+        } else if (Objects.equals(request.getStorageType(), "ftp")) {
+            storagePath = request.getStorageParams().toString();
+        } else {
+            throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());
+        }
 
-        executeBackupCommand(command, request.getDatabaseName(), request.getBackupLocation(), retentionPeriod);
+        String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod);
+        return "ARGS: " + command + "LOGS" + logs;
     }
 
-    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword) {
-        return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %b %s %s",
-                clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, clusterAdmin,
-                clusterUsername != null ? clusterUsername : "",
-                clusterPassword != null ? clusterPassword : "");
+
+    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword, String storageType, JsonNode storageParams) {
+        try {
+
+            String ftpServer = storageParams != null ? storageParams.get("ftpServer").asText() : "";
+            String ftpUser = storageParams != null ? storageParams.get("ftpUser").asText() : "";
+            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword").asText() : "";
+            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory").asText() : "";
+
+            return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
+                    clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, clusterAdmin,
+                    clusterUsername, clusterPassword, storageType, ftpServer, ftpUser, ftpPassword, ftpDirectory);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while extracting storage parameters", e);
+        }
     }
 
-    private void executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod) {
+    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -72,6 +98,7 @@ public class BackupService {
             status = "❌ Error executing backup: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod);
         }
+        return output.toString();
     }
  private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
         BackupHistory backupHistory = new BackupHistory();
