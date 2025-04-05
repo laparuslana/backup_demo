@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -112,12 +113,20 @@ public class BackupScheduler {
         }
     }
     private void executeBackup(ScheduledBackup schedule) {
+
+        JsonNode storageParams = schedule.getStorageParams();
+        String ftpServer = storageParams != null ? storageParams.get("ftpServer").asText() : "";
+        String ftpUser = storageParams != null ? storageParams.get("ftpUser").asText() : "";
+        String ftpPassword = storageParams != null ? storageParams.get("ftpPassword").asText() : "";
+        String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory").asText() : "";
+
         String command = String.format(
-                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s %s %b %s %s",
+                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
                 schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation(), schedule.getDaysKeep(),
                 schedule.isClusterAdmin(),
-                schedule.getClusterUsername() != null ? schedule.getClusterUsername() : "",
-                schedule.getClusterPassword() != null ? schedule.getClusterPassword() : ""
+                schedule.getClusterUsername(),
+                schedule.getClusterPassword(),
+                schedule.getStorageType(), ftpServer, ftpUser, ftpPassword, ftpDirectory
         );
 
         StringBuilder output = new StringBuilder();

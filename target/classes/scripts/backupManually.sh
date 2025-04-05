@@ -11,28 +11,21 @@ CLUSTER_ADMIN=$8
 CLUSTER_USERNAME=$9
 CLUSTER_PASSWORD="${10}"
 STORAGE_TYPE="${11}"
-STORAGE_PARAMS="${12}"
 DATA=$(date +"%Y%m%d")
 
 if [ "$STORAGE_TYPE" != "ftp" ]; then
   mkdir -p "$BACKUP_DIR"
 fi
-#FTP_SERVER="${12}"
-#FTP_USER="${13}"
-#FTP_PASSWORD="${14}"
-#FTP_DIRECTORY="${15}"
-#
-#echo "FTP Server: $FTP_SERVER"
-#echo "FTP User: $FTP_USER"
-#echo "FTP Password: $FTP_PASSWORD"
-#echo "FTP Directory: $FTP_DIRECTORY"
+FTP_SERVER="${12}"
+FTP_USER="${13}"
+FTP_PASSWORD="${14}"
+FTP_DIRECTORY="${15}"
 
-echo "🌐 Storage Parameters: $STORAGE_PARAMS"
-FTP_SERVER=$(echo "$STORAGE_PARAMS" | jq -r '.ftpServer')
-FTP_USER=$(echo "$STORAGE_PARAMS" | jq -r '.ftpUser')
-FTP_PASSWORD=$(echo "$STORAGE_PARAMS" | jq -r '.ftpPassword')
-FTP_DIRECTORY=$(echo "$STORAGE_PARAMS" | jq -r '.ftpDirectory')
-echo "Extracted: $FTP_SERVER, $FTP_USER, $FTP_DIRECTORY, $FTP_PASSWORD"
+echo "FTP Server: $FTP_SERVER"
+echo "FTP User: $FTP_USER"
+echo "FTP Password: $FTP_PASSWORD"
+echo "FTP Directory: $FTP_DIRECTORY"
+
 
 if [ "$CLUSTER_ADMIN" = "true" ]; then
     echo "Cluster admin mode enabled."

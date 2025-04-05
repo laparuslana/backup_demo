@@ -29,7 +29,7 @@ public class BackupController {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Backup started");
 
-        System.out.println(backupService.startBackup(request));
+        backupService.startBackup(request);
         return ResponseEntity.ok(response);
     }
 

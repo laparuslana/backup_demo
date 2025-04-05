@@ -27,6 +27,21 @@
             align-items: center;
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
         .menu {
             display: flex;
             gap: 20px;
@@ -221,6 +236,14 @@
         <a href="http://localhost:8080/req/backup-history/download">Backup history</a>
         <a href="/logout">Logout</a>
     </div>
+    <script src="/js/users.js" defer></script>
+    <script src="/js/popupHandlers.js" defer></script>
+    <script src="/js/loadDatabases.js" defer></script>
+    <script src="/js/storageHandlers.js" defer></script>
+    <script src="/js/validation.js" defer></script>
+    <script src="/js/backup.js" defer></script>
+    <script src="/js/autoBackup.js" defer></script>
+    <script src="/js/backupHistory.js"></script>
 </header>
 <main>
     <input type="text" placeholder="Enter text here...">
@@ -229,6 +252,16 @@
         <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
         <button class="btn-danger">Restore the copy</button>
     </div>
+    <h2>Backup history statistics</h2>
+    <table id="backupTable">
+        <tr>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Database Name</th>
+            <th>Backup Location</th>
+            <th>Retention Period</th>
+        </tr>
+    </table>
 </main>
 
 <div class="popup" id="backupPopup">
@@ -375,371 +408,5 @@
         <button onclick="closeAutoPopup()">Close</button>
     </div>
 </div>
-
-<script>
-    function validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function validatePassword(password) {
-        return password.length >= 6;
-    }
-
-    function addUser() {
-        let username, email, password, role;
-
-        while (!username) {
-            username = prompt("Enter new username:");
-            if (username === null) return;
-        }
-
-        while (!email || !email.includes("@")) {
-            email = prompt("Enter user email:");
-            if (email === null) return;
-            if (!validateEmail(email)) alert("Invalid email! Please enter a valid email.");
-        }
-
-        while (!password || password.length < 6) {
-            password = prompt("Enter user password (at least 6 characters):");
-            if (password === null) return;
-            if (!validatePassword(password)) alert("Password must be at least 6 characters long!");
-        }
-
-        while (true) {
-            role = prompt("Enter role (USER or ADMIN):");
-            if (role === null) return;
-            role = role.toUpperCase();
-            if (role === "USER" || role === "ADMIN") break;
-            alert("Invalid role! Only USER or ADMIN allowed.");
-        }
-
-        fetch('/req/users/add', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username, email, password, role})
-        })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => alert("Error: " + error));
-    }
-
-    function editUser() {
-        let userId, newUsername, newEmail, newPassword, newRole;
-
-        while (!userId) {
-            userId = prompt("Enter User ID to edit:");
-            if (userId === null) return;
-        }
-
-        while (!newUsername) {
-            newUsername = prompt("Enter new username:");
-            if (newUsername === null) return;
-        }
-
-        while (!newEmail || !newEmail.includes("@")) {
-            newEmail = prompt("Enter new email:");
-            if (newEmail === null) return;
-            if (!newEmail.includes("@")) alert("Invalid email! Please enter a valid email.");
-        }
-
-        while (true) {
-            newPassword = prompt("Enter new password (leave empty to keep current):");
-            if (newPassword === null) return;
-            if (newPassword === "") break;
-            if (newPassword.length < 6) alert("Password must be at least 6 characters long!");
-            else break;
-        }
-
-        while (true) {
-            newRole = prompt("Enter new role (USER or ADMIN):");
-            if (newRole === null) return;
-            newRole = newRole.toUpperCase();
-            if (newRole === "USER" || newRole === "ADMIN") break;
-            alert("Invalid role! Only USER or ADMIN allowed.");
-        }
-
-        fetch(`/req/users/edit/${userId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: newUsername, email: newEmail, password: newPassword, role: newRole})
-        })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => alert("Error: " + error));
-    }
-
-    function deleteUser() {
-        let userId = prompt("Enter User ID to delete:");
-        if (userId) {
-            fetch(`/req/users/delete/${userId}`, {
-                method: 'DELETE'
-            }).then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => alert("Error: " + error));
-        }
-    }
-
-
-    function openPopup() {
-        document.getElementById('backupPopup').style.display = 'flex';
-    }
-
-    function closePopup() {
-        document.getElementById('backupPopup').style.display = 'none';
-    }
-
-    document.getElementById("clusterAdmin").addEventListener("change", function () {
-        const clusterCredentials = document.getElementById("clusterCredentials");
-        clusterCredentials.style.display = this.checked ? "block" : "none";
-    });
-
-    const submitButttom = document.getElementById("submit");
-    submitButttom.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        let backupData = {
-            clusterServer: document.getElementById("clusterServer").value,
-            databaseName: document.getElementById("databaseName").value,
-            dbServer: document.getElementById("dbServer").value,
-            dbUser: document.getElementById("dbUser").value,
-            dbPassword: document.getElementById("dbPassword").value,
-            clusterAdmin: document.getElementById("clusterAdmin").checked,
-            storageType: document.getElementById("storageType").value
-        };
-
-        if (backupData.clusterAdmin) {
-            backupData.clusterUsername = document.getElementById("clusterUsername").value;
-            backupData.clusterPassword = document.getElementById("clusterPassword").value;
-        }
-
-        if (backupData.storageType === "local") {
-            backupData.backupLocation = document.getElementById("backupLocation").value;
-        }
-        if (backupData.storageType === "ftp") {
-            backupData.storageParams = {
-                ftpServer: document.getElementById("ftpServer").value,
-                ftpUser: document.getElementById("ftpUser").value,
-                ftpPassword: document.getElementById("ftpPassword").value,
-                ftpDirectory: document.getElementById("ftpDirectory").value
-            };
-        }
-
-
-        fetch("/api/backup/execute", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(backupData)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Server returned error");
-                }
-                return response.text();
-            })
-            .then(data => alert("✅ Backup started successfully!"))
-            .catch(error => alert("❌ Error starting backup: " + error));
-    });
-
-
-    function openAutoPopup() {
-        document.getElementById('autoBackupPopup').style.display = 'flex';
-    }
-
-    function closeAutoPopup() {
-        document.getElementById('autoBackupPopup').style.display = 'none';
-    }
-
-    document.getElementById("clusterAdmin2").addEventListener("change", function () {
-        const clusterCredentials = document.getElementById("clusterCredentials2");
-        clusterCredentials.style.display = this.checked ? "block" : "none";
-    });
-
-    document.getElementById("frequency").addEventListener("change", function () {
-        let daySelection = document.getElementById("daySelection");
-        let dayDropdown = document.getElementById("day");
-
-        dayDropdown.innerHTML = "";
-
-        if (this.value === "weekly") {
-            daySelection.style.display = "block";
-            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].forEach(day => {
-                let option = document.createElement("option");
-                option.value = day;
-                option.textContent = day;
-                dayDropdown.appendChild(option);
-            });
-        } else if (this.value === "monthly") {
-            daySelection.style.display = "block";
-            for (let i = 1; i <= 31; i++) {
-                let option = document.createElement("option");
-                option.value = i;
-                option.textContent = i;
-                dayDropdown.appendChild(option);
-            }
-        } else {
-            daySelection.style.display = "none";
-        }
-    });
-
-
-    const submitButtom = document.getElementById("autosubmit");
-    submitButtom.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        let backupData2 = {
-            clusterServer2: document.getElementById("clusterServer2").value,
-            databaseName2: document.getElementById("databaseName2").value,
-            dbServer2: document.getElementById("dbServer2").value,
-            dbUser2: document.getElementById("dbUser2").value,
-            dbPassword2: document.getElementById("dbPassword2").value,
-            frequency: document.getElementById("frequency").value,
-            day: document.getElementById("day").value,
-            time: document.getElementById("time").value,
-            daysKeep2: document.getElementById("daysKeep2").value,
-            clusterAdmin2: document.getElementById("clusterAdmin2").checked,
-            storageType2: document.getElementById("storageType2").value
-        };
-
-        if (backupData2.clusterAdmin2) {
-            backupData2.clusterUsername2 = document.getElementById("clusterUsername2").value;
-            backupData2.clusterPassword2 = document.getElementById("clusterPassword2").value;
-        }
-
-        if (backupData2.storageType2 === "LOCAL") {
-            backupData2.backupLocation2 = document.getElementById("backupLocation2").value;
-        }
-        if (backupData2.storageType2 === "FTP") {
-            backupData2.storageParams2 = {
-                ftpServer2: document.getElementById("ftpServer2").value,
-                ftpUser2: document.getElementById("ftpUser2").value,
-                ftpPassword2: document.getElementById("ftpPassword2").value,
-                ftpDirectory2: document.getElementById("ftpDirectory2").value
-            };
-        }
-
-        fetch("/api/backup/save", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(backupData2)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Server returned error");
-                }
-                return response.text();
-            })
-            .then(data => alert("✅ Backup started successfully!"))
-            .catch(error => alert("❌ Error starting backup: " + error));
-    });
-
-        document.addEventListener("DOMContentLoaded", () => {
-        const dbServerInput = document.getElementById("dbServer");
-        const dbUserInput = document.getElementById("dbUser");
-        const dbPasswordInput = document.getElementById("dbPassword");
-        const databaseNameSelect = document.getElementById("databaseName");
-
-        dbServerInput.addEventListener("change", loadDatabases);
-        dbUserInput.addEventListener("change", loadDatabases);
-        dbPasswordInput.addEventListener("change", loadDatabases);
-
-        function loadDatabases() {
-        const dbServer = dbServerInput.value;
-        const dbUser = dbUserInput.value;
-        const dbPassword = dbPasswordInput.value;
-
-        if (!dbServer || !dbUser || !dbPassword) return;
-
-        fetch(`/api/backup/listDatabases?dbServer=${encodeURIComponent(dbServer)}&dbUser=${encodeURIComponent(dbUser)}&dbPassword=${encodeURIComponent(dbPassword)}`)
-        .then(response => response.json())
-        .then(data => {
-        databaseNameSelect.innerHTML = "";
-        if (Array.isArray(data)) {
-        data.forEach(db => {
-        const option = document.createElement("option");
-        option.value = db;
-        option.textContent = db;
-        databaseNameSelect.appendChild(option);
-    });
-    } else {
-        databaseNameSelect.innerHTML = `<option value="">${data[0]}</option>`;
-    }
-    })
-        .catch(err => {
-        console.error("Error fetching databases:", err);
-        databaseNameSelect.innerHTML = `<option value="">Error loading databases</option>`;
-    });
-    }
-    loadDatabases();
-    })
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const dbServerInput2 = document.getElementById("dbServer2");
-        const dbUserInput2 = document.getElementById("dbUser2");
-        const dbPasswordInput2 = document.getElementById("dbPassword2");
-        const databaseNameSelect2 = document.getElementById("databaseName2");
-
-        dbServerInput2.addEventListener("change", loadDatabases);
-        dbUserInput2.addEventListener("change", loadDatabases);
-        dbPasswordInput2.addEventListener("change", loadDatabases);
-
-        function loadDatabases() {
-            const dbServer2 = dbServerInput2.value;
-            const dbUser2 = dbUserInput2.value;
-            const dbPassword2 = dbPasswordInput2.value;
-
-            if (!dbServer2 || !dbUser2 || !dbPassword2) return;
-
-            fetch(`/api/backup/listDatabases?dbServer=${encodeURIComponent(dbServer2)}&dbUser=${encodeURIComponent(dbUser2)}&dbPassword=${encodeURIComponent(dbPassword2)}`)
-                .then(response => response.json())
-                .then(data => {
-                    databaseNameSelect2.innerHTML = "";
-                    if (Array.isArray(data)) {
-                        data.forEach(db => {
-                            const option = document.createElement("option");
-                            option.value = db;
-                            option.textContent = db;
-                            databaseNameSelect2.appendChild(option);
-                        });
-                    } else {
-                        databaseNameSelect2.innerHTML = `<option value="">${data[0]}</option>`;
-                    }
-                })
-                .catch(err => {
-                    console.error("Error fetching databases:", err);
-                    databaseNameSelect2.innerHTML = `<option value="">Error loading databases</option>`;
-                });
-        }
-        loadDatabases();
-    })
-
-    const storageTypeSelect = document.getElementById("storageType");
-    const localPathContainer = document.getElementById("localPathContainer");
-    const ftpContainer = document.getElementById("ftpContainer");
-
-    storageTypeSelect.addEventListener("change", () => {
-        const selectedType = storageTypeSelect.value;
-
-        localPathContainer.style.display = selectedType === "local" ? "block" : "none";
-        ftpContainer.style.display = selectedType === "ftp" ? "block" : "none";
-
-        });
-
-    const storageTypeSelect2 = document.getElementById("storageType2");
-    const localPathContainer2 = document.getElementById("localPathContainer2");
-    const ftpContainer2 = document.getElementById("ftpContainer2");
-
-    storageTypeSelect2.addEventListener("change", () => {
-        const selectedType2 = storageTypeSelect2.value;
-
-        localPathContainer2.style.display = selectedType2 === "LOCAL" ? "block" : "none";
-        ftpContainer2.style.display = selectedType2 === "FTP" ? "block" : "none";
-
-    });
-</script>
 </body>
 </html>

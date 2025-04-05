@@ -48,7 +48,7 @@ public class BackupService {
         }
 
         String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod);
-        return "ARGS: " + command + "LOGS" + logs;
+        return "STATUS" + logs;
     }
 
 
@@ -98,8 +98,9 @@ public class BackupService {
             status = "❌ Error executing backup: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod);
         }
-        return output.toString();
+        return status;
     }
+
  private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
         BackupHistory backupHistory = new BackupHistory();
         backupHistory.setDatabase_name(databaseName);

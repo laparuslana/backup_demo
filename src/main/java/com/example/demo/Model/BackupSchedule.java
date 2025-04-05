@@ -58,6 +58,10 @@ public class BackupSchedule {
     @Convert(converter = JsonNodeConverter.class)
     private JsonNode storageParams2;
 
+    @Column(name = "storage_type", nullable = false)
+    private String storageType2;
+
+
     public String getStorageType2() {
         return storageType2;
     }
@@ -73,10 +77,6 @@ public class BackupSchedule {
     public void setStorageParams2(JsonNode storageParams2) {
         this.storageParams2 = storageParams2;
     }
-
-    @Column(name = "storage_type", nullable = false)
-    private String storageType2;
-
 
     private String encrypt(String data) {
         return Base64.getEncoder().encodeToString(data.getBytes());

@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import java.time.LocalTime;
 import java.util.Base64;
@@ -50,6 +51,29 @@ public class ScheduledBackup {
 
         @Column(name = "cluster_password")
         private String clusterPassword;
+
+    public JsonNode getStorageParams() {
+        return storageParams;
+    }
+
+    public void setStorageParams(JsonNode storageParams) {
+        this.storageParams = storageParams;
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = storageType;
+    }
+
+    @Column(name = "storage_params", columnDefinition = "json")
+    @Convert(converter = JsonNodeConverter.class)
+    private JsonNode storageParams;
+
+    @Column(name = "storage_type", nullable = false)
+    private String storageType;
 
 
     private String encrypt(String data) {
