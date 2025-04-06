@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.BackupHistory;
-import com.example.demo.Model.BackupHistoryRepository;
+import com.example.demo.Model.Backup.BackupHistory;
+import com.example.demo.Model.Backup.BackupHistoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

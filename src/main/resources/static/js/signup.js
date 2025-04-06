@@ -13,13 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
       const passwordInput = document.querySelector('input[type="password"]');
       const confirmPasswordInput = document.querySelector('input[type="password"][name="confirm-password"]');
 
-      function validateEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-      function validatePassword(password) {
-            return password.length >= 6;
-        }
-
       if (!validateEmail(emailInput) && !validatePassword(passwordInput) && !validatePassword(confirmPasswordInput))  {
         signupForm.classList.add('shake');
   

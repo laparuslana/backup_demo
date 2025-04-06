@@ -13,3 +13,11 @@ function openAutoPopup() {
 function closeAutoPopup() {
     document.getElementById('autoBackupPopup').style.display = 'none';
 }
+
+function openRestorePopup() {
+    document.getElementById('restorePopup').style.display = 'flex';
+}
+
+function closeRestorePopup() {
+    document.getElementById('restorePopup').style.display = 'none';
+}

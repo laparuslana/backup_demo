@@ -243,6 +243,7 @@
     <script src="/js/validation.js" defer></script>
     <script src="/js/backup.js" defer></script>
     <script src="/js/autoBackup.js" defer></script>
+    <script src="/js/restoreBackup.js" defer></script>
     <script src="/js/backupHistory.js"></script>
 </header>
 <main>
@@ -250,7 +251,7 @@
     <div class="buttons">
         <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
         <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
-        <button class="btn-danger">Restore the copy</button>
+        <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
     </div>
     <h2>Backup history statistics</h2>
     <table id="backupTable">
@@ -269,18 +270,6 @@
         <h3 style="color: #0f172a">Manually backup</h3>
         <form action="/api/backup/execute" method="post" id="backupForm">
 
-            <label for="clusterServer">Cluster Server:</label>
-            <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
-
-            <label for="dbServer">DB Server:</label>
-            <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
-
-            <label for="dbUser">DB User:</label>
-            <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
-
-            <label for="dbPassword">DB Password:</label>
-            <input type="password" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
-
             <div class="checkbox-group">
                 <input type="checkbox" id="clusterAdmin">
                 <label for="clusterAdmin">Do you have cluster admin?</label>
@@ -294,15 +283,27 @@
                 <input type="password" id="clusterPassword" placeholder="Cluster Password"><br>
             </div>
 
-            <label for="storageType">Storage Type:</label>
-            <select id="storageType" name="storageType" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
-            </select>
+            <label for="clusterServer">Cluster Server:</label>
+            <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
+
+            <label for="dbServer">DB Server:</label>
+            <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
+
+            <label for="dbUser">DB User:</label>
+            <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
+
+            <label for="dbPassword">DB Password:</label>
+            <input type="password" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
 
             <label for="databaseName">Choose database:</label>
             <select id="databaseName" name="databaseName">
                 <option value="">Loading...</option>
+            </select>
+
+            <label for="storageType">Storage Type:</label>
+            <select id="storageType" name="storageType" required>
+                <option value="local">Local</option>
+                <option value="ftp">FTP</option>
             </select>
 
             <div id="localPathContainer">
@@ -332,18 +333,6 @@
         <h3>Auto Backup</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
 
-            <label for="clusterServer2">Cluster Server:</label>
-            <input type="text" id="clusterServer2" name="clusterServer2" placeholder="Cluster Server" required>
-
-            <label for="dbServer2">DB Server:</label>
-            <input type="text" id="dbServer2" name="dbServer2" placeholder="DB Server" required>
-
-            <label for="dbUser2">DB User:</label>
-            <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
-
-            <label for="dbPassword2">DB Password:</label>
-            <input type="password" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
-
             <div class="checkbox-group">
                 <input type="checkbox" id="clusterAdmin2">
                 <label for="clusterAdmin2">Do you have cluster admin?</label>
@@ -357,15 +346,27 @@
                 <input type="password" id="clusterPassword2" placeholder="Cluster Password2"><br>
             </div>
 
-            <label for="storageType2">Storage Type:</label>
-            <select id="storageType2" name="storageType2" required>
-                <option value="LOCAL">Local</option>
-                <option value="FTP">FTP</option>
-            </select>
+            <label for="clusterServer2">Cluster Server:</label>
+            <input type="text" id="clusterServer2" name="clusterServer2" placeholder="Cluster Server" required>
+
+            <label for="dbServer2">DB Server:</label>
+            <input type="text" id="dbServer2" name="dbServer2" placeholder="DB Server" required>
+
+            <label for="dbUser2">DB User:</label>
+            <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
+
+            <label for="dbPassword2">DB Password:</label>
+            <input type="password" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
 
             <label for="databaseName2">Choose database:</label>
             <select id="databaseName2" name="databaseName2">
                 <option value="">Loading...</option>
+            </select>
+
+            <label for="storageType2">Storage Type:</label>
+            <select id="storageType2" name="storageType2" required>
+                <option value="LOCAL">Local</option>
+                <option value="FTP">FTP</option>
             </select>
 
             <div id="localPathContainer2">
@@ -385,7 +386,7 @@
             </div>
 
             <label for="daysKeep2">Days to keep backup:</label>
-            <input type="text" id="daysKeep2" name="daysKeep2" placeholder="Days To Keep" required>
+            <input type="number" id="daysKeep2" name="daysKeep2" min="7" placeholder="Days To Keep" required>
 
                 <label for="frequency">Frequency:</label>
                 <select id="frequency" name="frequency">
@@ -402,10 +403,50 @@
                 <label for="time">Time:</label>
                 <input type="time" id="time" name="time" required>
 
-
             <button type="submit" id="autosubmit">Do backup</button>
         </form>
         <button onclick="closeAutoPopup()">Close</button>
+    </div>
+</div>
+<div class="popup" id="restorePopup">
+    <div class="popup-content">
+        <h3>Manually restore backup</h3>
+        <form action="/api/restore/backup" method="post" id="restoreForm">
+
+<!--            <div class="checkbox-group">-->
+<!--                <input type="checkbox" id="res_clusterAdmin">-->
+<!--                <label for="res_clusterAdmin">Do you have cluster admin?</label>-->
+<!--            </div>-->
+
+<!--            <div id="res_clusterCredentials" style="display: none;">-->
+<!--                <label for="res_clusterUsername">Cluster Username:</label>-->
+<!--                <input type="text" id="res_clusterUsername" placeholder="Cluster Username"><br>-->
+
+<!--                <label for="res_clusterPassword">Cluster Password:</label>-->
+<!--                <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>-->
+<!--            </div>-->
+
+            <label for="res_clusterServer">Cluster Server:</label>
+            <input type="text" id="res_clusterServer" name="res_clusterServer" placeholder="Cluster Server" required>
+
+            <label for="restoreDbServer">Cluster Server:</label>
+            <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="DB Server" required>
+
+            <label for="testDbName">Test Database Name:</label>
+            <input type="text" id="testDbName" name="testDbName" placeholder="e.g. test_restore_db" required>
+
+            <label for="restoreDbUser">DB User:</label>
+            <input type="text" id="restoreDbUser" name="restoreDbUser" placeholder="DB User" required>
+
+            <label for="restoreDbPassword">DB Password:</label>
+            <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="DB Password" required>
+
+            <label for="backupFile">Backup File Path:</label>
+            <input type="text" id="backupFile" name="backupFile" required>
+
+            <button type="submit" id="submitRestore">Restore Backup</button>
+        </form>
+        <button onclick="closeRestorePopup()">Close</button>
     </div>
 </div>
 </body>

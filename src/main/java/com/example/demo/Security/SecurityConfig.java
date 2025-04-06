@@ -14,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.demo.Model.MyAppUserService;
+import com.example.demo.Model.UserManagement.MyAppUserService;
 import lombok.AllArgsConstructor;
 import java.util.Set;
 
@@ -70,8 +70,9 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/req/signup","/css/**","/js/**").permitAll()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/api/backup/**").permitAll()
+                    .requestMatchers("/admin/**", "/js/**").hasRole("ADMIN")
+                    .requestMatchers("/api/backup/**", "/js/**").permitAll()
+                    .requestMatchers("/api/restore/**", "/js/**").permitAll()
                     .anyRequest().authenticated()
             )
             .build();

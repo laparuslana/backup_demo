@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.*;
@@ -64,17 +65,40 @@ public class BackupScheduler {
             String cronJob = String.format("%s /bin/bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s",
                     cronExpression, schedule.getDatabaseName(), schedule.getDbServer(), schedule.getBackupLocation());
 
-            existingCronJobs.append(cronJob).append("\n");
+            Path cronFilePath = Paths.get("/tmp/my_cron_jobs");
+            if (!isDuplicate(cronExpression, cronFilePath)) {
+                existingCronJobs.append(cronJob).append("\n");
+            } else {
+                System.out.println("Cron job exists");
+            }
 
-            Files.write(Paths.get("/tmp/my_cron_jobs"), existingCronJobs.toString().getBytes(),
+            Files.write(cronFilePath, existingCronJobs.toString().getBytes(),
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-            Runtime.getRuntime().exec("crontab /tmp/my_cron_jobs");
+            Runtime.getRuntime().exec("crontab " + cronFilePath);
 
             System.out.println("Backup task scheduled: " + cronJob);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isDuplicate(String cronExpression, Path cronFilePath) {
+    try {
+        if (!Files.exists(cronFilePath)) {
+            return  false;
+        }
+        List<String> lines = Files.readAllLines(cronFilePath);
+
+        for (String line : lines) {
+            if (line.startsWith(cronExpression + " ")) {
+                return true;
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return false;
     }
 
     public static long calculateInitialDelay(String day, LocalTime time) {

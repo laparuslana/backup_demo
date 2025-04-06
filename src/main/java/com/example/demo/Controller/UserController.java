@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.MyAppUser;
-import com.example.demo.Model.MyAppUserRepository;
+import com.example.demo.Model.UserManagement.MyAppUser;
+import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

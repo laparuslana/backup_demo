@@ -1,4 +1,4 @@
-package com.example.demo.Model;
+package com.example.demo.Model.Backup;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +19,6 @@ public class BackupService {
 
     @Autowired
     private BackupHistoryRepository backupHistoryRepository;
-
 
     public String startBackup(BackupRequest request) {
         String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
@@ -42,7 +41,7 @@ public class BackupService {
         if (Objects.equals(request.getStorageType(), "local")) {
             storagePath = request.getBackupLocation();
         } else if (Objects.equals(request.getStorageType(), "ftp")) {
-            storagePath = request.getStorageParams().toString();
+            storagePath = request.getStorageParams().get("ftpDirectory").asText();
         } else {
             throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());
         }
@@ -98,10 +97,10 @@ public class BackupService {
             status = "❌ Error executing backup: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod);
         }
-        return status;
+        return output.toString();
     }
 
- private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
+    private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
         BackupHistory backupHistory = new BackupHistory();
         backupHistory.setDatabase_name(databaseName);
         backupHistory.setStatus(status);
@@ -109,7 +108,7 @@ public class BackupService {
         backupHistory.setBackup_location(backup_location);
         backupHistory.setRetention_period(retentionPeriod);
         backupHistoryRepository.save(backupHistory);
- }
+    }
 
     @Autowired
     private BackupScheduleRepository backupScheduleRepository;
@@ -119,29 +118,30 @@ public class BackupService {
     }
 
     public List<String> getDatabases(String dbServer, String dbUser, String dbPassword) {
-    List<String> databases = new ArrayList<>();
-   try {
-       String[] command = {
-               "/bin/bash", "src/main/resources/scripts/retrieveDatabases.sh",
-               dbServer, dbUser, dbPassword
-       };
+        List<String> databases = new ArrayList<>();
+        try {
+            String[] command = {
+                    "/bin/bash", "src/main/resources/scripts/retrieveDatabases.sh",
+                    dbServer, dbUser, dbPassword
+            };
 
-       ProcessBuilder processBuilder = new ProcessBuilder(command);
-       processBuilder.redirectErrorStream(true);
-       Process process = processBuilder.start();
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
 
-       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-       String line;
-       while ((line = reader.readLine()) != null) {
-           databases.add(line);
-       }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                databases.add(line);
+            }
 
-       process.waitFor();
-   } catch (Exception e) {
-       e.printStackTrace();
-   }
-   return databases;
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return databases;
     }
 }
+
 
 
