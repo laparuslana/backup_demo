@@ -21,7 +21,10 @@ public class RestoreService {
                 restoreRequest.getRestoreDbServer(),
                 restoreRequest.getRestoreDbUser(),
                 restoreRequest.getRestoreDbPassword(),
-                restoreRequest.getBackupFile()
+                restoreRequest.getBackupFile(),
+                restoreRequest.isRes_clusterAdmin(),
+                restoreRequest.getRes_clusterUsername(),
+                restoreRequest.getRes_clusterPassword()
         );
 
         String logs = executeRestoreCommand(command);
@@ -29,9 +32,9 @@ public class RestoreService {
     }
 
 
-    private String buildRestoreCommand(String clusterServer, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile) {
-        return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s",
-                clusterServer, testDbName, dbServer, dbUser, dbPassword, backupFile);
+    private String buildRestoreCommand(String clusterServer, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile, boolean clusterAdmin, String clusterUsername, String clusterPassword) {
+        return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s",
+                clusterServer, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword);
     }
 
 

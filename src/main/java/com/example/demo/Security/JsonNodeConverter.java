@@ -1,32 +1,84 @@
 package com.example.demo.Security;
 
-
-import com.fasterxml.jackson.databind.JsonNode;
+//
+//import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//
+//@Converter
+//public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
+//
+//    private final ObjectMapper objectMapper = new ObjectMapper();
+//    @Override
+//    public String convertToDatabaseColumn(JsonNode attribute) {
+//        try {
+//            return attribute == null ? null : objectMapper.writeValueAsString(attribute);
+//
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("Error converting", e);
+//        }
+//    }
+//
+//    @Override
+//    public JsonNode convertToEntityAttribute(String dbData) {
+//        try {
+//            return dbData == null ? null : objectMapper.readTree(dbData);
+//
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("Error converting String", e);
+//        }
+//    }
+//}
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 @Converter
 public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public String convertToDatabaseColumn(JsonNode attribute) {
         try {
-            return attribute == null ? null : objectMapper.writeValueAsString(attribute);
+            if (attribute == null) return null;
 
+            ObjectNode copy = attribute.deepCopy();
+
+            if (copy.has("ftpPassword2") && !copy.get("ftpPassword2").isNull()) {
+                String rawPassword = copy.get("ftpPassword2").asText();
+                String encryptedPassword = getEncryptor().encrypt(rawPassword);
+                copy.put("ftpPassword2", encryptedPassword);
+            }
+
+            return objectMapper.writeValueAsString(copy);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error converting", e);
+            throw new IllegalArgumentException("Error converting JsonNode to String", e);
         }
     }
 
     @Override
     public JsonNode convertToEntityAttribute(String dbData) {
         try {
-            return dbData == null ? null : objectMapper.readTree(dbData);
+            if (dbData == null) return null;
 
+            JsonNode node = objectMapper.readTree(dbData);
+
+            if (node.has("ftpPassword2") && !node.get("ftpPassword2").isNull()) {
+                String encryptedPassword = node.get("ftpPassword2").asText();
+                String decryptedPassword = getEncryptor().decrypt(encryptedPassword);
+                ((ObjectNode) node).put("ftpPassword2", decryptedPassword);
+            }
+
+            return node;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error converting String", e);
+            throw new IllegalArgumentException("Error converting String to JsonNode", e);
         }
+    }
+
+    private AesEncryptor getEncryptor() {
+        return SpringContext.getBean(AesEncryptor.class);
     }
 }

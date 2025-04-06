@@ -8,21 +8,51 @@ public class RestoreRequest {
     private String restoreDbServer;
     private String restoreDbUser;
     private String restoreDbPassword;
-//    private boolean res_clusterAdmin;
-//    private String res_clusterUsername;
-//    private String res_clusterPassword;
     private String backupFile;
+    private boolean res_clusterAdmin;
+    private String res_clusterUsername;
+    private String res_clusterPassword;
+
+
+
+    public boolean isRes_clusterAdmin() {
+        return res_clusterAdmin;
+    }
+
+    public void setRes_clusterAdmin(boolean res_clusterAdmin) {
+        this.res_clusterAdmin = res_clusterAdmin;
+    }
+
+    public String getRes_clusterUsername() {
+        return res_clusterUsername;
+    }
+
+    public void setRes_clusterUsername(String res_clusterUsername) {
+        this.res_clusterUsername = res_clusterUsername;
+    }
+
+    public String getRes_clusterPassword() {
+        return res_clusterPassword;
+    }
+
+    public void setRes_clusterPassword(String res_clusterPassword) {
+        this.res_clusterPassword = res_clusterPassword;
+    }
+
 
     public RestoreRequest() {
     }
 
-    public RestoreRequest(String res_clusterServer, String testDbName, String restoreDbServer, String restoreDbUser, String restoreDbPassword, String backupFile) {
+    public RestoreRequest(String res_clusterServer, String testDbName, String restoreDbServer, String restoreDbUser, String restoreDbPassword, String backupFile, boolean res_clusterAdmin, String res_clusterUsername, String res_clusterPassword) {
         this.res_clusterServer = res_clusterServer;
         this.testDbName = testDbName;
         this.restoreDbServer = restoreDbServer;
         this.restoreDbUser = restoreDbUser;
         this.restoreDbPassword = restoreDbPassword;
         this.backupFile = backupFile;
+        this.res_clusterAdmin = res_clusterAdmin;
+        this.res_clusterUsername = res_clusterUsername;
+        this.res_clusterPassword = res_clusterPassword;
     }
 
     public String getRes_clusterServer() {

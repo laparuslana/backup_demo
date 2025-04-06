@@ -2,6 +2,8 @@ package com.example.demo.Controller;
 
 import com.example.demo.Model.Backup.BackupHistory;
 import com.example.demo.Model.Backup.BackupHistoryRepository;
+import com.example.demo.Model.Restore.RestoreHistory;
+import com.example.demo.Model.Restore.RestoreHistoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,18 +15,27 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/req/backup-history")
+@RequestMapping("/req/history")
 @CrossOrigin(origins = "*")
-public class BackupHistoryController {
+public class HistoryController {
     private final BackupHistoryRepository repository;
 
-    public BackupHistoryController(BackupHistoryRepository repository) {
+    public HistoryController(BackupHistoryRepository repository, RestoreHistoryRepository restoreRepository) {
+
         this.repository = repository;
+        this.restoreRepository = restoreRepository;
     }
 
-    @GetMapping
+    @GetMapping("/backup")
     public List<BackupHistory> getBackupHistory() {
         return repository.findAll();
+    }
+
+    private final RestoreHistoryRepository restoreRepository;
+
+    @GetMapping("/restore")
+    public List<RestoreHistory> getRestoreHistory() {
+        return restoreRepository.findAll();
     }
 
     @GetMapping("/download")

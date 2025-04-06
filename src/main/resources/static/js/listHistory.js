@@ -1,5 +1,5 @@
 function loadBackupHistory() {
-    fetch("http://localhost:8080/req/backup-history")
+    fetch("http://localhost:8080/req/history/backup")
         .then(response => response.json())
         .then(data => {
             const table = document.getElementById("backupTable");
@@ -29,4 +29,33 @@ function loadBackupHistory() {
 document.addEventListener("DOMContentLoaded", function () {
 loadBackupHistory();
 setInterval(loadBackupHistory, 10000);
+});
+
+function loadRestoreHistory() {
+    fetch("http://localhost:8080/req/history/restore")
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById("restoreTable");
+
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            data.forEach(restore => {
+                let row = table.insertRow(-1);
+                let cell1 = row.insertCell(0);
+                let cell2 = row.insertCell(1);
+
+
+                cell1.textContent = restore.status;
+                cell2.textContent = new Date(restore.restore_time).toLocaleString();
+
+            });
+        })
+        .catch(error => console.error("Error fetching restore history:", error));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadRestoreHistory();
+    setInterval(loadRestoreHistory, 10000);
 });

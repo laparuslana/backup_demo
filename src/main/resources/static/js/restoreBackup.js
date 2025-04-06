@@ -1,10 +1,10 @@
-// document.getElementById("res_clusterAdmin").addEventListener("change", function () {
-//     const clusterCredentials = document.getElementById("res_clusterCredentials");
-//     clusterCredentials.style.display = this.checked ? "block" : "none";
-// });
+document.getElementById("res_clusterAdmin").addEventListener("change", function () {
+    const clusterCredentials = document.getElementById("res_clusterCredentials");
+    clusterCredentials.style.display = this.checked ? "block" : "none";
+});
 
 const submitButom = document.getElementById("submitRestore");
-submitButom.addEventListener('click', (event) => {
+submitButom.addEventListener('click', async(event) => {
     event.preventDefault();
 
     let restoreData = {
@@ -13,17 +13,36 @@ submitButom.addEventListener('click', (event) => {
         restoreDbServer: document.getElementById("restoreDbServer").value,
         restoreDbUser: document.getElementById("restoreDbUser").value,
         restoreDbPassword: document.getElementById("restoreDbPassword").value,
-        // res_clusterAdmin: document.getElementById("res_clusterAdmin").checked,
         backupFile: document.getElementById("backupFile").value,
+        res_clusterAdmin: document.getElementById("res_clusterAdmin").checked
 
     };
-    //
-    // if (restoreData.res_clusterAdmin) {
-    //     restoreData.res_clusterUsername = document.getElementById("res_clusterUsername").value;
-    //     restoreData.res_clusterPassword = document.getElementById("res_clusterPassword").value;
-    // }
 
-    //validateDbName(restoreData.testDbName);
+    if (restoreData.res_clusterAdmin) {
+        restoreData.res_clusterUsername = document.getElementById("res_clusterUsername").value;
+        restoreData.res_clusterPassword = document.getElementById("res_clusterPassword").value;
+    }
+
+    const checkDbExistsUrl = `/api/backup/listDatabases?dbServer=${encodeURIComponent(restoreData.restoreDbServer)}&dbUser=${encodeURIComponent(restoreData.restoreDbUser)}&dbPassword=${encodeURIComponent(restoreData.restoreDbPassword)}`;
+
+    try {
+        const response = await fetch(checkDbExistsUrl);
+        if (!response.ok) {
+            throw new Error("Failed to check databases");
+        }
+
+        const databases = await response.json();
+        if (databases.includes(restoreData.testDbName)) {
+            alert(`❌ Database "${restoreData.testDbName}" already exists on the server.`);
+            return;
+        }
+    } catch (err) {
+        alert(`❌ Error checking database existence: ${err.message}`);
+        return;
+    }
+    if (!validateDbName(restoreData.testDbName)) {
+        return;
+    }
 
     fetch("/api/restore/backup", {
         method: "POST",

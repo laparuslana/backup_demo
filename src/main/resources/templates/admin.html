@@ -233,7 +233,7 @@
                 <a href="#" onclick="deleteUser()">Delete User</a>
             </div>
         </div>
-        <a href="http://localhost:8080/req/backup-history/download">Backup history</a>
+        <a href="http://localhost:8080/req/history/download">Backup history</a>
         <a href="/logout">Logout</a>
     </div>
     <script src="/js/users.js" defer></script>
@@ -244,7 +244,7 @@
     <script src="/js/backup.js" defer></script>
     <script src="/js/autoBackup.js" defer></script>
     <script src="/js/restoreBackup.js" defer></script>
-    <script src="/js/backupHistory.js"></script>
+    <script src="/js/listHistory.js"></script>
 </header>
 <main>
     <input type="text" placeholder="Enter text here...">
@@ -253,7 +253,7 @@
         <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
         <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
     </div>
-    <h2>Backup history statistics</h2>
+    <h2>History statistics</h2>
     <table id="backupTable">
         <tr>
             <th>Status</th>
@@ -261,6 +261,12 @@
             <th>Database Name</th>
             <th>Backup Location</th>
             <th>Retention Period</th>
+        </tr>
+    </table>
+    <table id="restoreTable">
+        <tr>
+            <th>Status</th>
+            <th>Date</th>
         </tr>
     </table>
 </main>
@@ -413,18 +419,18 @@
         <h3>Manually restore backup</h3>
         <form action="/api/restore/backup" method="post" id="restoreForm">
 
-<!--            <div class="checkbox-group">-->
-<!--                <input type="checkbox" id="res_clusterAdmin">-->
-<!--                <label for="res_clusterAdmin">Do you have cluster admin?</label>-->
-<!--            </div>-->
+            <div class="checkbox-group">
+                <input type="checkbox" id="res_clusterAdmin">
+                <label for="res_clusterAdmin">Do you have cluster admin?</label>
+            </div>
 
-<!--            <div id="res_clusterCredentials" style="display: none;">-->
-<!--                <label for="res_clusterUsername">Cluster Username:</label>-->
-<!--                <input type="text" id="res_clusterUsername" placeholder="Cluster Username"><br>-->
+            <div id="res_clusterCredentials" style="display: none;">
+                <label for="res_clusterUsername">Cluster Username:</label>
+                <input type="text" id="res_clusterUsername" placeholder="Cluster Username"><br>
 
-<!--                <label for="res_clusterPassword">Cluster Password:</label>-->
-<!--                <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>-->
-<!--            </div>-->
+                <label for="res_clusterPassword">Cluster Password:</label>
+                <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>
+            </div>
 
             <label for="res_clusterServer">Cluster Server:</label>
             <input type="text" id="res_clusterServer" name="res_clusterServer" placeholder="Cluster Server" required>
