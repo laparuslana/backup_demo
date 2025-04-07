@@ -25,4 +25,9 @@ public class ContentController {
     public String admin(){
         return "admin";
     }
+
+    @GetMapping("/storage_settings")
+    public String storage(){
+        return "storage_settings";
+    }
 }

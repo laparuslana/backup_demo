@@ -4,221 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #0f172a, #1e3a8a);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            padding: 15px 20px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            padding: 10px;
-        }
-
-        .menu a, .dropdown {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            padding: 10px;
-        }
-
-        .menu a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #004080;
-            min-width: 150px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: white;
-            padding: 10px;
-            display: block;
-            text-decoration: none;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #0056b3;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-
-        input[type="text"], input[type="password"], select {
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            width: 300px;
-            border: none;
-            border-radius: 5px;
-            outline: none;
-            color: #333;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #45a049;
-        }
-
-        .btn-secondary {
-            background: #008CBA;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #007bb5;
-        }
-
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #da190b;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            max-height: 500px;
-            overflow-y: auto;
-            background-color: white;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-            border-radius: 5px;
-        }
-
-        .popup-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            width: 400px;
-            max-height: 500px;
-            color: #333;
-        }
-
-        .popup input, .popup select {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .popup button {
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .popup button:hover {
-            background-color: #218838;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin: 5px 0;
-        }
-
-        #submit {
-            align-self: flex-start;
-        }
-
-        label {
-            margin-bottom: 5px;
-        }
-</style>
+    <link rel="stylesheet" href="/css/pages.css">
 </head>
 <body>
 <header>
@@ -233,7 +19,7 @@
                 <a href="#" onclick="deleteUser()">Delete User</a>
             </div>
         </div>
-        <a href="http://localhost:8080/req/history/download">Backup history</a>
+        <a href="/storage_settings">Backup Storage Settings</a>
         <a href="/logout">Logout</a>
     </div>
     <script src="/js/users.js" defer></script>
@@ -312,21 +98,21 @@
                 <option value="ftp">FTP</option>
             </select>
 
-            <div id="localPathContainer">
-            <label for="backupLocation">Backup Location:</label>
-            <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>
-            </div>
+<!--            <div id="localPathContainer">-->
+<!--            <label for="backupLocation">Backup Location:</label>-->
+<!--            <input type="text" id="backupLocation" name="backupLocation" placeholder="backupLocation" required>-->
+<!--            </div>-->
 
-            <div id="ftpContainer" style="display: none;">
-                <label for="ftpServer">FTP Server:</label>
-                <input type="text" id="ftpServer" name="ftpServer" placeholder="ftp.example.com" required>
-                <label for="ftpUser">FTP User:</label>
-                <input type="text" id="ftpUser" name="ftpUser" placeholder="username" required>
-                <label for="ftpPassword">FTP Password:</label>
-                <input type="password" id="ftpPassword" name="ftpPassword" placeholder="password" required>
-                <label for="ftpDirectory">FTP Directory:</label>
-                <input type="text" id="ftpDirectory" name="ftpDirectory" placeholder="backup" required>
-            </div>
+<!--            <div id="ftpContainer" style="display: none;">-->
+<!--                <label for="ftpServer">FTP Server:</label>-->
+<!--                <input type="text" id="ftpServer" name="ftpServer" placeholder="ftp.example.com" required>-->
+<!--                <label for="ftpUser">FTP User:</label>-->
+<!--                <input type="text" id="ftpUser" name="ftpUser" placeholder="username" required>-->
+<!--                <label for="ftpPassword">FTP Password:</label>-->
+<!--                <input type="password" id="ftpPassword" name="ftpPassword" placeholder="password" required>-->
+<!--                <label for="ftpDirectory">FTP Directory:</label>-->
+<!--                <input type="text" id="ftpDirectory" name="ftpDirectory" placeholder="backup" required>-->
+<!--            </div>-->
 
             <button type="submit" id="submit">Do backup</button>
         </form>

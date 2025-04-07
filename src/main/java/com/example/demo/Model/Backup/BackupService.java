@@ -1,16 +1,15 @@
 package com.example.demo.Model.Backup;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -41,7 +40,7 @@ public class BackupService {
         if (Objects.equals(request.getStorageType(), "local")) {
             storagePath = request.getBackupLocation();
         } else if (Objects.equals(request.getStorageType(), "ftp")) {
-            storagePath = request.getStorageParams().get("ftpDirectory").asText();
+            storagePath = request.getStorageParams().get("ftpDirectory");
         } else {
             throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());
         }
@@ -51,13 +50,13 @@ public class BackupService {
     }
 
 
-    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword, String storageType, JsonNode storageParams) {
+    private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword, String storageType, Map<String, String> storageParams) {
         try {
 
-            String ftpServer = storageParams != null ? storageParams.get("ftpServer").asText() : "";
-            String ftpUser = storageParams != null ? storageParams.get("ftpUser").asText() : "";
-            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword").asText() : "";
-            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory").asText() : "";
+            String ftpServer = storageParams != null ? storageParams.get("ftpServer") : "";
+            String ftpUser = storageParams != null ? storageParams.get("ftpUser") : "";
+            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : "";
+            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : "";
 
             return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
                     clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, clusterAdmin,

@@ -6,18 +6,18 @@ DB_HOST=$3
 DB_USER=$4
 DB_PASSWORD=$5
 BACKUP_FILE=$6
-#CLUSTER_ADMIN=$7
-#CLUSTER_USER=$8
-#CLUSTER_PASS=$9
+CLUSTER_ADMIN=$7
+CLUSTER_USER=$8
+CLUSTER_PASS=$9
 
-#if [ "$CLUSTER_ADMIN" = "true" ]; then
-#    echo "Cluster admin mode enabled."
-#    export PGPASSWORD="$CLUSTER_PASS"
-#else
-#    export PGPASSWORD="$DB_PASSWORD"
-#fi
-export PGPASSWORD="$DB_PASSWORD"
-#dropdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$TEST_DB_NAME"
+if [ "$CLUSTER_ADMIN" = "true" ]; then
+    echo "Cluster admin mode enabled."
+    export PGPASSWORD="$CLUSTER_PASS"
+else
+    export PGPASSWORD="$DB_PASSWORD"
+fi
+#export PGPASSWORD="postgres"
+#dropdb -h "localhost" -p "5432" -U "postgres" "test_base"
 
 echo "Creating test database: $TEST_DB_NAME"
 createdb -h "$DB_HOST" -p 5432 -U "$DB_USER" "$TEST_DB_NAME"

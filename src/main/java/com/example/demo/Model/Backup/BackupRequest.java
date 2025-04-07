@@ -2,6 +2,8 @@ package com.example.demo.Model.Backup;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
 public class BackupRequest {
     private String clusterServer;
     private String databaseName;
@@ -14,16 +16,17 @@ public class BackupRequest {
     private String clusterUsername;
     private String clusterPassword;
     private String storageType;
-    private JsonNode storageParams;
 
-
-    public JsonNode getStorageParams() {
+    public Map<String, String> getStorageParams() {
         return storageParams;
     }
 
-    public void setStorageParams(JsonNode storageParams) {
+    public void setStorageParams(Map<String, String> storageParams) {
         this.storageParams = storageParams;
     }
+
+    private Map<String, String> storageParams;
+
 
     public String getStorageType() {
         return storageType;
