@@ -6,7 +6,7 @@ function validatePassword(password) {
 }
 function validateDbName(dbName) {
     if (!dbName.startsWith('test_')) {
-        alert("❗ Имя тестовой базы должно начинаться с 'test_'");
+        alert("❗ Test DB Name should start with 'test_'");
     return false;
     }
     return true;

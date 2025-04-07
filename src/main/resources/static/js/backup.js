@@ -21,18 +21,6 @@ submitButttom.addEventListener('click', (event) => {
         backupData.clusterUsername = document.getElementById("clusterUsername").value;
         backupData.clusterPassword = document.getElementById("clusterPassword").value;
     }
-    //
-    // if (backupData.storageType === "local") {
-    //     backupData.backupLocation = document.getElementById("backupLocation").value;
-    // }
-    // if (backupData.storageType === "ftp") {
-    //     backupData.storageParams = {
-    //         ftpServer: document.getElementById("ftpServer").value,
-    //         ftpUser: document.getElementById("ftpUser").value,
-    //         ftpPassword: document.getElementById("ftpPassword").value,
-    //         ftpDirectory: document.getElementById("ftpDirectory").value
-    //     };
-    // }
 
 
     fetch("/api/backup/execute", {

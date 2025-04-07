@@ -22,10 +22,10 @@ public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
 
             ObjectNode copy = attribute.deepCopy();
 
-            if (copy.has("ftpPassword2") && !copy.get("ftpPassword2").isNull()) {
-                String rawPassword = copy.get("ftpPassword2").asText();
+            if (copy.has("ftpPassword") && !copy.get("ftpPassword").isNull()) {
+                String rawPassword = copy.get("ftpPassword").asText();
                 String encryptedPassword = getEncryptor().encrypt(rawPassword);
-                copy.put("ftpPassword2", encryptedPassword);
+                copy.put("ftpPassword", encryptedPassword);
             }
 
             return objectMapper.writeValueAsString(copy);
@@ -41,10 +41,10 @@ public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
 
             JsonNode node = objectMapper.readTree(dbData);
 
-            if (node.has("ftpPassword2") && !node.get("ftpPassword2").isNull()) {
-                String encryptedPassword = node.get("ftpPassword2").asText();
+            if (node.has("ftpPassword") && !node.get("ftpPassword").isNull()) {
+                String encryptedPassword = node.get("ftpPassword").asText();
                 String decryptedPassword = getEncryptor().decrypt(encryptedPassword);
-                ((ObjectNode) node).put("ftpPassword2", decryptedPassword);
+                ((ObjectNode) node).put("ftpPassword", decryptedPassword);
             }
 
             return node;

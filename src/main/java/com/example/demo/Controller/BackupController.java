@@ -4,9 +4,11 @@ import com.example.demo.Model.Backup.BackupRequest;
 import com.example.demo.Model.Backup.BackupSchedule;
 import com.example.demo.Model.Backup.BackupService;
 import com.example.demo.Model.Backup.StorageSettingsService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -51,9 +53,26 @@ public class BackupController {
     }
 
     @PostMapping(value = "/save", consumes = "application/json")
-    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule){
-        backupService.save(backupSchedule);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
+    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) {
+        try {
+            if ("FTP".equalsIgnoreCase(backupSchedule.getStorageType2())) {
+                Map<String, Object> ftpSettings = storageSettingsService.getSettingsForType("ftp");
+
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode ftpParams = mapper.valueToTree(ftpSettings);
+
+                backupSchedule.setStorageParams2(ftpParams);
+            } else {
+                backupSchedule.setStorageParams2(null);
+            }
+
+            backupService.save(backupSchedule);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Could not save settings: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/listDatabases")
