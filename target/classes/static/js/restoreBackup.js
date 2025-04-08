@@ -13,6 +13,7 @@ submitButom.addEventListener('click', async(event) => {
         restoreDbServer: document.getElementById("restoreDbServer").value,
         restoreDbUser: document.getElementById("restoreDbUser").value,
         restoreDbPassword: document.getElementById("restoreDbPassword").value,
+        res_storageType: document.getElementById("res_storageType").value,
         backupFile: document.getElementById("backupFile").value,
         res_clusterAdmin: document.getElementById("res_clusterAdmin").checked
 

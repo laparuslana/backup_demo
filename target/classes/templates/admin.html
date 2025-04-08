@@ -233,13 +233,39 @@
             <label for="restoreDbPassword">DB Password:</label>
             <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="DB Password" required>
 
-            <label for="backupFile">Backup File Path:</label>
-            <input type="text" id="backupFile" name="backupFile" required>
+            <label for="storageType">Storage Type:</label>
+            <select id="res_storageType" name="res_storageType" required>
+                <option value="local">Local</option>
+                <option value="ftp">FTP</option>
+            </select>
+
+            <label for="backupFile">Select Backup File:</label>
+            <select id="backupFile" name="backupFile"></select>
 
             <button type="submit" id="submitRestore">Restore Backup</button>
         </form>
         <button onclick="closeRestorePopup()">Close</button>
     </div>
+
 </div>
+<script>
+        document.getElementById("res_storageType").addEventListener("change", function () {
+            const type = this.value;
+            fetch(`/api/restore/list?type=${type}`)
+                .then(response => response.json())
+                .then(files => {
+                    const select = document.getElementById('backupFile');
+                    select.innerHTML = "";
+                    files.forEach(file => {
+                        const option = document.createElement('option');
+                        option.value = file;
+                        option.textContent = file;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Error fetching backups:', err));
+        });
+
+</script>
 </body>
 </html>

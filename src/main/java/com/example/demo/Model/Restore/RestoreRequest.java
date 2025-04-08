@@ -1,6 +1,8 @@
 package com.example.demo.Model.Restore;
 
 
+import java.util.Map;
+
 public class RestoreRequest {
 
     private String res_clusterServer;
@@ -8,11 +10,41 @@ public class RestoreRequest {
     private String restoreDbServer;
     private String restoreDbUser;
     private String restoreDbPassword;
+
+    public String getRes_storageType() {
+        return res_storageType;
+    }
+
+    public void setRes_storageType(String res_storageType) {
+        this.res_storageType = res_storageType;
+    }
+
+    private String res_storageType;
     private String backupFile;
     private boolean res_clusterAdmin;
     private String res_clusterUsername;
     private String res_clusterPassword;
 
+
+
+    public Map<String, String> getStorageParams() {
+        return storageParams;
+    }
+
+    public void setStorageParams(Map<String, String> storageParams) {
+        this.storageParams = storageParams;
+    }
+
+    public String getFullPath() {
+        return fullPath;
+    }
+
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+
+    private String fullPath;
+    private Map<String, String> storageParams;
 
 
     public boolean isRes_clusterAdmin() {

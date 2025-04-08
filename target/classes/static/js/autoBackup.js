@@ -52,18 +52,7 @@ submitButtom.addEventListener('click', (event) => {
         backupData2.clusterUsername2 = document.getElementById("clusterUsername2").value;
         backupData2.clusterPassword2 = document.getElementById("clusterPassword2").value;
     }
-    //
-    // if (backupData2.storageType2 === "LOCAL") {
-    //     backupData2.backupLocation2 = document.getElementById("backupLocation2").value;
-    // }
-    // if (backupData2.storageType2 === "FTP") {
-    //     backupData2.storageParams2 = {
-    //         ftpServer2: document.getElementById("ftpServer2").value,
-    //         ftpUser2: document.getElementById("ftpUser2").value,
-    //         ftpPassword2: document.getElementById("ftpPassword2").value,
-    //         ftpDirectory2: document.getElementById("ftpDirectory2").value
-    //     };
-    // }
+
 
     fetch("/api/backup/save", {
         method: "POST",
@@ -78,6 +67,6 @@ submitButtom.addEventListener('click', (event) => {
             }
             return response.text();
         })
-        .then(data => alert("✅ Backup started successfully!"))
-        .catch(error => alert("❌ Error starting backup: " + error));
+        .then(data => alert("✅ Backup parameters saved!"))
+        .catch(error => alert("❌ Error saving backup parameters: " + error));
 });
