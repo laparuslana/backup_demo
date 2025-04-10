@@ -11,6 +11,17 @@ public class RestoreRequest {
     private String restoreDbUser;
     private String restoreDbPassword;
 
+    private String res_storageType;
+    private String backupFile;
+    private boolean res_clusterAdmin;
+    private String res_clusterUsername;
+    private String res_clusterPassword;
+
+    private Map<String, String> storageParams;
+    private String fullPath;
+
+
+
     public String getRes_storageType() {
         return res_storageType;
     }
@@ -18,14 +29,6 @@ public class RestoreRequest {
     public void setRes_storageType(String res_storageType) {
         this.res_storageType = res_storageType;
     }
-
-    private String res_storageType;
-    private String backupFile;
-    private boolean res_clusterAdmin;
-    private String res_clusterUsername;
-    private String res_clusterPassword;
-
-
 
     public Map<String, String> getStorageParams() {
         return storageParams;
@@ -42,9 +45,6 @@ public class RestoreRequest {
     public void setFullPath(String fullPath) {
         this.fullPath = fullPath;
     }
-
-    private String fullPath;
-    private Map<String, String> storageParams;
 
 
     public boolean isRes_clusterAdmin() {
@@ -72,20 +72,7 @@ public class RestoreRequest {
     }
 
 
-    public RestoreRequest() {
-    }
 
-    public RestoreRequest(String res_clusterServer, String testDbName, String restoreDbServer, String restoreDbUser, String restoreDbPassword, String backupFile, boolean res_clusterAdmin, String res_clusterUsername, String res_clusterPassword) {
-        this.res_clusterServer = res_clusterServer;
-        this.testDbName = testDbName;
-        this.restoreDbServer = restoreDbServer;
-        this.restoreDbUser = restoreDbUser;
-        this.restoreDbPassword = restoreDbPassword;
-        this.backupFile = backupFile;
-        this.res_clusterAdmin = res_clusterAdmin;
-        this.res_clusterUsername = res_clusterUsername;
-        this.res_clusterPassword = res_clusterPassword;
-    }
 
     public String getRes_clusterServer() {
         return res_clusterServer;

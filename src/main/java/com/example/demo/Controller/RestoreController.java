@@ -85,13 +85,13 @@ public class RestoreController {
 
         Map<String, Object> config = storageSettingsService.getSettingsForType(type);
 
-        String fullPath;
+        String fullPath = "";
         if ("local".equals(type)) {
             String localPath = (String) config.get("backupLocation");
             fullPath = Paths.get(localPath, fileName).toString();
         } else if ("ftp".equals(type)) {
             String ftpDirectory = (String) config.get("ftpDirectory");
-            fullPath = Paths.get(ftpDirectory, fileName).toString();
+            //fullPath = Paths.get(ftpDirectory, fileName).toString();
 
             Map<String, String> ftpParams = new HashMap<>();
             ftpParams.put("ftpServer", (String) config.get("ftpServer"));
@@ -105,6 +105,8 @@ public class RestoreController {
 
         restoreRequest.setFullPath(fullPath);
 
+        System.out.println(restoreRequest.getFullPath());
+        System.out.println(restoreRequest.getStorageParams());
         System.out.println(restoreService.restore(restoreRequest));
         response.put("message", "Restore done");
         return ResponseEntity.ok(response);

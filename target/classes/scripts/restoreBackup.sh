@@ -15,6 +15,14 @@ FTP_USER="${11}"
 FTP_PASSWORD="${12}"
 FTP_DIRECTORY="${13}"
 FULL_PATH="${14}"
+STORAGE_TYPE="${15}"
+
+
+echo "FTP Server: $FTP_SERVER"
+echo "FTP User: $FTP_USER"
+echo "FTP Password: $FTP_PASSWORD"
+echo "FTP Directory: $FTP_DIRECTORY"
+echo "Full path: $FULL_PATH"
 
 LOCAL_DIR="/home/adminbs/ftp"
 
@@ -27,6 +35,9 @@ fi
 #export PGPASSWORD="postgres"
 #dropdb -h "localhost" -p "5432" -U "postgres" "test_base"
 
+
+echo "We chose: $STORAGE_TYPE"
+if [ "$STORAGE_TYPE" = "ftp" ]; then
 
 echo "🌐 Connecting to FTP server: $FTP_SERVER"
 ftp -inv "$FTP_SERVER" <<EOF
@@ -57,7 +68,32 @@ echo "Database '$TEST_DB_NAME' created successfully"
 echo "📋 Available databases after creation:"
 psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt | cut -d \| -f 1 | sed -e 's/^[ \t]*//' | sort
 
-echo "Restoring backup from $BACKUP_FILE into $TEST_DB_NAME"
+echo "Restoring FTP backup from $LOCAL_DIR/$BACKUP_FILE into $TEST_DB_NAME"
+pg_restore -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$LOCAL_DIR/$BACKUP_FILE"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Restore completed successfully into database '$TEST_DB_NAME'"
+else
+    echo "❌ Restore failed"
+    exit 1
+fi
+fi
+
+if [ "$STORAGE_TYPE" = "local" ]; then
+
+echo "Creating test database: $TEST_DB_NAME"
+createdb -h "$DB_HOST" -p 5432 -U "$DB_USER" "$TEST_DB_NAME"
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to create database"
+    exit 1
+fi
+
+echo "Database '$TEST_DB_NAME' created successfully"
+
+echo "📋 Available databases after creation:"
+psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt | cut -d \| -f 1 | sed -e 's/^[ \t]*//' | sort
+
+echo "Restoring backup $BACKUP_FILE into $TEST_DB_NAME"
 pg_restore -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$FULL_PATH"
 
 if [ $? -eq 0 ]; then
@@ -65,4 +101,5 @@ if [ $? -eq 0 ]; then
 else
     echo "❌ Restore failed"
     exit 1
+fi
 fi

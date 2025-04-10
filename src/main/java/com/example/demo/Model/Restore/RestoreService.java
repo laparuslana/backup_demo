@@ -1,10 +1,7 @@
 package com.example.demo.Model.Restore;
 
 
-import com.example.demo.Model.UserManagement.MyAppUser;
-import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,9 +40,6 @@ public class RestoreService {
     @Autowired
     private RestoreHistoryRepository restoreHistoryRepository;
 
-    @Autowired
-    private MyAppUserRepository myAppUserRepository;
-
     public String restore(RestoreRequest restoreRequest) {
         String command = buildRestoreCommand(
                 restoreRequest.getRes_clusterServer(),
@@ -58,36 +52,34 @@ public class RestoreService {
                 restoreRequest.getRes_clusterUsername(),
                 restoreRequest.getRes_clusterPassword(),
                 restoreRequest.getStorageParams(),
-                restoreRequest.getFullPath()
+                restoreRequest.getFullPath(),
+                restoreRequest.getRes_storageType()
         );
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        String logs = executeRestoreCommand(command, user);
+        String logs = executeRestoreCommand(command);
         return "STATUS" + logs;
     }
 
 
-    private String buildRestoreCommand(String clusterServer, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile, boolean clusterAdmin, String clusterUsername, String clusterPassword, Map<String, String> storageParams, String fullPath) {
+    private String buildRestoreCommand(String clusterServer, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile, boolean clusterAdmin, String clusterUsername, String clusterPassword, Map<String, String> storageParams, String fullPath, String storageType) {
         try {
 
-            String ftpServer = storageParams != null ? storageParams.get("ftpServer") : "";
-            String ftpUser = storageParams != null ? storageParams.get("ftpUser") : "";
-            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : "";
-            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : "";
+            String ftpServer = storageParams != null ? storageParams.get("ftpServer") : null;
+            String ftpUser = storageParams != null ? storageParams.get("ftpUser") : null;
+            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : null;
+            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
             return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
                     clusterServer, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
-                    ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath);
+                    ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath, storageType);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while extracting storage parameters", e);
         }
     }
 
 
-    private String executeRestoreCommand(String command, MyAppUser user) {
+    private String executeRestoreCommand(String command) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -111,20 +103,19 @@ public class RestoreService {
                 status = "Restore failed with exit code: " + exitCode;
             }
 
-            logRestore(status, user);
+            logRestore(status);
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logRestore(status, user);
+            logRestore(status);
         }
         return output.toString();
     }
 
-    private void logRestore(String status, MyAppUser user) {
+    private void logRestore(String status) {
         RestoreHistory restoreHistory = new RestoreHistory();
         restoreHistory.setStatus(status);
         restoreHistory.setRestore_time(LocalDateTime.now());
-        restoreHistory.setUser(user);
         restoreHistoryRepository.save(restoreHistory);
     }
 }
