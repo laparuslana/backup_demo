@@ -1,5 +1,6 @@
 package com.example.demo.Model.Backup;
 
+import com.example.demo.Model.UserManagement.MyAppUser;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,18 @@ public class BackupHistory {
 
     @Column(name = "retention_period", nullable = false)
     private String retention_period;
+
+    public MyAppUser getUser() {
+        return user;
+    }
+
+    public void setUser(MyAppUser user) {
+        this.user = user;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private MyAppUser user;
 
     public String getRetention_period() {
         return retention_period;

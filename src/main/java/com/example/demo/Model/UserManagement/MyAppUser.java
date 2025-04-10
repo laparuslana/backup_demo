@@ -1,6 +1,11 @@
 package com.example.demo.Model.UserManagement;
 
+import com.example.demo.Model.Backup.BackupHistory;
+import com.example.demo.Model.Restore.RestoreHistory;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "my_app_user")
@@ -20,6 +25,28 @@ public class MyAppUser {
     private String password;
 
     private String role;
+
+    public List<BackupHistory> getBackupHistories() {
+        return backupHistories;
+    }
+
+    public void setBackupHistories(List<BackupHistory> backupHistories) {
+        this.backupHistories = backupHistories;
+    }
+
+    @OneToMany(mappedBy = "user")
+    private List<BackupHistory> backupHistories = new ArrayList<>();
+
+    public List<RestoreHistory> getRestoreHistories() {
+        return restoreHistories;
+    }
+
+    public void setRestoreHistories(List<RestoreHistory> restoreHistories) {
+        this.restoreHistories = restoreHistories;
+    }
+
+    @OneToMany(mappedBy = "user")
+    private List<RestoreHistory> restoreHistories = new ArrayList<>();
 
     public String getRole() {
         return role;

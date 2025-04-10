@@ -1,16 +1,16 @@
 package com.example.demo.Model.Backup;
 
 
+import com.example.demo.Model.UserManagement.MyAppUser;
+import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 @Service
@@ -18,6 +18,9 @@ public class BackupService {
 
     @Autowired
     private BackupHistoryRepository backupHistoryRepository;
+
+    @Autowired
+    private MyAppUserRepository myAppUserRepository;
 
     public String startBackup(BackupRequest request) {
         String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
@@ -45,7 +48,11 @@ public class BackupService {
             throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());
         }
 
-        String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod, user);
         return "STATUS" + logs;
     }
 
@@ -66,7 +73,7 @@ public class BackupService {
         }
     }
 
-    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod) {
+    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -90,22 +97,23 @@ public class BackupService {
                 status = "Backup failed with exit code: " + exitCode;
             }
 
-            logBackup(databaseName, status, backup_location, retentionPeriod);
+            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logBackup(databaseName, status, backup_location, retentionPeriod);
+            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
         }
         return output.toString();
     }
 
-    private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod) {
+    private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
         BackupHistory backupHistory = new BackupHistory();
         backupHistory.setDatabase_name(databaseName);
         backupHistory.setStatus(status);
         backupHistory.setBackup_time(LocalDateTime.now());
         backupHistory.setBackup_location(backup_location);
         backupHistory.setRetention_period(retentionPeriod);
+        backupHistory.setUser(myAppUserId);
         backupHistoryRepository.save(backupHistory);
     }
 

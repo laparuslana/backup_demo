@@ -4,6 +4,8 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Backup.StorageSettingsService;
 import com.example.demo.Model.Restore.RestoreRequest;
 import com.example.demo.Model.Restore.RestoreService;
+import com.example.demo.Security.AesEncryptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +29,16 @@ public class RestoreController {
 
     private final StorageSettingsService storageSettingsService;
 
+    @Autowired
+    private AesEncryptor aesEncryptor;
+
     public RestoreController(RestoreService restoreService, StorageSettingsService storageSettingsService) {
         this.restoreService = restoreService;
         this.storageSettingsService = storageSettingsService;
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> listBackupFiles(@RequestParam String type) throws IOException {
+    public ResponseEntity<List<String>> listBackupFiles(@RequestParam String type) throws Exception {
         Map<String, Object> config = storageSettingsService.getSettingsForType(type);
 
         if ("local".equals(type)) {
@@ -55,7 +60,7 @@ public class RestoreController {
         } else if ("ftp".equals(type)) {
             String ftpHost = (String) config.get("ftpServer");
             String ftpUser = (String) config.get("ftpUser");
-            String ftpPassword = (String) config.get("ftpPassword");
+            String ftpPassword = aesEncryptor.decrypt((String) config.get("ftpPassword"));
             String ftpDir = (String) config.get("ftpDirectory");
 
             try {
@@ -72,7 +77,7 @@ public class RestoreController {
 
 
     @PostMapping(value = "/backup", consumes = "application/json")
-    public ResponseEntity<Map<String, String>> restoreBackup(@RequestBody RestoreRequest restoreRequest) throws IOException {
+    public ResponseEntity<Map<String, String>> restoreBackup(@RequestBody RestoreRequest restoreRequest) throws Exception {
         Map<String, String> response = new HashMap<>();
 
         String type = restoreRequest.getRes_storageType();
@@ -91,7 +96,7 @@ public class RestoreController {
             Map<String, String> ftpParams = new HashMap<>();
             ftpParams.put("ftpServer", (String) config.get("ftpServer"));
             ftpParams.put("ftpUser", (String) config.get("ftpUser"));
-            ftpParams.put("ftpPassword", (String) config.get("ftpPassword"));
+            ftpParams.put("ftpPassword", aesEncryptor.decrypt((String) config.get("ftpPassword")));
             ftpParams.put("ftpDirectory", ftpDirectory);
             restoreRequest.setStorageParams(ftpParams);
         } else {

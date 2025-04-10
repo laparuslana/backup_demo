@@ -15,12 +15,14 @@ function loadBackupHistory() {
                 let cell3 = row.insertCell(2);
                 let cell4 = row.insertCell(3);
                 let cell5 = row.insertCell(4);
+                let cell6 = row.insertCell(5);
 
                 cell1.textContent = backup.status;
                 cell2.textContent = new Date(backup.backup_time).toLocaleString();
                 cell3.textContent = backup.database_name;
                 cell4.textContent = backup.backup_location;
                 cell5.textContent = backup.retention_period;
+                cell6.textContent = backup.user.username;
             });
         })
         .catch(error => console.error("Error fetching backup history:", error));
@@ -45,10 +47,12 @@ function loadRestoreHistory() {
                 let row = table.insertRow(-1);
                 let cell1 = row.insertCell(0);
                 let cell2 = row.insertCell(1);
+                let cell3 = row.insertCell(2);
 
 
                 cell1.textContent = restore.status;
                 cell2.textContent = new Date(restore.restore_time).toLocaleString();
+                cell3.textContent = restore.user.username;
 
             });
         })

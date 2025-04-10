@@ -34,7 +34,7 @@ public class StorageSettingsController {
         try {
             storageSettingsService.saveSettings(settings);
             return ResponseEntity.ok(Map.of("message", "Settings saved"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Could not save settings"));
         }

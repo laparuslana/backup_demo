@@ -1,5 +1,6 @@
 package com.example.demo.Model.Restore;
 
+import com.example.demo.Model.UserManagement.MyAppUser;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -42,4 +43,15 @@ public class RestoreHistory {
     @Column(name = "restore_time")
     private LocalDateTime restore_time;
 
+    public MyAppUser getUser() {
+        return user;
+    }
+
+    public void setUser(MyAppUser user) {
+        this.user = user;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private MyAppUser user;
 }
