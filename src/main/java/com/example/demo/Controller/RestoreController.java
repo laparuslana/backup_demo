@@ -29,8 +29,6 @@ public class RestoreController {
 
     private final StorageSettingsService storageSettingsService;
 
-    @Autowired
-    private AesEncryptor aesEncryptor;
 
     public RestoreController(RestoreService restoreService, StorageSettingsService storageSettingsService) {
         this.restoreService = restoreService;
@@ -60,7 +58,7 @@ public class RestoreController {
         } else if ("ftp".equals(type)) {
             String ftpHost = (String) config.get("ftpServer");
             String ftpUser = (String) config.get("ftpUser");
-            String ftpPassword = aesEncryptor.decrypt((String) config.get("ftpPassword"));
+            String ftpPassword = (String) config.get("ftpPassword");
             String ftpDir = (String) config.get("ftpDirectory");
 
             try {
@@ -96,7 +94,7 @@ public class RestoreController {
             Map<String, String> ftpParams = new HashMap<>();
             ftpParams.put("ftpServer", (String) config.get("ftpServer"));
             ftpParams.put("ftpUser", (String) config.get("ftpUser"));
-            ftpParams.put("ftpPassword", aesEncryptor.decrypt((String) config.get("ftpPassword")));
+            ftpParams.put("ftpPassword", (String) config.get("ftpPassword"));
             ftpParams.put("ftpDirectory", ftpDirectory);
             restoreRequest.setStorageParams(ftpParams);
         } else {

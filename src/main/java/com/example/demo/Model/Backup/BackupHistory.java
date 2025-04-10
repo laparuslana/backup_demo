@@ -1,6 +1,7 @@
 package com.example.demo.Model.Backup;
 
 import com.example.demo.Model.UserManagement.MyAppUser;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -22,39 +23,16 @@ public class BackupHistory {
     @Column(name = "database_name")
     private String database_name;
 
+    @Column(name = "storage_path")
+    private String backup_location;
+
     @Column(name = "retention_period", nullable = false)
     private String retention_period;
 
-    public MyAppUser getUser() {
-        return user;
-    }
-
-    public void setUser(MyAppUser user) {
-        this.user = user;
-    }
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private MyAppUser user;
-
-    public String getRetention_period() {
-        return retention_period;
-    }
-
-    public void setRetention_period(String retention_period) {
-        this.retention_period = retention_period;
-    }
-
-    public String getBackup_location() {
-        return backup_location;
-    }
-
-    public void setBackup_location(String backup_location) {
-        this.backup_location = backup_location;
-    }
-
-    @Column(name = "storage_path")
-    private String backup_location;
 
     public Long getId() {
         return id;
@@ -87,4 +65,30 @@ public class BackupHistory {
     public void setDatabase_name(String database_name) {
         this.database_name = database_name;
     }
+
+
+    public MyAppUser getUser() {
+        return user;
+    }
+
+    public void setUser(MyAppUser user) {
+        this.user = user;
+    }
+
+    public String getRetention_period() {
+        return retention_period;
+    }
+
+    public void setRetention_period(String retention_period) {
+        this.retention_period = retention_period;
+    }
+
+    public String getBackup_location() {
+        return backup_location;
+    }
+
+    public void setBackup_location(String backup_location) {
+        this.backup_location = backup_location;
+    }
+
 }

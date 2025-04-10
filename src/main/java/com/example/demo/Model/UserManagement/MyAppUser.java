@@ -2,6 +2,7 @@ package com.example.demo.Model.UserManagement;
 
 import com.example.demo.Model.Backup.BackupHistory;
 import com.example.demo.Model.Restore.RestoreHistory;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class MyAppUser {
     }
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<BackupHistory> backupHistories = new ArrayList<>();
 
     public List<RestoreHistory> getRestoreHistories() {
@@ -46,6 +48,7 @@ public class MyAppUser {
     }
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<RestoreHistory> restoreHistories = new ArrayList<>();
 
     public String getRole() {

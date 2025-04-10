@@ -22,7 +22,7 @@ function loadBackupHistory() {
                 cell3.textContent = backup.database_name;
                 cell4.textContent = backup.backup_location;
                 cell5.textContent = backup.retention_period;
-                cell6.textContent = backup.user.username;
+                cell6.textContent = backup.username;
             });
         })
         .catch(error => console.error("Error fetching backup history:", error));
@@ -52,7 +52,7 @@ function loadRestoreHistory() {
 
                 cell1.textContent = restore.status;
                 cell2.textContent = new Date(restore.restore_time).toLocaleString();
-                cell3.textContent = restore.user.username;
+                cell3.textContent = restore.username;
 
             });
         })

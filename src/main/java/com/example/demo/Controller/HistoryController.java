@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Backup.BackupHistory;
 import com.example.demo.Model.Backup.BackupHistoryRepository;
 import com.example.demo.Model.Restore.RestoreHistory;
+import com.example.demo.Model.Restore.RestoreHistoryDTO;
 import com.example.demo.Model.Restore.RestoreHistoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
+import com.example.demo.Model.Backup.BackupHistoryDTO;
 
 @RestController
 @RequestMapping("/req/history")
@@ -27,15 +30,22 @@ public class HistoryController {
     }
 
     @GetMapping("/backup")
-    public List<BackupHistory> getBackupHistory() {
-        return repository.findAll();
+    public List<BackupHistoryDTO> getBackupHistory() {
+        return repository.findAll()
+                .stream()
+                .map(BackupHistoryDTO::new)
+                .collect(Collectors.toList());
     }
 
     private final RestoreHistoryRepository restoreRepository;
 
     @GetMapping("/restore")
-    public List<RestoreHistory> getRestoreHistory() {
-        return restoreRepository.findAll();
+    public List<RestoreHistoryDTO> getRestoreHistory() {
+
+        return restoreRepository.findAll()
+                .stream()
+                .map(RestoreHistoryDTO::new)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/download")

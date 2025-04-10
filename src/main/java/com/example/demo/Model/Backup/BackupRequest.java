@@ -69,21 +69,6 @@ public class BackupRequest {
     }
 
 
-    public BackupRequest() {
-    }
-
-    public BackupRequest(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword) {
-        this.clusterServer = clusterServer;
-        this.databaseName = databaseName;
-        this.dbServer = dbServer;
-        this.dbUser = dbUser;
-        this.dbPassword = dbPassword;
-        this.backupLocation = backupLocation;
-        this.retentionPeriod = retentionPeriod;
-        this.clusterAdmin = clusterAdmin;
-        this.clusterUsername = clusterUsername;
-        this.clusterPassword = clusterPassword;
-    }
 
     // Getters and Setters
     public String getClusterServer() {

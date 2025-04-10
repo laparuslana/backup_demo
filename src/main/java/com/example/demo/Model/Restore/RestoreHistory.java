@@ -1,6 +1,7 @@
 package com.example.demo.Model.Restore;
 
 import com.example.demo.Model.UserManagement.MyAppUser;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -53,5 +54,6 @@ public class RestoreHistory {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private MyAppUser user;
 }

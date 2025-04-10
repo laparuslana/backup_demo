@@ -60,10 +60,10 @@ public class BackupService {
     private String buildBackupCommand(String clusterServer, String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, boolean clusterAdmin, String clusterUsername, String clusterPassword, String storageType, Map<String, String> storageParams) {
         try {
 
-            String ftpServer = storageParams != null ? storageParams.get("ftpServer") : "";
-            String ftpUser = storageParams != null ? storageParams.get("ftpUser") : "";
-            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : "";
-            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : "";
+            String ftpServer = storageParams != null ? storageParams.get("ftpServer") : null;
+            String ftpUser = storageParams != null ? storageParams.get("ftpUser") : null;
+            String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : null;
+            String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
             return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
                     clusterServer, databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, clusterAdmin,

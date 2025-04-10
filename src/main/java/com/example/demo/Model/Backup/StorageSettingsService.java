@@ -32,9 +32,6 @@ public class StorageSettingsService {
     }
 
     public void saveSettings(Map<String, Object> settings) throws Exception {
-        Object rawPassword = settings.get("ftpPassword");
-        String encrypted = aesEncryptor.encrypt((String) rawPassword);
-        settings.put("ftpPassword", encrypted);
         Files.createDirectories(settingsFile.getParent());
         objectMapper.writeValue(settingsFile.toFile(), settings);
     }

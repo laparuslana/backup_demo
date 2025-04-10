@@ -1,7 +1,10 @@
 package com.example.demo.Model.Restore;
 
 
+import com.example.demo.Model.UserManagement.MyAppUser;
+import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,6 +43,9 @@ public class RestoreService {
     @Autowired
     private RestoreHistoryRepository restoreHistoryRepository;
 
+    @Autowired
+    private MyAppUserRepository myAppUserRepository;
+
     public String restore(RestoreRequest restoreRequest) {
         String command = buildRestoreCommand(
                 restoreRequest.getRes_clusterServer(),
@@ -56,8 +62,11 @@ public class RestoreService {
                 restoreRequest.getRes_storageType()
         );
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        String logs = executeRestoreCommand(command);
+        String logs = executeRestoreCommand(command, user);
         return "STATUS" + logs;
     }
 
@@ -79,7 +88,7 @@ public class RestoreService {
     }
 
 
-    private String executeRestoreCommand(String command) {
+    private String executeRestoreCommand(String command, MyAppUser user) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -103,19 +112,20 @@ public class RestoreService {
                 status = "Restore failed with exit code: " + exitCode;
             }
 
-            logRestore(status);
+            logRestore(status, user);
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logRestore(status);
+            logRestore(status, user);
         }
         return output.toString();
     }
 
-    private void logRestore(String status) {
+    private void logRestore(String status, MyAppUser user) {
         RestoreHistory restoreHistory = new RestoreHistory();
         restoreHistory.setStatus(status);
         restoreHistory.setRestore_time(LocalDateTime.now());
+        restoreHistory.setUser(user);
         restoreHistoryRepository.save(restoreHistory);
     }
 }
