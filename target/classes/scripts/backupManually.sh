@@ -41,7 +41,7 @@ if [ "$STORAGE_TYPE" = "ftp" ]; then
 
     mkdir -p "$TEMP_BACKUP_DIR"
 
-    pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "$TEMP_BACKUP_DIR/$DATABASE_NAME.backup"
+    pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "${TEMP_BACKUP_DIR}/${DATABASE_NAME}_${DATA}_ftp.backup"
 
     sleep 10
 
@@ -50,7 +50,7 @@ ftp -inv "$FTP_SERVER" <<EOF
 user $FTP_USER $FTP_PASSWORD
 lcd $TEMP_BACKUP_DIR
 cd $FTP_DIRECTORY
-put $DATABASE_NAME.backup
+put ${DATABASE_NAME}_${DATA}_ftp.backup
 bye
 EOF
 

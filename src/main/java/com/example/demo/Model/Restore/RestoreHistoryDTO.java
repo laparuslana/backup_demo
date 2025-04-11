@@ -33,11 +33,31 @@ public void setUsername(String username) {
 }
 
 private String username;
+private String backup_file;
+
+    public String getSource_database() {
+        return source_database;
+    }
+
+    public void setSource_database(String source_database) {
+        this.source_database = source_database;
+    }
+
+    public String getBackup_file() {
+        return backup_file;
+    }
+
+    public void setBackup_file(String backup_file) {
+        this.backup_file = backup_file;
+    }
+
+    private String source_database;
 
 public RestoreHistoryDTO(RestoreHistory restore) {
     this.status = restore.getStatus();
     this.restore_time = restore.getRestore_time();
-
+this.backup_file = restore.getBackup_file();
+this.source_database = restore.getSource_database();
     this.username = restore.getUser().getUsername();
 }
     }

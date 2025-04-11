@@ -66,7 +66,12 @@ public class RestoreService {
         MyAppUser user = myAppUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        String logs = executeRestoreCommand(command, user);
+        String backupFileName = restoreRequest.getBackupFile();
+
+        String sourceDatabase = backupFileName.contains("_") ?
+                backupFileName.substring(0, backupFileName.indexOf('_')) : "unknown";
+
+        String logs = executeRestoreCommand(command, user, backupFileName, sourceDatabase);
         return "STATUS" + logs;
     }
 
@@ -79,7 +84,7 @@ public class RestoreService {
             String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : null;
             String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
-            return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
+            return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s %s",
                     clusterServer, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
                     ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath, storageType);
         } catch (Exception e) {
@@ -88,7 +93,7 @@ public class RestoreService {
     }
 
 
-    private String executeRestoreCommand(String command, MyAppUser user) {
+    private String executeRestoreCommand(String command, MyAppUser user, String backupFile, String sourceDatabase) {
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -112,20 +117,22 @@ public class RestoreService {
                 status = "Restore failed with exit code: " + exitCode;
             }
 
-            logRestore(status, user);
+            logRestore(status, user, backupFile, sourceDatabase);
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
-            logRestore(status, user);
+            logRestore(status, user, backupFile, sourceDatabase);
         }
         return output.toString();
     }
 
-    private void logRestore(String status, MyAppUser user) {
+    private void logRestore(String status, MyAppUser user, String backupFile, String sourceDatabase) {
         RestoreHistory restoreHistory = new RestoreHistory();
         restoreHistory.setStatus(status);
         restoreHistory.setRestore_time(LocalDateTime.now());
         restoreHistory.setUser(user);
+        restoreHistory.setBackup_file(backupFile);
+        restoreHistory.setSource_database(sourceDatabase);
         restoreHistoryRepository.save(restoreHistory);
     }
 }

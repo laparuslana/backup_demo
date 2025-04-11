@@ -48,11 +48,14 @@ function loadRestoreHistory() {
                 let cell1 = row.insertCell(0);
                 let cell2 = row.insertCell(1);
                 let cell3 = row.insertCell(2);
-
+                let cell4 = row.insertCell(3);
+                let cell5 = row.insertCell(4);
 
                 cell1.textContent = restore.status;
                 cell2.textContent = new Date(restore.restore_time).toLocaleString();
-                cell3.textContent = restore.username;
+                cell3.textContent = restore.backup_file;
+                cell4.textContent = restore.source_database;
+                cell5.textContent = restore.username;
 
             });
         })
