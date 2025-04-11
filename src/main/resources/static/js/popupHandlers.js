@@ -21,3 +21,12 @@ function openRestorePopup() {
 function closeRestorePopup() {
     document.getElementById('restorePopup').style.display = 'none';
 }
+
+
+function openManageRestorePopup() {
+    document.getElementById('manageRestorePopup').style.display = 'flex';
+}
+
+function closeManageRestorePopup() {
+    document.getElementById('manageRestorePopup').style.display = 'none';
+}

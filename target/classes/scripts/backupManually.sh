@@ -43,7 +43,7 @@ if [ "$STORAGE_TYPE" = "ftp" ]; then
 
     pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "${TEMP_BACKUP_DIR}/${DATABASE_NAME}_${DATA}_ftp.backup"
 
-    sleep 10
+   # sleep 10
 
 echo "🌐 Connecting to FTP server: $FTP_SERVER"
 ftp -inv "$FTP_SERVER" <<EOF

@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 
+import com.example.demo.Model.Backup.BackupRequest;
 import com.example.demo.Model.Backup.StorageSettingsService;
 import com.example.demo.Model.Restore.RestoreRequest;
 import com.example.demo.Model.Restore.RestoreService;
@@ -109,4 +110,17 @@ public class RestoreController {
         response.put("message", "Restore done");
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping(value = "/manage", produces = "application/json")
+    public ResponseEntity<Map<String, String>> deleteTest(@RequestParam String testDb,
+                                                          @RequestParam String server,
+                                                          @RequestParam String user,
+                                                          @RequestParam String password) throws IOException, InterruptedException {
+        Map<String, String> response = new HashMap<>();
+
+        restoreService.deleteTest(testDb, server, user, password);
+        response.put("message", "Backup started");
+        return ResponseEntity.ok(response);
+    }
+
 }

@@ -20,7 +20,15 @@ public class RestoreRequest {
     private Map<String, String> storageParams;
     private String fullPath;
 
+    public String getTest_database() {
+        return test_database;
+    }
 
+    public void setTest_database(String test_database) {
+        this.test_database = test_database;
+    }
+
+    private String test_database;
 
     public String getRes_storageType() {
         return res_storageType;

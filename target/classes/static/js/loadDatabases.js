@@ -78,3 +78,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadDatabases();
 })
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const man_dbServer = document.getElementById("man_dbServer");
+    const man_dbUser = document.getElementById("man_dbUser");
+    const man_dbPassword = document.getElementById("man_dbPassword");
+    const selectDbName = document.getElementById("selectTestDb");
+
+    man_dbServer.addEventListener("change", loadDatabases);
+    man_dbUser.addEventListener("change", loadDatabases);
+    man_dbPassword.addEventListener("change", loadDatabases);
+
+    function loadDatabases() {
+        const dbServer = man_dbServer.value;
+        const dbUser = man_dbUser.value;
+        const dbPassword = man_dbPassword.value;
+
+        if (!dbServer || !dbUser || !dbPassword) return;
+
+        fetch(`/api/backup/listDatabases?dbServer=${encodeURIComponent(dbServer)}&dbUser=${encodeURIComponent(dbUser)}&dbPassword=${encodeURIComponent(dbPassword)}`)
+            .then(response => response.json())
+            .then(data => {
+                selectDbName.innerHTML = "";
+                if (Array.isArray(data)) {
+                    data.forEach(db => {
+                        const option = document.createElement("option");
+                        option.value = db;
+                        option.textContent = db;
+                        selectDbName.appendChild(option);
+                    });
+                } else {
+                    selectDbName.innerHTML = `<option value="">${data[0]}</option>`;
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching databases:", err);
+                selectDbName.innerHTML = `<option value="">Error loading databases</option>`;
+            });
+    }
+    loadDatabases();
+})

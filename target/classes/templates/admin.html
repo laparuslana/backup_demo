@@ -38,6 +38,7 @@
         <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
         <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
         <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
+        <button onclick="openManageRestorePopup()" class="btn-danger">Restore the copy</button>
     </div>
     <h2>History statistics</h2>
     <table id="backupTable">
@@ -218,8 +219,43 @@
         </form>
         <button onclick="closeRestorePopup()">Close</button>
     </div>
-
 </div>
+<div class="popup" id="manageRestorePopup">
+    <div class="popup-content">
+        <h3>Manage Restored Backups</h3>
+        <form id="manageRestoreForm" action="/api/restore/manage" method="post">
+
+            <label for="man_dbServer">DB Server:</label>
+            <input type="text" id="man_dbServer" name="man_dbServer" placeholder="DB Server" required>
+
+            <label for="man_dbUser">DB User:</label>
+            <input type="text" id="man_dbUser" name="man_dbUser" placeholder="DB User" required>
+
+            <label for="man_dbPassword">DB Password:</label>
+            <input type="password" id="man_dbPassword" name="man_dbPassword" placeholder="DB Password" required>
+
+            <label for="selectTestDb">Select Restored (Test) Database:</label>
+            <select id="selectTestDb" name="testDatabaseName" required>
+                <option value="">Loading...</option>
+            </select>
+
+            <label for="sourceDbName">Source Database (from backup):</label>
+            <input type="text" id="sourceDbName" name="sourceDatabaseName" placeholder="e.g. baf_prod" readonly>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="confirmAction" required>
+                <label for="confirmAction">I confirm that I reviewed the restored database and want to proceed.</label>
+            </div>
+
+                <button type="submit" >Make Switch</button>
+                <button type="submit" id="submitDelete">Delete Test Database</button>
+
+        </form>
+
+        <button onclick="closeManageRestorePopup()">Close</button>
+    </div>
+</div>
+
 <script>
         document.getElementById("res_storageType").addEventListener("change", function () {
             const type = this.value;

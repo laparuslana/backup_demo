@@ -61,3 +61,35 @@ submitButom.addEventListener('click', async(event) => {
         .then(data => alert("✅ Restore started successfully!"))
         .catch(error => alert("❌ Error starting restore: " + error));
 });
+
+const submitButton = document.getElementById("submitDelete");
+submitButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    const man_DbServer = document.getElementById("man_dbServer").value;
+    const man_DbUser = document.getElementById("man_dbUser").value;
+    const  man_DbPassword = document.getElementById("man_dbPassword").value;
+    const  selectTestDb = document.getElementById("selectTestDb").value;
+    const   confirmAction = document.getElementById("confirmAction").checked;
+
+    if (!confirmAction) {
+        alert("❗ Please confirm the action before deleting.");
+        return;
+    }
+
+    fetch(`/api/restore/manage?testDb=${encodeURIComponent(selectTestDb)}&server=${encodeURIComponent(man_DbServer)}&user=${encodeURIComponent(man_DbUser)}&password=${encodeURIComponent(man_DbPassword)}`,
+        {
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server returned error");
+            }
+            return response.text();
+        })
+        .then(data => alert("✅ Delete started successfully!"))
+        .catch(error => alert("❌ Error starting delete: " + error));
+});

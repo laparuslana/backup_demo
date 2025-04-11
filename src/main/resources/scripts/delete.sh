@@ -1,0 +1,13 @@
+#!/bin/bash
+
+DBNAME=$1
+HOST=$2
+USER=$3
+PASSWORD=$4
+PORT="5432"
+
+export PGPASSWORD=$PASSWORD
+
+dropdb -h $HOST -p $PORT -U $USER $DBNAME
+
+unset PGPASSWORD

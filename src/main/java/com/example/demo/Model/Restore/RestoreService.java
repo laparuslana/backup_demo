@@ -40,7 +40,32 @@ public class RestoreService {
         return output;
     }
 
-    @Autowired
+        public String deleteTest(String testDb, String server, String user, String password) throws IOException, InterruptedException {
+            StringBuilder output = new StringBuilder();
+            String status;
+
+            ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/delete.sh", testDb, server, user, password);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                status = "✅ Test database deleted successfully!";
+            } else {
+                status = "❌ Delete failed with exit code: " + exitCode;
+            }
+
+            return output.toString();
+        }
+
+
+        @Autowired
     private RestoreHistoryRepository restoreHistoryRepository;
 
     @Autowired
