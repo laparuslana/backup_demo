@@ -67,22 +67,6 @@
         <h3 style="color: #0f172a">Manually backup</h3>
         <form action="/api/backup/execute" method="post" id="backupForm">
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="clusterAdmin">
-                <label for="clusterAdmin">Do you have cluster admin?</label>
-            </div>
-
-            <div id="clusterCredentials" style="display: none;">
-                <label for="clusterUsername">Cluster Username:</label>
-                <input type="text" id="clusterUsername" placeholder="Cluster Username"><br>
-
-                <label for="clusterPassword">Cluster Password:</label>
-                <input type="password" id="clusterPassword" placeholder="Cluster Password"><br>
-            </div>
-
-            <label for="clusterServer">Cluster Server:</label>
-            <input type="text" id="clusterServer" name="clusterServer" placeholder="Cluster Server" required>
-
             <label for="dbServer">DB Server:</label>
             <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
 
@@ -191,8 +175,8 @@
                 <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>
             </div>
 
-            <label for="res_clusterServer">Cluster Server:</label>
-            <input type="text" id="res_clusterServer" name="res_clusterServer" placeholder="Cluster Server" required>
+            <label for="res_bafPath">BAF Path:</label>
+            <input type="text" id="res_bafPath" name="res_bafPath" placeholder="BAF Path" required>
 
             <label for="restoreDbServer">Cluster Server:</label>
             <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="DB Server" required>
@@ -225,6 +209,23 @@
         <h3>Manage Restored Backups</h3>
         <form id="manageRestoreForm" action="/api/restore/manage" method="post">
 
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="man_clusterAdmin">
+                <label for="man_clusterAdmin">Do you have cluster admin?</label>
+            </div>
+
+            <div id="man_clusterCredentials" style="display: none;">
+                <label for="man_clusterUsername">Cluster Username:</label>
+                <input type="text" id="man_clusterUsername" placeholder="Cluster Username"><br>
+
+                <label for="man_clusterPassword">Cluster Password:</label>
+                <input type="password" id="man_clusterPassword" placeholder="Cluster Password"><br>
+            </div>
+
+            <label for="man_bafPath">BAF Path:</label>
+            <input type="text" id="man_bafPath" name="man_bafPath" placeholder="BAF Path" required>
+
             <label for="man_dbServer">DB Server:</label>
             <input type="text" id="man_dbServer" name="man_dbServer" placeholder="DB Server" required>
 
@@ -234,20 +235,22 @@
             <label for="man_dbPassword">DB Password:</label>
             <input type="password" id="man_dbPassword" name="man_dbPassword" placeholder="DB Password" required>
 
-            <label for="selectTestDb">Select Restored (Test) Database:</label>
-            <select id="selectTestDb" name="testDatabaseName" required>
+            <label for="selectTestDb">Select Database:</label>
+            <select id="selectTestDb" name="selectTestDb" required>
                 <option value="">Loading...</option>
             </select>
 
-            <label for="sourceDbName">Source Database (from backup):</label>
-            <input type="text" id="sourceDbName" name="sourceDatabaseName" placeholder="e.g. baf_prod" readonly>
+            <label for="sourceDbName">Source Database:</label>
+            <select id="sourceDbName" name="sourceDbName" required>
+                <option value="">Loading...</option>
+            </select>
 
             <div class="checkbox-group">
                 <input type="checkbox" id="confirmAction" required>
                 <label for="confirmAction">I confirm that I reviewed the restored database and want to proceed.</label>
             </div>
 
-                <button type="submit" >Make Switch</button>
+                <button type="submit" id="submitSwitch">Make Switch</button>
                 <button type="submit" id="submitDelete">Delete Test Database</button>
 
         </form>

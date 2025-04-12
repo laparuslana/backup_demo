@@ -1,12 +1,9 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.Model.Backup.BackupRequest;
 import com.example.demo.Model.Backup.StorageSettingsService;
 import com.example.demo.Model.Restore.RestoreRequest;
 import com.example.demo.Model.Restore.RestoreService;
-import com.example.demo.Security.AesEncryptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -119,8 +116,30 @@ public class RestoreController {
         Map<String, String> response = new HashMap<>();
 
         restoreService.deleteTest(testDb, server, user, password);
-        response.put("message", "Backup started");
+        response.put("message", "Delete started");
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/switch", produces = "application/json")
+    public ResponseEntity<Map<String, String>> switchDB(@RequestParam String bafPath,
+                                                        @RequestParam String clusterAd,
+                                                        @RequestParam String clusterUser,
+                                                        @RequestParam String clusterPass,
+                                                        @RequestParam String sourceDb,
+                                                        @RequestParam String infobase) throws IOException, InterruptedException {
+        Map<String, String> response = new HashMap<>();
+
+        restoreService.switchDb(bafPath, clusterAd, clusterUser, clusterPass, sourceDb, infobase);
+        response.put("message", "Switch started");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/listInfobases")
+    public List<String> listDatabases(@RequestParam String bafPath,
+                                      @RequestParam String clusterAd,
+                                      @RequestParam String clusterUser,
+                                      @RequestParam String clusterPass) {
+        return restoreService.getInfobases(bafPath, clusterAd, clusterUser, clusterPass);
+    }
 }

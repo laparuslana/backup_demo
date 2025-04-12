@@ -1,6 +1,8 @@
 #!/bin/bash
 
-CLUSTER_SERVER=$1
+# Parameters for BAF
+#/opt/1cv8/i386/8.3.25.1374
+BAF_PATH=$1
 TEST_DB_NAME=$2
 DB_HOST=$3
 DB_USER=$4
@@ -32,8 +34,21 @@ if [ "$CLUSTER_ADMIN" = "true" ]; then
 else
     export PGPASSWORD="$DB_PASSWORD"
 fi
-#export PGPASSWORD="postgres"
-#dropdb -h "localhost" -p "5432" -U "postgres" "test_base"
+
+
+# Ensure we are in the correct BAF directory
+cd "$BAF_PATH" || exit 1
+clear
+pwd
+
+# Check if the database exists in BAF
+echo -e "\nChecking if the database exists in the BAF cluster..."
+cluster=$(./rac cluster list | awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
+
+# List all databases in the cluster
+echo -e "\nCluster is $cluster"
+echo -e "\nCurrently available databases in the cluster: "
+./rac infobase --cluster=$cluster summary list | awk -F: '/name/{print $2}'
 
 
 echo "We chose: $STORAGE_TYPE"
@@ -56,17 +71,19 @@ fi
 
 echo "Backup downloaded $LOCAL_DIR"
 
-echo "Creating test database: $TEST_DB_NAME"
-createdb -h "$DB_HOST" -p 5432 -U "$DB_USER" "$TEST_DB_NAME"
+# Step 1: Create the test database in the BAF cluster
+echo -e "\nCreating the test database in the BAF cluster..."
+INFOBASENEW=$(./rac infobase --cluster=$cluster create \
+  --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
+  --locale=uk --db-user=$DB_USER --db-pwd=$DB_PASSWORD --license-distribution=allow | \
+  awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
+
 if [ $? -ne 0 ]; then
-    echo "❌ Failed to create database"
-    exit 1
+  echo "❌ Failed to create database in BAF"
+  exit 1
 fi
 
-echo "Database '$TEST_DB_NAME' created successfully"
-
-echo "📋 Available databases after creation:"
-psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt | cut -d \| -f 1 | sed -e 's/^[ \t]*//' | sort
+echo "✅ Database '$TEST_DB_NAME' created in BAF"
 
 echo "Restoring FTP backup from $LOCAL_DIR/$BACKUP_FILE into $TEST_DB_NAME"
 pg_restore -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$LOCAL_DIR/$BACKUP_FILE"
@@ -79,22 +96,28 @@ else
 fi
 fi
 
+
 if [ "$STORAGE_TYPE" = "local" ]; then
 
-echo "Creating test database: $TEST_DB_NAME"
-createdb -h "$DB_HOST" -p 5432 -U "$DB_USER" "$TEST_DB_NAME"
+# Step 1: Create the test database in the BAF cluster
+echo -e "\nCreating the test database in the BAF cluster..."
+INFOBASENEW=$(./rac infobase --cluster=$cluster create \
+  --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
+  --locale=uk --db-user=$DB_USER --db-pwd=$DB_PASSWORD --license-distribution=allow | \
+  awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
+
 if [ $? -ne 0 ]; then
-    echo "❌ Failed to create database"
-    exit 1
+  echo "❌ Failed to create database in BAF"
+  exit 1
 fi
 
-echo "Database '$TEST_DB_NAME' created successfully"
+echo "✅ Database '$TEST_DB_NAME' created in BAF"
 
-echo "📋 Available databases after creation:"
-psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt | cut -d \| -f 1 | sed -e 's/^[ \t]*//' | sort
+# Step 2: Restore the backup into the test database using pg_restore
+echo "Restoring backup into database '$TEST_DB_NAME'..."
 
-echo "Restoring backup $BACKUP_FILE into $TEST_DB_NAME"
-pg_restore -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$FULL_PATH"
+pg_restore -h "$DB_HOST" -p "5432" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$FULL_PATH"
+
 
 if [ $? -eq 0 ]; then
     echo "✅ Restore completed successfully into database '$TEST_DB_NAME'"
@@ -102,4 +125,9 @@ else
     echo "❌ Restore failed"
     exit 1
 fi
+
+# Verify the databases after restore
+echo "📋 Available databases after restore:"
+psql -h "$DB_HOST" -p "5432" -U "$DB_USER" -lqt | cut -d \| -f 1 | sed -e 's/^[ \t]*//' | sort
+
 fi

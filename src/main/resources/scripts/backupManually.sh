@@ -1,25 +1,21 @@
 #!/bin/bash
 
-CLUSTER_SERVER=$1
-DATABASE_NAME=$2
-DB_SERVER=$3
-DB_USER=$4
-DB_PASSWORD=$5
-BACKUP_DIR=$6
-DAYS_TO_KEEP=$7
-CLUSTER_ADMIN=$8
-CLUSTER_USERNAME=$9
-CLUSTER_PASSWORD="${10}"
-STORAGE_TYPE="${11}"
+DATABASE_NAME=$1
+DB_SERVER=$2
+DB_USER=$3
+DB_PASSWORD=$4
+BACKUP_DIR=$5
+DAYS_TO_KEEP=$6
+STORAGE_TYPE=$7
 DATA=$(date +"%Y%m%d")
 
 if [ "$STORAGE_TYPE" != "ftp" ]; then
   mkdir -p "$BACKUP_DIR"
 fi
-FTP_SERVER="${12}"
-FTP_USER="${13}"
-FTP_PASSWORD="${14}"
-FTP_DIRECTORY="${15}"
+FTP_SERVER=$8
+FTP_USER=$9
+FTP_PASSWORD="${10}"
+FTP_DIRECTORY="${11}"
 
 echo "FTP Server: $FTP_SERVER"
 echo "FTP User: $FTP_USER"
@@ -27,12 +23,7 @@ echo "FTP Password: $FTP_PASSWORD"
 echo "FTP Directory: $FTP_DIRECTORY"
 
 
-if [ "$CLUSTER_ADMIN" = "true" ]; then
-    echo "Cluster admin mode enabled."
-    export PGPASSWORD="$CLUSTER_PASSWORD"
-else
-    export PGPASSWORD="$DB_PASSWORD"
-fi
+export PGPASSWORD="$DB_PASSWORD"
 
 echo "We chose: $STORAGE_TYPE"
 if [ "$STORAGE_TYPE" = "ftp" ]; then

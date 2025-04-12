@@ -5,7 +5,15 @@ import java.util.Map;
 
 public class RestoreRequest {
 
-    private String res_clusterServer;
+    public String getRes_bafPath() {
+        return res_bafPath;
+    }
+
+    public void setRes_bafPath(String res_bafPath) {
+        this.res_bafPath = res_bafPath;
+    }
+
+    private String res_bafPath;
     private String testDbName;
     private String restoreDbServer;
     private String restoreDbUser;
@@ -77,17 +85,6 @@ public class RestoreRequest {
 
     public void setRes_clusterPassword(String res_clusterPassword) {
         this.res_clusterPassword = res_clusterPassword;
-    }
-
-
-
-
-    public String getRes_clusterServer() {
-        return res_clusterServer;
-    }
-
-    public void setRes_clusterServer(String res_clusterServer) {
-        this.res_clusterServer = res_clusterServer;
     }
 
     public String getTestDbName() {

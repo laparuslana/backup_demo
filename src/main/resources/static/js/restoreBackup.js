@@ -8,7 +8,7 @@ submitButom.addEventListener('click', async(event) => {
     event.preventDefault();
 
     let restoreData = {
-        res_clusterServer: document.getElementById("res_clusterServer").value,
+        res_bafPath: document.getElementById("res_bafPath").value,
         testDbName: document.getElementById("testDbName").value,
         restoreDbServer: document.getElementById("restoreDbServer").value,
         restoreDbUser: document.getElementById("restoreDbUser").value,
@@ -91,5 +91,50 @@ submitButton.addEventListener('click', (event) => {
             return response.text();
         })
         .then(data => alert("✅ Delete started successfully!"))
+        .catch(error => alert("❌ Error starting delete: " + error));
+});
+
+document.getElementById("man_clusterAdmin").addEventListener("change", function () {
+    const clusterCredentials = document.getElementById("man_clusterCredentials");
+    clusterCredentials.style.display = this.checked ? "block" : "none";
+});
+
+const submitButon = document.getElementById("submitSwitch");
+submitButon.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    const man_bafPath = document.getElementById("man_bafPath").value;
+    const man_clusterAdmin = document.getElementById("man_clusterAdmin").checked;
+    const  selectTestDb = document.getElementById("selectTestDb").value;
+    const sourceDbName = document.getElementById("sourceTestDb").value;
+    const   confirmAction = document.getElementById("confirmAction").checked;
+
+    let man_clusterUsername= "";
+    let man_clusterPassword = "";
+
+    if (man_clusterAdmin) {
+        man_clusterUsername = document.getElementById("man_clusterUsername").value;
+        man_clusterPassword = document.getElementById("man_clusterPassword").value;
+    }
+
+    if (!confirmAction) {
+        alert("❗ Please confirm the action before deleting.");
+        return;
+    }
+
+    fetch(`/api/restore/switch?bafPath=${encodeURIComponent(man_bafPath)}&clusterAd=${encodeURIComponent(man_clusterAdmin)}&clusterUser=${encodeURIComponent(man_clusterUsername)}&clusterPass=${encodeURIComponent(man_clusterPassword)}&sourceDb=${encodeURIComponent(selectTestDb)}&infobase=${encodeURIComponent(sourceDbName)}`,
+        {
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server returned error");
+            }
+            return response.text();
+        })
+        .then(data => alert("✅ Switch started successfully!"))
         .catch(error => alert("❌ Error starting delete: " + error));
 });

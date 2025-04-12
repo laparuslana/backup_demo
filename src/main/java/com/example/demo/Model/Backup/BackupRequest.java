@@ -1,20 +1,16 @@
 package com.example.demo.Model.Backup;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Map;
 
 public class BackupRequest {
-    private String clusterServer;
+
     private String databaseName;
     private String dbServer;
     private String dbUser;
     private String dbPassword;
     private String backupLocation;
     private String retentionPeriod;
-    private boolean clusterAdmin;
-    private String clusterUsername;
-    private String clusterPassword;
     private String storageType;
 
     public Map<String, String> getStorageParams() {
@@ -42,41 +38,6 @@ public class BackupRequest {
 
     public void setRetentionPeriod(String retentionPeriod) {
         this.retentionPeriod = retentionPeriod;
-    }
-
-    public boolean isClusterAdmin() {
-        return clusterAdmin;
-    }
-
-    public void setClusterAdmin(boolean clusterAdmin) {
-        this.clusterAdmin = clusterAdmin;
-    }
-
-    public String getClusterUsername() {
-        return clusterUsername;
-    }
-
-    public void setClusterUsername(String clusterUsername) {
-        this.clusterUsername = clusterUsername;
-    }
-
-    public String getClusterPassword() {
-        return clusterPassword;
-    }
-
-    public void setClusterPassword(String clusterPassword) {
-        this.clusterPassword = clusterPassword;
-    }
-
-
-
-    // Getters and Setters
-    public String getClusterServer() {
-        return clusterServer;
-    }
-
-    public void setClusterServer(String clusterServer) {
-        this.clusterServer = clusterServer;
     }
 
     public String getDatabaseName() {

@@ -64,6 +64,29 @@ public class RestoreService {
             return output.toString();
         }
 
+    public String switchDb(String bafPath, String clusterAd, String clusterUser, String clusterPass, String sourceDb, String infobase) throws IOException, InterruptedException {
+        StringBuilder output = new StringBuilder();
+        String status;
+
+        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, sourceDb, infobase);
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode == 0) {
+            status = "✅ Switch successfully!";
+        } else {
+            status = "❌ Delete failed with exit code: " + exitCode;
+        }
+
+        return output.toString();
+    }
 
         @Autowired
     private RestoreHistoryRepository restoreHistoryRepository;
@@ -73,7 +96,7 @@ public class RestoreService {
 
     public String restore(RestoreRequest restoreRequest) {
         String command = buildRestoreCommand(
-                restoreRequest.getRes_clusterServer(),
+                restoreRequest.getRes_bafPath(),
                 restoreRequest.getTestDbName(),
                 restoreRequest.getRestoreDbServer(),
                 restoreRequest.getRestoreDbUser(),
@@ -101,7 +124,7 @@ public class RestoreService {
     }
 
 
-    private String buildRestoreCommand(String clusterServer, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile, boolean clusterAdmin, String clusterUsername, String clusterPassword, Map<String, String> storageParams, String fullPath, String storageType) {
+    private String buildRestoreCommand(String bafPath, String testDbName, String dbServer, String dbUser, String dbPassword, String backupFile, boolean clusterAdmin, String clusterUsername, String clusterPassword, Map<String, String> storageParams, String fullPath, String storageType) {
         try {
 
             String ftpServer = storageParams != null ? storageParams.get("ftpServer") : null;
@@ -110,7 +133,7 @@ public class RestoreService {
             String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
             return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s %s",
-                    clusterServer, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
+                    bafPath, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
                     ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath, storageType);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while extracting storage parameters", e);
@@ -159,5 +182,32 @@ public class RestoreService {
         restoreHistory.setBackup_file(backupFile);
         restoreHistory.setSource_database(sourceDatabase);
         restoreHistoryRepository.save(restoreHistory);
+    }
+
+    public List<String> getInfobases(String bafPath, String clusterAd, String clusterUser, String clusterPass) {
+        List<String> databases = new ArrayList<>();
+        try {
+            String[] command = {
+                    "/bin/bash", "src/main/resources/scripts/listInfobases.sh",
+                    bafPath, clusterAd, clusterUser, clusterPass
+            };
+
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("ID=") && line.contains("name=")) {
+                    String namePart = line.substring(line.indexOf("name=") + 5).trim();
+                    databases.add(namePart);
+                }
+            }
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return databases;
     }
 }
