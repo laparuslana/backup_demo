@@ -145,9 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 sourceDbName.innerHTML = "";
                 if (Array.isArray(data)) {
                     data.forEach(db => {
+                        const [uuid, name] = db.split(";");
                         const option = document.createElement("option");
-                        option.value = db;
-                        option.textContent = db;
+                        option.value = uuid;
+                        option.textContent = name;
                         sourceDbName.appendChild(option);
                     });
                 } else {

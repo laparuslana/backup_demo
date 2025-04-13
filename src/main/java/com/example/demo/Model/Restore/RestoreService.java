@@ -199,11 +199,8 @@ public class RestoreService {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.contains("ID=") && line.contains("name=")) {
-                    String namePart = line.substring(line.indexOf("name=") + 5).trim();
-                    databases.add(namePart);
+                databases.add(line);
                 }
-            }
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();

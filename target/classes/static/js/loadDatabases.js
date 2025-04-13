@@ -119,3 +119,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadDatabases();
 })
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const man_bafPath = document.getElementById("man_bafPath");
+    const man_clusterAdmin = document.getElementById("man_clusterAdmin");
+    const man_clusterUsername = document.getElementById("man_clusterUsername");
+    const man_clusterPassword = document.getElementById("man_clusterPassword");
+    const sourceDbName = document.getElementById("sourceDbName");
+
+    man_bafPath.addEventListener("change", loadInfobases)
+    man_clusterAdmin.addEventListener("change", loadInfobases)
+    man_clusterUsername.addEventListener("change", loadInfobases);
+    man_clusterPassword.addEventListener("change", loadInfobases);
+
+    function loadInfobases() {
+        const bafPath = man_bafPath.value;
+        const clusterAd = man_clusterAdmin.checked;
+        const clusterUser = man_clusterUsername.value;
+        const clusterPass = man_clusterPassword.value;
+
+        fetch(`/api/restore/listInfobases?bafPath=${encodeURIComponent(bafPath)}&clusterAd=${encodeURIComponent(clusterAd)}&clusterUser=${encodeURIComponent(clusterUser)}&clusterPass=${encodeURIComponent(clusterPass)}`)
+            .then(response => response.json())
+            .then(data => {
+                sourceDbName.innerHTML = "";
+                if (Array.isArray(data)) {
+                    data.forEach(db => {
+                        const [uuid, name] = db.split(";");
+                        const option = document.createElement("option");
+                        option.value = uuid;
+                        option.textContent = name;
+                        sourceDbName.appendChild(option);
+                    });
+                    //
+                    // data.forEach(db => {
+                    //     const option = document.createElement("option");
+                    //     option.value = db;
+                    //     option.textContent = db;
+                    //     sourceDbName.appendChild(option);
+                    // });
+                } else {
+                    sourceDbName.innerHTML = `<option value="">${data[0]}</option>`;
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching databases:", err);
+                sourceDbName.innerHTML = `<option value="">Error loading databases</option>`;
+            });
+    }
+    loadInfobases();
+})

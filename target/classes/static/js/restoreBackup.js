@@ -68,9 +68,9 @@ submitButton.addEventListener('click', (event) => {
 
     const man_DbServer = document.getElementById("man_dbServer").value;
     const man_DbUser = document.getElementById("man_dbUser").value;
-    const  man_DbPassword = document.getElementById("man_dbPassword").value;
-    const  selectTestDb = document.getElementById("selectTestDb").value;
-    const   confirmAction = document.getElementById("confirmAction").checked;
+    const man_DbPassword = document.getElementById("man_dbPassword").value;
+    const selectTestDb = document.getElementById("selectTestDb").value;
+    const confirmAction = document.getElementById("confirmAction").checked;
 
     if (!confirmAction) {
         alert("❗ Please confirm the action before deleting.");
@@ -105,9 +105,9 @@ submitButon.addEventListener('click', (event) => {
 
     const man_bafPath = document.getElementById("man_bafPath").value;
     const man_clusterAdmin = document.getElementById("man_clusterAdmin").checked;
-    const  selectTestDb = document.getElementById("selectTestDb").value;
-    const sourceDbName = document.getElementById("sourceTestDb").value;
-    const   confirmAction = document.getElementById("confirmAction").checked;
+    const selectTestDb = document.getElementById("selectTestDb").value;
+    const sourceDbName = document.getElementById("sourceDbName").value;
+    const confirmAction = document.getElementById("confirmAction").checked;
 
     let man_clusterUsername= "";
     let man_clusterPassword = "";
