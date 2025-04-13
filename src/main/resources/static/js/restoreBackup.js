@@ -88,9 +88,12 @@ submitButton.addEventListener('click', (event) => {
             if (!response.ok) {
                 throw new Error("Server returned error");
             }
-            return response.text();
+            alert("✅ Delete started successfully!")
+            return response.json();
         })
-        .then(data => alert("✅ Delete started successfully!"))
+        .then(data => {
+            alert(data.message);
+        })
         .catch(error => alert("❌ Error starting delete: " + error));
 });
 
@@ -105,7 +108,6 @@ submitButon.addEventListener('click', (event) => {
 
     const man_bafPath = document.getElementById("man_bafPath").value;
     const man_clusterAdmin = document.getElementById("man_clusterAdmin").checked;
-    const selectTestDb = document.getElementById("selectTestDb").value;
     const sourceDbName = document.getElementById("sourceDbName").value;
     const confirmAction = document.getElementById("confirmAction").checked;
 
@@ -122,7 +124,7 @@ submitButon.addEventListener('click', (event) => {
         return;
     }
 
-    fetch(`/api/restore/switch?bafPath=${encodeURIComponent(man_bafPath)}&clusterAd=${encodeURIComponent(man_clusterAdmin)}&clusterUser=${encodeURIComponent(man_clusterUsername)}&clusterPass=${encodeURIComponent(man_clusterPassword)}&sourceDb=${encodeURIComponent(selectTestDb)}&infobase=${encodeURIComponent(sourceDbName)}`,
+    fetch(`/api/restore/switch?bafPath=${encodeURIComponent(man_bafPath)}&clusterAd=${encodeURIComponent(man_clusterAdmin)}&clusterUser=${encodeURIComponent(man_clusterUsername)}&clusterPass=${encodeURIComponent(man_clusterPassword)}&infobase=${encodeURIComponent(sourceDbName)}`,
         {
             method: "POST",
             headers: {
@@ -133,8 +135,11 @@ submitButon.addEventListener('click', (event) => {
             if (!response.ok) {
                 throw new Error("Server returned error");
             }
-            return response.text();
+            alert("✅ Switch started successfully!")
+            return response.json();
         })
-        .then(data => alert("✅ Switch started successfully!"))
+        .then(data => {
+            alert(data.message);
+})
         .catch(error => alert("❌ Error starting delete: " + error));
 });

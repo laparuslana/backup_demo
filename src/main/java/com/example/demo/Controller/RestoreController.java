@@ -115,8 +115,8 @@ public class RestoreController {
                                                           @RequestParam String password) throws IOException, InterruptedException {
         Map<String, String> response = new HashMap<>();
 
-        restoreService.deleteTest(testDb, server, user, password);
-        response.put("message", "Delete started");
+        String result = restoreService.deleteTest(testDb, server, user, password);
+        response.put("message", result);
         return ResponseEntity.ok(response);
     }
 
@@ -125,12 +125,11 @@ public class RestoreController {
                                                         @RequestParam String clusterAd,
                                                         @RequestParam String clusterUser,
                                                         @RequestParam String clusterPass,
-                                                        @RequestParam String sourceDb,
                                                         @RequestParam String infobase) throws IOException, InterruptedException {
         Map<String, String> response = new HashMap<>();
 
-        restoreService.switchDb(bafPath, clusterAd, clusterUser, clusterPass, sourceDb, infobase);
-        response.put("message", "Switch started");
+        String result = restoreService.switchDb(bafPath, clusterAd, clusterUser, clusterPass, infobase);
+        response.put("message", result);
         return ResponseEntity.ok(response);
     }
 

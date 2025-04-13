@@ -151,13 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         option.textContent = name;
                         sourceDbName.appendChild(option);
                     });
-                    //
-                    // data.forEach(db => {
-                    //     const option = document.createElement("option");
-                    //     option.value = db;
-                    //     option.textContent = db;
-                    //     sourceDbName.appendChild(option);
-                    // });
                 } else {
                     sourceDbName.innerHTML = `<option value="">${data[0]}</option>`;
                 }

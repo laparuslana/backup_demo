@@ -61,14 +61,14 @@ public class RestoreService {
                 status = "❌ Delete failed with exit code: " + exitCode;
             }
 
-            return output.toString();
+            return status;
         }
 
-    public String switchDb(String bafPath, String clusterAd, String clusterUser, String clusterPass, String sourceDb, String infobase) throws IOException, InterruptedException {
+    public String switchDb(String bafPath, String clusterAd, String clusterUser, String clusterPass, String infobase) throws IOException, InterruptedException {
         StringBuilder output = new StringBuilder();
         String status;
 
-        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, sourceDb, infobase);
+        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, infobase);
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
@@ -85,7 +85,7 @@ public class RestoreService {
             status = "❌ Delete failed with exit code: " + exitCode;
         }
 
-        return output.toString();
+        return status;
     }
 
         @Autowired
