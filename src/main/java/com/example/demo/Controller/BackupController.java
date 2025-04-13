@@ -6,6 +6,7 @@ import com.example.demo.Model.Backup.BackupService;
 import com.example.demo.Model.Backup.StorageSettingsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -51,28 +52,50 @@ public class BackupController {
         response.put("message", "Backup started");
         return ResponseEntity.ok(response);
     }
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @PostMapping(value = "/save", consumes = "application/json")
-    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) {
-        try {
-            if ("FTP".equalsIgnoreCase(backupSchedule.getStorageType2())) {
-                Map<String, Object> ftpSettings = storageSettingsService.getSettingsForType("ftp");
+   @PostMapping(value = "/save", consumes = "application/json")
+//    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) {
+//            Map<String, Object> storageSettings = storageSettingsService.getSettingsForType(request.getStorageType());
+//
+//            if ("local".equals(backupSchedule.getStorageType2())) {
+//                backupSchedule.setBackupLocation2((String) storageSettings.get("backupLocation"));
+//            } else if ("ftp".equals(backupSchedule.getStorageType2())) {
+//                Map<String, String> ftpParams = new HashMap<>();
+//                ftpParams.put("ftpServer", (String) storageSettings.get("ftpServer"));
+//                ftpParams.put("ftpUser", (String) storageSettings.get("ftpUser"));
+//                ftpParams.put("ftpPassword", (String) storageSettings.get("ftpPassword"));
+//                ftpParams.put("ftpDirectory", (String) storageSettings.get("ftpDirectory"));
+//                backupSchedule.setStorageParams(ftpParams);
+//            }
+//
+//            backupService.save(backupSchedule);
+//            return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
+//        }
+    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) throws IOException {
+        Map<String, Object> storageSettings = storageSettingsService.getSettingsForType(backupSchedule.getStorageType2());
 
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode ftpParams = mapper.valueToTree(ftpSettings);
+        if ("local".equals(backupSchedule.getStorageType2())) {
+            backupSchedule.setBackupLocation2((String) storageSettings.get("backupLocation"));
+        } else if ("ftp".equals(backupSchedule.getStorageType2())) {
+            Map<String, String> ftpParams = new HashMap<>();
+            ftpParams.put("ftpServer", (String) storageSettings.get("ftpServer"));
+            ftpParams.put("ftpUser", (String) storageSettings.get("ftpUser"));
+            ftpParams.put("ftpPassword", (String) storageSettings.get("ftpPassword"));
+            ftpParams.put("ftpDirectory", (String) storageSettings.get("ftpDirectory"));
 
-                backupSchedule.setStorageParams2(ftpParams);
-            } else {
-                backupSchedule.setStorageParams2(null);
+            try {
+                JsonNode ftpParamsJson = objectMapper.valueToTree(ftpParams);
+                backupSchedule.setStorageParams2(ftpParamsJson);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("error", "Failed to serialize FTP params"));
             }
-
-            backupService.save(backupSchedule);
-            return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Could not save settings: " + e.getMessage()));
         }
+
+        backupService.save(backupSchedule);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
     }
 
     @GetMapping("/listDatabases")
