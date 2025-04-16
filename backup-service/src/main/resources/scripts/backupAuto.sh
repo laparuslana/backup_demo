@@ -1,25 +1,21 @@
 #!/bin/bash
 
-CLUSTER_SERVER=$1
-DATABASE_NAME=$2
-DB_SERVER=$3
-DB_USER=$4
-DB_PASSWORD=$5
-BACKUP_DIR=$6
-DAYS_TO_KEEP=$7
-CLUSTER_ADMIN=$8
-CLUSTER_USERNAME=$9
-CLUSTER_PASSWORD="${10}"
-STORAGE_TYPE="${11}"
+DATABASE_NAME=$1
+DB_SERVER=$2
+DB_USER=$3
+DB_PASSWORD=$4
+BACKUP_DIR=$5
+DAYS_TO_KEEP=$6
+STORAGE_TYPE=$7
 DATA=$(date +"%Y%m%d")
 
 if [ "$STORAGE_TYPE" != "ftp" ]; then
   mkdir -p "$BACKUP_DIR"
 fi
-FTP_SERVER="${12}"
-FTP_USER="${13}"
-FTP_PASSWORD="${14}"
-FTP_DIRECTORY="${15}"
+FTP_SERVER=$8
+FTP_USER=$9
+FTP_PASSWORD="${10}"
+FTP_DIRECTORY="${11}"
 
 echo "FTP Server: $FTP_SERVER"
 echo "FTP User: $FTP_USER"
@@ -41,7 +37,7 @@ if [ "$STORAGE_TYPE" = "ftp" ]; then
 
     mkdir -p "$TEMP_BACKUP_DIR"
 
-    pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "$TEMP_BACKUP_DIR/$DATABASE_NAME.backup"
+    pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "${TEMP_BACKUP_DIR}/${DATABASE_NAME}_${DATA}_ftp.backup"
 
     sleep 10
 
@@ -50,7 +46,7 @@ ftp -inv "$FTP_SERVER" <<EOF
 user $FTP_USER $FTP_PASSWORD
 lcd $TEMP_BACKUP_DIR
 cd $FTP_DIRECTORY
-put $DATABASE_NAME.backup
+put ${DATABASE_NAME}_${DATA}_ftp.backup
 bye
 EOF
 
@@ -63,7 +59,7 @@ echo "FTP executed"
         exit 1
     fi
 else
-  echo "Backup locally $BACKUP_DIR"
+  echo "Backup locally"
   pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup"
 
   if [ -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup" ]; then

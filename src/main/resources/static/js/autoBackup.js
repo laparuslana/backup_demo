@@ -1,8 +1,3 @@
-document.getElementById("clusterAdmin2").addEventListener("change", function () {
-    const clusterCredentials = document.getElementById("clusterCredentials2");
-    clusterCredentials.style.display = this.checked ? "block" : "none";
-});
-
 document.getElementById("frequency").addEventListener("change", function () {
     let daySelection = document.getElementById("daySelection");
     let dayDropdown = document.getElementById("day");
@@ -35,7 +30,6 @@ submitButtom.addEventListener('click', (event) => {
     event.preventDefault();
 
     let backupData2 = {
-        clusterServer2: document.getElementById("clusterServer2").value,
         databaseName2: document.getElementById("databaseName2").value,
         dbServer2: document.getElementById("dbServer2").value,
         dbUser2: document.getElementById("dbUser2").value,
@@ -44,14 +38,8 @@ submitButtom.addEventListener('click', (event) => {
         day: document.getElementById("day").value,
         time: document.getElementById("time").value,
         daysKeep2: document.getElementById("daysKeep2").value,
-        clusterAdmin2: document.getElementById("clusterAdmin2").checked,
         storageType2: document.getElementById("storageType2").value
     };
-
-    if (backupData2.clusterAdmin2) {
-        backupData2.clusterUsername2 = document.getElementById("clusterUsername2").value;
-        backupData2.clusterPassword2 = document.getElementById("clusterPassword2").value;
-    }
 
 
     fetch("/api/backup/save", {

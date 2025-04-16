@@ -20,210 +20,115 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Service
-public class BackupScheduler {
+    @Service
+    public class BackupScheduler {
 
-    @Autowired
-    private BackupRepository backupScheduleRepository;
+        @Autowired
+        private BackupRepository backupScheduleRepository;
 
-    @Autowired
-    private HistoryRepository historyRepository;
+        @Scheduled(fixedRate = 60000)
+        public void scheduleBackups() {
+            System.out.println("Checking schedule");
+            List<ScheduledBackup> schedules = backupScheduleRepository.findAll();
 
-    @Scheduled(fixedRate = 60000)
-    public void scheduleBackups() {
-        System.out.println("Checking schedule");
-        List<ScheduledBackup> schedules = backupScheduleRepository.findAll();
-
-        for (ScheduledBackup schedule : schedules) {
-            scheduleBackup(schedule);
-        }
-    }
-
-    private void scheduleBackup(ScheduledBackup schedule) {
-        String cronExpression = convertToCron(schedule.getFrequency(), schedule.getDay(), schedule.getTime());
-
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        Runnable backupTask = () -> executeBackup(schedule);
-
-        long initialDelay = calculateInitialDelay(schedule.getDay(), schedule.getTime());
-        long period = calculatePeriod(schedule.getFrequency());
-
-        scheduler.scheduleAtFixedRate(backupTask, initialDelay, period, TimeUnit.MILLISECONDS);
-        System.out.println("Task " + schedule.getDatabaseName() + " с cron: " + cronExpression);
-
-        try {
-            Process process = Runtime.getRuntime().exec("crontab -l");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-            StringBuilder existingCronJobs = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                existingCronJobs.append(line).append("\n");
-            }
-
-            String cronJob = String.format("%s /bin/bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s",
-                    cronExpression, schedule.getDatabaseName(), schedule.getDbServer(), schedule.getBackupLocation());
-
-            Path cronFilePath = Paths.get("/tmp/my_cron_jobs");
-            if (!isDuplicate(cronExpression, cronFilePath)) {
-                existingCronJobs.append(cronJob).append("\n");
-            } else {
-                System.out.println("Cron job exists");
-            }
-
-            Files.write(cronFilePath, existingCronJobs.toString().getBytes(),
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            Runtime.getRuntime().exec("crontab " + cronFilePath);
-
-            System.out.println("Backup task scheduled: " + cronJob);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isDuplicate(String cronExpression, Path cronFilePath) {
-    try {
-        if (!Files.exists(cronFilePath)) {
-            return  false;
-        }
-        List<String> lines = Files.readAllLines(cronFilePath);
-
-        for (String line : lines) {
-            if (line.startsWith(cronExpression + " ")) {
-                return true;
+            for (ScheduledBackup schedule : schedules) {
+                installCronJob(schedule);
             }
         }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    return false;
-    }
 
-    public static long calculateInitialDelay(String day, LocalTime time) {
-        LocalDate now = LocalDate.now();
-
-        DayOfWeek targetDay;
-        if (day == null || day.isBlank()) {
-            targetDay = now.getDayOfWeek();
-        } else {
+        private void installCronJob(ScheduledBackup schedule) {
             try {
-                targetDay = DayOfWeek.valueOf(day.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid day value: " + day, e);
+                String cronExpression = convertToCron(schedule.getFrequency(), schedule.getDay(), schedule.getTime());
+
+                String projectRoot = Paths.get("").toAbsolutePath().toString();
+                String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
+
+                String cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s >> /tmp/auto-cron.log 2>&1",
+                        cronExpression,
+                        scriptPath,
+                        schedule.getDatabaseName(),
+                        schedule.getDbServer(),
+                        schedule.getDbUser(),
+                        schedule.getDbPassword(),
+                        schedule.getBackupLocation(),
+                        schedule.getDaysKeep(),
+                        schedule.getStorageType(),
+                        getJson(schedule.getStorageParams(), "ftpServer"),
+                        getJson(schedule.getStorageParams(), "ftpUser"),
+                        getJson(schedule.getStorageParams(), "ftpPassword"),
+                        getJson(schedule.getStorageParams(), "ftpDirectory")
+                );
+
+                Process getCron = new ProcessBuilder("crontab", "-l").start();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(getCron.getInputStream()));
+                StringBuilder currentJobs = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    currentJobs.append(line).append("\n");
+                    System.out.println("✅ Cron job installed: " + cronJob);
+                }
+                getCron.waitFor();
+
+                if (currentJobs.toString().contains(cronJob)) {
+                    System.out.println("⏩ Cron job already exists");
+                    return;
+                }
+
+                currentJobs.append(cronJob).append("\n");
+
+                Path tempCron = Files.createTempFile("my_cron", ".tmp");
+                Files.write(tempCron, currentJobs.toString().getBytes());
+
+                Process setCron = new ProcessBuilder("crontab", tempCron.toString()).start();
+                BufferedReader errorReader = new BufferedReader(new InputStreamReader(setCron.getInputStream()));
+                while ((line = errorReader.readLine()) != null) {
+                    System.out.println("CRONTAB OUTPUT: " + line);
+                }
+                int exitCode = setCron.waitFor();
+                System.out.println("CRONTAB INSTALL EXIT CODE: " + exitCode);
+
+                Files.deleteIfExists(tempCron);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
-        LocalDate targetDate = now.with(TemporalAdjusters.nextOrSame(targetDay));
 
-        LocalDateTime scheduledTime = LocalDateTime.of(targetDate, time);
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        long delay = Duration.between(currentTime, scheduledTime).toSeconds();
-        return delay > 0 ? delay : 0;
-    }
-
-    public static long calculatePeriod(String frequency) {
-        switch (frequency.toLowerCase()) {
-            case "hourly":
-                return 3600;
-            case "daily":
-                return 86400;
-            case "weekly":
-                return 604800;
-            default:
-                throw new IllegalArgumentException("Unsupported frequency: " + frequency);
+            private String getJson(JsonNode node, String key) {
+            return (node != null && node.has(key)) ? node.get(key).asText() : "";
         }
-    }
-    private void executeBackup(ScheduledBackup schedule) {
 
-        JsonNode storageParams = schedule.getStorageParams();
-        String ftpServer = storageParams != null ? storageParams.get("ftpServer").asText() : "";
-        String ftpUser = storageParams != null ? storageParams.get("ftpUser").asText() : "";
-        String ftpPassword = storageParams != null ? storageParams.get("ftpPassword").asText() : "";
-        String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory").asText() : "";
+        private String convertToCron(String frequency, String day, LocalTime time) {
+            String timeStr = time.format(DateTimeFormatter.ofPattern("mm HH"));
+            String[] timeParts = timeStr.split(" ");
+            String minutes = timeParts[0];
+            String hours = timeParts[1];
 
-        String command = String.format(
-                "bash backup-service/src/main/resources/scripts/backupAuto.sh %s %s %s %s %s %s %s %b %s %s %s %s %s %s %s",
-                schedule.getClusterServer(), schedule.getDatabaseName(), schedule.getDbServer(), schedule.getDbUser(), schedule.getDbPassword(), schedule.getBackupLocation(), schedule.getDaysKeep(),
-                schedule.isClusterAdmin(),
-                schedule.getClusterUsername(),
-                schedule.getClusterPassword(),
-                schedule.getStorageType(), ftpServer, ftpUser, ftpPassword, ftpDirectory
-        );
-
-        StringBuilder output = new StringBuilder();
-        String status;
-
-        try {
-            Process process = Runtime.getRuntime().exec(command);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+            switch (frequency.toLowerCase()) {
+                case "daily":
+                    return String.format("%s %s * * *", minutes, hours);
+                case "weekly":
+                    return String.format("%s %s * * %s", minutes, hours, convertDayToCron(day));
+                case "monthly":
+                    return String.format("%s %s %s * *", minutes, hours, day);
+                default:
+                    throw new IllegalArgumentException("Unknown frequency: " + frequency);
             }
-            while ((line = stdError.readLine()) != null) {
-                output.append("ERROR: ").append(line).append("\n");
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                status = "Backup executed successfully!\n";
-            } else {
-                status = "Backup failed with exit code: " + exitCode;
-            }
-
-            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation(), schedule.getDaysKeep());
-
-        } catch (IOException | InterruptedException e) {
-            status = "❌ Error executing backup: " + e.getMessage();
-            logBackup(schedule.getDatabaseName(), status, schedule.getBackupLocation(), schedule.getDaysKeep());
-        }
         }
 
-    private void logBackup(String databaseName, String status, String backup_location, String retention_days) {
-        HistoryTask backupHistory = new HistoryTask();
-        backupHistory.setDatabase_name(databaseName);
-        backupHistory.setStatus(status);
-        backupHistory.setBackup_time(LocalDateTime.now());
-        backupHistory.setBackup_location(backup_location);
-        backupHistory.setRetention_period(retention_days);
-        historyRepository.save(backupHistory);
-    }
-
-    private String convertToCron(String frequency, String day, LocalTime time) {
-        System.out.println("DEBUG: " + time);
-        String timestr = time.format(DateTimeFormatter.ofPattern("mm:HH"));
-        String[] timeParts = timestr.split(":");
-        String minutes = timeParts[0];
-        String hours = timeParts[1];
-
-        System.out.println("DEBUG: " + hours + minutes);
-        switch (frequency) {
-            case "daily":
-                return String.format("%s %s * * *", minutes, hours);
-            case "weekly":
-                return String.format("%s %s * * %s", minutes, hours, convertDayToCron(day));
-            case "monthly":
-                return String.format("%s %s %s * *", minutes, hours, day);
-            default:
-                throw new IllegalArgumentException("Unknown frequency: " + frequency);
+        private String convertDayToCron(String day) {
+            Map<String, String> daysMap = Map.of(
+                    "Monday", "1",
+                    "Tuesday", "2",
+                    "Wednesday", "3",
+                    "Thursday", "4",
+                    "Friday", "5",
+                    "Saturday", "6",
+                    "Sunday", "0"
+            );
+            return daysMap.getOrDefault(day, "*");
         }
-    }
-
-    private String convertDayToCron(String day) {
-        Map<String, String> daysMap = Map.of(
-                "Monday", "1",
-                "Tuesday", "2",
-                "Wednesday", "3",
-                "Thursday", "4",
-                "Friday", "5",
-                "Saturday", "6",
-                "Sunday", "7"
-        );
-        return daysMap.getOrDefault(day, "*");
-    }
 }
 

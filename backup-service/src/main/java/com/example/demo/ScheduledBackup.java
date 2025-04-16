@@ -25,9 +25,6 @@ public class ScheduledBackup {
         @Column(name = "time")
         private LocalTime time;
 
-        @Column(name = "cluster_server")
-        private String clusterServer;
-
         @Column(name = "db_server")
         private String dbServer;
 
@@ -42,15 +39,6 @@ public class ScheduledBackup {
 
         @Column(name = "retention_period")
         private String daysKeep;
-
-        @Column(name = "cluster_admin")
-        private boolean clusterAdmin;
-
-        @Column(name = "cluster_username")
-        private String clusterUsername;
-
-        @Column(name = "cluster_password")
-        private String clusterPassword;
 
     public JsonNode getStorageParams() {
         return storageParams;
@@ -81,6 +69,9 @@ public class ScheduledBackup {
     }
 
     private String decrypt(String encryptedData) {
+        if (encryptedData == null) {
+            return "";
+        }
         return new String(Base64.getDecoder().decode(encryptedData));
     }
 
@@ -92,32 +83,8 @@ public class ScheduledBackup {
             this.daysKeep = daysKeep;
         }
 
-        public String getClusterPassword() {
-            return decrypt(clusterPassword);
-        }
-
-        public String getClusterUsername() {
-            return clusterUsername;
-        }
-
-        public void setClusterUsername(String clusterUsername) {
-            this.clusterUsername = clusterUsername;
-        }
-
-        public boolean isClusterAdmin() {
-            return clusterAdmin;
-        }
-
-        public void setClusterAdmin(boolean clusterAdmin) {
-            this.clusterAdmin = clusterAdmin;
-        }
-
         public void setDbPassword(String dbPassword) {
             this.dbPassword = encrypt(dbPassword);
-        }
-
-        public void setClusterPassword(String clusterPassword) {
-            this.clusterPassword = encrypt(clusterPassword);
         }
 
         public Long getId() {
@@ -158,14 +125,6 @@ public class ScheduledBackup {
 
         public void setTime(LocalTime time) {
             this.time = time;
-        }
-
-        public String getClusterServer() {
-            return clusterServer;
-        }
-
-        public void setClusterServer(String clusterServer) {
-            this.clusterServer = clusterServer;
         }
 
         public String getDbServer() {

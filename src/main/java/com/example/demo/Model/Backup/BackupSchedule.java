@@ -27,9 +27,6 @@ public class BackupSchedule {
     @Column(name = "time")
     private LocalTime time;
 
-    @Column(name = "cluster_server")
-    private String clusterServer2;
-
     @Column(name = "db_server")
     private String dbServer2;
 
@@ -45,14 +42,6 @@ public class BackupSchedule {
     @Column(name = "retention_period")
     private String daysKeep2;
 
-    @Column(name = "cluster_admin")
-    private boolean clusterAdmin2;
-
-    @Column(name = "cluster_username")
-    private String clusterUsername2;
-
-    @Column(name = "cluster_password")
-    private String clusterPassword2;
 
     @Column(name = "storage_params", columnDefinition = "json")
     @Convert(converter = JsonNodeConverter.class)
@@ -126,14 +115,6 @@ public class BackupSchedule {
         this.time = time;
     }
 
-    public String getClusterServer2() {
-        return clusterServer2;
-    }
-
-    public void setClusterServer2(String clusterServer2) {
-        this.clusterServer2 = clusterServer2;
-    }
-
     public String getDbServer2() {
         return dbServer2;
     }
@@ -172,30 +153,6 @@ public class BackupSchedule {
 
     public void setDaysKeep2(String daysKeep2) {
         this.daysKeep2 = daysKeep2;
-    }
-
-    public boolean isClusterAdmin2() {
-        return clusterAdmin2;
-    }
-
-    public void setClusterAdmin2(boolean clusterAdmin2) {
-        this.clusterAdmin2 = clusterAdmin2;
-    }
-
-    public String getClusterUsername2() {
-        return clusterUsername2;
-    }
-
-    public void setClusterUsername2(String clusterUsername2) {
-        this.clusterUsername2 = clusterUsername2;
-    }
-
-    public String getClusterPassword2() {
-        return clusterPassword2;
-    }
-
-    public void setClusterPassword2(String clusterPassword2) {
-        this.clusterPassword2 = encrypt(clusterPassword2);
     }
 
     public JsonNode getStorageParams() {
