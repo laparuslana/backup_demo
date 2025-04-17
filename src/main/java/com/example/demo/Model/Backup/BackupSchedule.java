@@ -15,6 +15,12 @@ public class BackupSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "type", nullable = false)
+    private String type;
+
+    @Column(name = "folder_path", nullable = true)
+    private String folderPath;
+
     @Column(name = "database_name")
     private String databaseName2;
 
@@ -50,6 +56,23 @@ public class BackupSchedule {
     @Column(name = "storage_type", nullable = false)
     private String storageType2;
 
+
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getFolderPath() {
+        return folderPath;
+    }
+
+    public void setFolderPath(String folderPath) {
+        this.folderPath = folderPath;
+    }
 
     public String getStorageType2() {
         return storageType2;

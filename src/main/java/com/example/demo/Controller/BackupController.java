@@ -58,27 +58,45 @@ public class BackupController {
    @PostMapping(value = "/save", consumes = "application/json")
 
     public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) throws IOException {
-        Map<String, Object> storageSettings = storageSettingsService.getSettingsForType(backupSchedule.getStorageType2());
+       String type = backupSchedule.getType();
 
-        if ("local".equals(backupSchedule.getStorageType2())) {
-            backupSchedule.setBackupLocation2((String) storageSettings.get("backupLocation"));
-        } else if ("ftp".equals(backupSchedule.getStorageType2())) {
-            Map<String, String> ftpParams = new HashMap<>();
-            ftpParams.put("ftpServer", (String) storageSettings.get("ftpServer"));
-            ftpParams.put("ftpUser", (String) storageSettings.get("ftpUser"));
-            ftpParams.put("ftpPassword", (String) storageSettings.get("ftpPassword"));
-            ftpParams.put("ftpDirectory", (String) storageSettings.get("ftpDirectory"));
+       if ("database".equals(type)) {
+           Map<String, Object> storageSettings = storageSettingsService.getSettingsForType(backupSchedule.getStorageType2());
 
-            try {
-                JsonNode ftpParamsJson = objectMapper.valueToTree(ftpParams);
-                backupSchedule.setStorageParams2(ftpParamsJson);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Collections.singletonMap("error", "Failed to serialize FTP params"));
-            }
-        }
+           if ("local".equals(backupSchedule.getStorageType2())) {
+               backupSchedule.setBackupLocation2((String) storageSettings.get("backupLocation"));
+           } else if ("ftp".equals(backupSchedule.getStorageType2())) {
+               Map<String, String> ftpParams = new HashMap<>();
+               ftpParams.put("ftpServer", (String) storageSettings.get("ftpServer"));
+               ftpParams.put("ftpUser", (String) storageSettings.get("ftpUser"));
+               ftpParams.put("ftpPassword", (String) storageSettings.get("ftpPassword"));
+               ftpParams.put("ftpDirectory", (String) storageSettings.get("ftpDirectory"));
 
-        backupService.save(backupSchedule);
+               try {
+                   JsonNode ftpParamsJson = objectMapper.valueToTree(ftpParams);
+                   backupSchedule.setStorageParams2(ftpParamsJson);
+               } catch (Exception e) {
+                   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                           .body(Collections.singletonMap("error", "Failed to serialize FTP params"));
+               }
+           }
+
+           backupService.save(backupSchedule);
+
+       } else if ("file".equals(type)) {
+           Map<String, Object> storageSettings = storageSettingsService.getSettingsForType(backupSchedule.getStorageType2());
+
+               Map<String, String> ftpParams = new HashMap<>();
+               ftpParams.put("ftpServer", (String) storageSettings.get("ftpServer"));
+               ftpParams.put("ftpUser", (String) storageSettings.get("ftpUser"));
+               ftpParams.put("ftpPassword", (String) storageSettings.get("ftpPassword"));
+               ftpParams.put("ftpDirectory", (String) storageSettings.get("ftpDirectory"));
+
+               JsonNode ftpParamsJson = objectMapper.valueToTree(ftpParams);
+               backupSchedule.setStorageParams2(ftpParamsJson);
+
+           backupService.save(backupSchedule);
+       }
         return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
     }
 

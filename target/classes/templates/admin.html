@@ -34,12 +34,38 @@
 </header>
 <main>
     <input type="text" placeholder="Enter text here...">
-    <div class="buttons">
-        <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
-        <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
-        <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
-        <button onclick="openManageRestorePopup()" class="btn-primary">Manage Restored Backups</button>
+
+    <div style="margin-bottom: 1rem;">
+        <label for="basType">Select BAS type:</label>
+        <select id="basType" onchange="handleBasTypeChange()">
+            <option value="">-- Choose --</option>
+            <option value="file">File-based BAS</option>
+            <option value="server">Client-server BAS</option>
+        </select>
     </div>
+
+    <div class="buttons">
+
+        <div id="server-buttons" style="display: none;">
+            <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
+            <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
+            <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
+            <button onclick="openManageRestorePopup()" class="btn-danger">Manage Restored Backups</button>
+        </div>
+
+        <div id="file-buttons" style="display: none;">
+            <button onclick="openFilePopup()" class="btn-primary">File Database backup</button>
+            <button onclick="openFileRestorePopup()" class="btn-danger">Restore File Database</button>
+        </div>
+    </div>
+
+<!--   <div class="buttons">-->
+<!--        <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>-->
+<!--        <button onclick="openPopup()" class="btn-secondary">Manually backup</button>-->
+<!--        <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>-->
+<!--        <button onclick="openManageRestorePopup()" class="btn-danger">Manage Restored Backups</button>-->
+<!--        <button onclick="openFilePopup()" class="btn-primary">File Database backup</button>-->
+<!--    </div>-->
     <h2>History statistics</h2>
     <table id="backupTable">
         <tr>
@@ -97,22 +123,6 @@
     <div class="popup-content">
         <h3>Auto Backup</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="clusterAdmin2">
-                <label for="clusterAdmin2">Do you have cluster admin?</label>
-            </div>
-
-            <div id="clusterCredentials2" style="display: none;">
-                <label for="clusterUsername2">Cluster Username:</label>
-                <input type="text" id="clusterUsername2" placeholder="Cluster Username2"><br>
-
-                <label for="clusterPassword2">Cluster Password:</label>
-                <input type="password" id="clusterPassword2" placeholder="Cluster Password2"><br>
-            </div>
-
-            <label for="clusterServer2">Cluster Server:</label>
-            <input type="text" id="clusterServer2" name="clusterServer2" placeholder="Cluster Server" required>
 
             <label for="dbServer2">DB Server:</label>
             <input type="text" id="dbServer2" name="dbServer2" placeholder="DB Server" required>
@@ -209,7 +219,6 @@
         <h3>Manage Restored Backups</h3>
         <form id="manageRestoreForm" action="/api/restore/manage" method="post">
 
-
             <div class="checkbox-group">
                 <input type="checkbox" id="man_clusterAdmin">
                 <label for="man_clusterAdmin">Do you have cluster admin?</label>
@@ -258,6 +267,37 @@
         <button onclick="closeManageRestorePopup()">Close</button>
     </div>
 </div>
+<div class="popup" id="fileBackupPopup">
+    <div class="popup-content">
+        <h3>Auto Backup</h3>
+        <form action="/api/backup/save" method="post" id="fileBackupForm">
+
+            <label for="folderPath">Path to folder with File DB:</label>
+            <input type="text" id="folderPath" name="folderPath" placeholder="/opt/baf..." required>
+
+            <label for="daysKeep">Days to keep backup:</label>
+            <input type="number" id="daysKeep" name="daysKeep" min="7" placeholder="Days To Keep" required>
+
+            <label for="fileFrequency">Frequency:</label>
+            <select id="fileFrequency" name="fileFrequency">
+                <option value="daily">Every Day</option>
+                <option value="weekly">Every Week</option>
+                <option value="monthly">Every Month</option>
+            </select>
+
+            <div id="fileDaySelection" style="display: none;">
+                <label for="fileDay">Day:</label>
+                <select id="fileDay" name="fileDay"></select>
+            </div>
+
+            <label for="fileTime">Time:</label>
+            <input type="time" id="fileTime" name="fileTime" required>
+
+            <button type="submit" id="filesubmit">Do backup</button>
+        </form>
+        <button onclick="closeFilePopup()">Close</button>
+    </div>
+</div>
 
 <script>
         document.getElementById("res_storageType").addEventListener("change", function () {
@@ -277,6 +317,12 @@
                 .catch(err => console.error('Error fetching backups:', err));
         });
 
+        function handleBasTypeChange() {
+            const type = document.getElementById("basType").value;
+
+            document.getElementById("server-buttons").style.display = (type === "server") ? "block" : "none";
+            document.getElementById("file-buttons").style.display = (type === "file") ? "block" : "none";
+        }
 </script>
 </body>
 </html>

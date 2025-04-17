@@ -30,3 +30,12 @@ function openManageRestorePopup() {
 function closeManageRestorePopup() {
     document.getElementById('manageRestorePopup').style.display = 'none';
 }
+
+
+function openFilePopup() {
+    document.getElementById('fileBackupPopup').style.display = 'flex';
+}
+
+function closeFilePopup() {
+    document.getElementById('fileBackupPopup').style.display = 'none';
+}
