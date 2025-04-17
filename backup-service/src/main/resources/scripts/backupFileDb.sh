@@ -8,7 +8,8 @@ FTP_PASSWORD=$5
 FTP_DIRECTORY=$6
 DATA=$(date +"%Y%m%d")
 
-ARCHIVE_NAME="backup_$DATA.tar.gz"
+SOURCE_BASENAME=$(basename "$SOURCE_DIR")
+ARCHIVE_NAME="${SOURCE_BASENAME}_backup_${DATA}.tar.gz"
 ARCHIVE_PATH="/home/adminbs/archive"
 
 mkdir -p "$ARCHIVE_PATH"

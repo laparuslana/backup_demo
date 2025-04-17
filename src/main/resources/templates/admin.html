@@ -59,13 +59,6 @@
         </div>
     </div>
 
-<!--   <div class="buttons">-->
-<!--        <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>-->
-<!--        <button onclick="openPopup()" class="btn-secondary">Manually backup</button>-->
-<!--        <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>-->
-<!--        <button onclick="openManageRestorePopup()" class="btn-danger">Manage Restored Backups</button>-->
-<!--        <button onclick="openFilePopup()" class="btn-primary">File Database backup</button>-->
-<!--    </div>-->
     <h2>History statistics</h2>
     <table id="backupTable">
         <tr>
@@ -298,7 +291,22 @@
         <button onclick="closeFilePopup()">Close</button>
     </div>
 </div>
+<div class="popup" id="fileRestorePopup">
+    <div class="popup-content">
+        <h3>Manually restore backup</h3>
+        <form action="/api/restore/backup" method="post" id="fileRestoreForm">
 
+            <label for="restorePath">Restore Path:</label>
+            <input type="text" id="restorePath" name="restorePath" placeholder="Restore Path" required>
+
+            <label for="restoreFile">Select Restore File:</label>
+            <select id="restoreFile" name="restoreFile"></select>
+
+            <button type="submit" id="submitFileRestore">Restore Backup</button>
+        </form>
+        <button onclick="closeFileRestorePopup()">Close</button>
+    </div>
+</div>
 <script>
         document.getElementById("res_storageType").addEventListener("change", function () {
             const type = this.value;
@@ -316,6 +324,21 @@
                 })
                 .catch(err => console.error('Error fetching backups:', err));
         });
+
+        fetch(`/api/restore/archive?type=ftp`)
+            .then(response => response.json())
+            .then(files => {
+                const select = document.getElementById('restoreFile');
+                select.innerHTML = "";
+                files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Error fetching backups:', err));
+
 
         function handleBasTypeChange() {
             const type = document.getElementById("basType").value;

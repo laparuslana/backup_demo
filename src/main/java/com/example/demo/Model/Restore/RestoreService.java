@@ -6,6 +6,8 @@ import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,6 +29,29 @@ public class RestoreService {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.endsWith(".backup")) {
+                    output.add(line.trim());
+                }
+            }
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("FTP script failed with exit code: " + exitCode);
+        }
+
+        return output;
+    }
+
+    public List<String> listArchiveFilesFromFtp(String host, String user, String password, String directory) throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/listArchivesFtp.sh", host, user, password, directory);
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+
+        List<String> output = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.endsWith(".tar.gz")) {
                     output.add(line.trim());
                 }
             }
@@ -88,7 +113,7 @@ public class RestoreService {
         return status;
     }
 
-        @Autowired
+    @Autowired
     private RestoreHistoryRepository restoreHistoryRepository;
 
     @Autowired
@@ -206,5 +231,53 @@ public class RestoreService {
             e.printStackTrace();
         }
         return databases;
+    }
+
+    public String restoreFileDb(String restorePath, String restoreFile, String ftpHost, String ftpUser, String ftpPassword, String ftpDirectory) {
+      String command = String.format("bash src/main/resources/scripts/restoreFileDb.sh %s %s %s %s %s %s",
+                restorePath, restoreFile, ftpHost, ftpUser, ftpPassword, ftpDirectory);
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        String sourceDatabase = restoreFile.contains("_") ?
+                restoreFile.substring(0, restoreFile.indexOf('_')) : "unknown";
+
+        String logs = executeRestoreFileCommand(command, user, restoreFile, sourceDatabase);
+        return "STATUS" + logs;
+    }
+
+    private String executeRestoreFileCommand(String command, MyAppUser user, String backupFile, String sourceDatabase) {
+        StringBuilder output = new StringBuilder();
+        String status;
+
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+            while ((line = stdError.readLine()) != null) {
+                output.append("ERROR: ").append(line).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                status = "Restore executed successfully!\n";
+            } else {
+                status = "Restore failed with exit code: " + exitCode;
+            }
+
+            logRestore(status, user, backupFile, sourceDatabase);
+
+        } catch (IOException | InterruptedException e) {
+            status = "❌ Error executing backup: " + e.getMessage();
+            logRestore(status, user, backupFile, sourceDatabase);
+        }
+        return output.toString();
     }
 }

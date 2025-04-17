@@ -62,6 +62,35 @@ submitButom.addEventListener('click', async(event) => {
         .catch(error => alert("❌ Error starting restore: " + error));
 });
 
+document.getElementById("res_clusterAdmin").addEventListener("change", function () {
+    const clusterCredentials = document.getElementById("res_clusterCredentials");
+    clusterCredentials.style.display = this.checked ? "block" : "none";
+});
+
+const submitRestore = document.getElementById("submitFileRestore");
+submitRestore.addEventListener('click', async(event) => {
+    event.preventDefault();
+
+    const type = "ftp";
+    const restorePath = document.getElementById("restorePath").value;
+    const restoreFile = document.getElementById("restoreFile").value;
+
+    fetch(`/api/restore/file?type=ftp&restorePath=${encodeURIComponent(restorePath)}&restoreFile=${encodeURIComponent(restoreFile)}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server returned error");
+            }
+            return response.text();
+        })
+        .then(data => alert("✅ Restore started successfully!"))
+        .catch(error => alert("❌ Error starting restore: " + error));
+});
+
 const submitButton = document.getElementById("submitDelete");
 submitButton.addEventListener('click', (event) => {
     event.preventDefault();

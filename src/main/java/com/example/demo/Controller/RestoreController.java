@@ -72,6 +72,26 @@ public class RestoreController {
     }
 
 
+    @GetMapping("/archive")
+    public ResponseEntity<List<String>> listArchiveFiles(@RequestParam String type) throws Exception {
+        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+
+            String ftpHost = (String) config.get("ftpServer");
+            String ftpUser = (String) config.get("ftpUser");
+            String ftpPassword = (String) config.get("ftpPassword");
+            String ftpDir = (String) config.get("ftpDirectory");
+
+            try {
+                List<String> ftpFiles = restoreService.listArchiveFilesFromFtp(ftpHost, ftpUser, ftpPassword, ftpDir);
+                return ResponseEntity.ok(ftpFiles);
+            } catch (IOException | InterruptedException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonList("Error: " + e.getMessage()));
+            }
+
+    }
+
+
     @PostMapping(value = "/backup", consumes = "application/json")
     public ResponseEntity<Map<String, String>> restoreBackup(@RequestBody RestoreRequest restoreRequest) throws Exception {
         Map<String, String> response = new HashMap<>();
@@ -87,7 +107,6 @@ public class RestoreController {
             fullPath = Paths.get(localPath, fileName).toString();
         } else if ("ftp".equals(type)) {
             String ftpDirectory = (String) config.get("ftpDirectory");
-            //fullPath = Paths.get(ftpDirectory, fileName).toString();
 
             Map<String, String> ftpParams = new HashMap<>();
             ftpParams.put("ftpServer", (String) config.get("ftpServer"));
@@ -119,6 +138,25 @@ public class RestoreController {
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping(value = "/file", produces = "application/json")
+    public ResponseEntity<Map<String, String>> restoreFileDb(@RequestParam String type,
+                                                          @RequestParam String restorePath,
+                                                          @RequestParam String restoreFile) throws IOException, InterruptedException {
+        Map<String, String> response = new HashMap<>();
+
+        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+
+        String ftpHost = (String) config.get("ftpServer");
+        String ftpUser = (String) config.get("ftpUser");
+        String ftpPassword = (String) config.get("ftpPassword");
+        String ftpDir = (String) config.get("ftpDirectory");
+
+        String result = restoreService.restoreFileDb(restorePath, restoreFile, ftpHost, ftpUser, ftpPassword, ftpDir);
+        response.put("message", result);
+        return ResponseEntity.ok(response);
+    }
+
 
     @PostMapping(value = "/switch", produces = "application/json")
     public ResponseEntity<Map<String, String>> switchDB(@RequestParam String bafPath,

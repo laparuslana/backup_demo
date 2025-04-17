@@ -39,3 +39,12 @@ function openFilePopup() {
 function closeFilePopup() {
     document.getElementById('fileBackupPopup').style.display = 'none';
 }
+
+
+function openFileRestorePopup() {
+    document.getElementById('fileRestorePopup').style.display = 'flex';
+}
+
+function closeFileRestorePopup() {
+    document.getElementById('fileRestorePopup').style.display = 'none';
+}
