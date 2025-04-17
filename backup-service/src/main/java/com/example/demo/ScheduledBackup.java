@@ -13,6 +13,12 @@ public class ScheduledBackup {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
+        @Column(name = "type", nullable = false)
+        private String type;
+
+        @Column(name = "folder_path")
+        private String folderPath;
+
         @Column(name = "database_name")
         private String databaseName;
 
@@ -39,6 +45,23 @@ public class ScheduledBackup {
 
         @Column(name = "retention_period")
         private String daysKeep;
+
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getFolderPath() {
+        return folderPath;
+    }
+
+    public void setFolderPath(String folderPath) {
+        this.folderPath = folderPath;
+    }
 
     public JsonNode getStorageParams() {
         return storageParams;

@@ -18,7 +18,7 @@ public class BackupSchedule {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @Column(name = "folder_path", nullable = true)
+    @Column(name = "folder_path")
     private String folderPath;
 
     @Column(name = "database_name")

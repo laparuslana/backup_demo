@@ -36,28 +36,111 @@ import java.util.concurrent.TimeUnit;
             }
         }
 
+//        private void installCronJob(ScheduledBackup schedule) {
+//            try {
+//                String cronExpression = convertToCron(schedule.getFrequency(), schedule.getDay(), schedule.getTime());
+//
+//                String projectRoot = Paths.get("").toAbsolutePath().toString();
+//                String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
+//
+//                String cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s >> /tmp/auto-cron.log 2>&1",
+//                        cronExpression,
+//                        scriptPath,
+//                        schedule.getDatabaseName(),
+//                        schedule.getDbServer(),
+//                        schedule.getDbUser(),
+//                        schedule.getDbPassword(),
+//                        schedule.getBackupLocation(),
+//                        schedule.getDaysKeep(),
+//                        schedule.getStorageType(),
+//                        getJson(schedule.getStorageParams(), "ftpServer"),
+//                        getJson(schedule.getStorageParams(), "ftpUser"),
+//                        getJson(schedule.getStorageParams(), "ftpPassword"),
+//                        getJson(schedule.getStorageParams(), "ftpDirectory")
+//                );
+//
+//                Process getCron = new ProcessBuilder("crontab", "-l").start();
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(getCron.getInputStream()));
+//                StringBuilder currentJobs = new StringBuilder();
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    currentJobs.append(line).append("\n");
+//                    System.out.println("✅ Cron job installed: " + cronJob);
+//                }
+//                getCron.waitFor();
+//
+//                if (currentJobs.toString().contains(cronJob)) {
+//                    System.out.println("⏩ Cron job already exists");
+//                    return;
+//                }
+//
+//                currentJobs.append(cronJob).append("\n");
+//
+//                Path tempCron = Files.createTempFile("my_cron", ".tmp");
+//                Files.write(tempCron, currentJobs.toString().getBytes());
+//
+//                Process setCron = new ProcessBuilder("crontab", tempCron.toString()).start();
+//                BufferedReader errorReader = new BufferedReader(new InputStreamReader(setCron.getInputStream()));
+//                while ((line = errorReader.readLine()) != null) {
+//                    System.out.println("CRONTAB OUTPUT: " + line);
+//                }
+//                int exitCode = setCron.waitFor();
+//                System.out.println("CRONTAB INSTALL EXIT CODE: " + exitCode);
+//
+//                Files.deleteIfExists(tempCron);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//
+//
+
+
         private void installCronJob(ScheduledBackup schedule) {
             try {
                 String cronExpression = convertToCron(schedule.getFrequency(), schedule.getDay(), schedule.getTime());
-
                 String projectRoot = Paths.get("").toAbsolutePath().toString();
-                String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
 
-                String cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s >> /tmp/auto-cron.log 2>&1",
-                        cronExpression,
-                        scriptPath,
-                        schedule.getDatabaseName(),
-                        schedule.getDbServer(),
-                        schedule.getDbUser(),
-                        schedule.getDbPassword(),
-                        schedule.getBackupLocation(),
-                        schedule.getDaysKeep(),
-                        schedule.getStorageType(),
-                        getJson(schedule.getStorageParams(), "ftpServer"),
-                        getJson(schedule.getStorageParams(), "ftpUser"),
-                        getJson(schedule.getStorageParams(), "ftpPassword"),
-                        getJson(schedule.getStorageParams(), "ftpDirectory")
-                );
+                String cronJob;
+
+                if ("database".equalsIgnoreCase(schedule.getType())) {
+                    String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
+
+                    cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s >> /tmp/auto-db-cron.log 2>&1",
+                            cronExpression,
+                            scriptPath,
+                            schedule.getDatabaseName(),
+                            schedule.getDbServer(),
+                            schedule.getDbUser(),
+                            schedule.getDbPassword(),
+                            schedule.getBackupLocation(),
+                            schedule.getDaysKeep(),
+                            schedule.getStorageType(),
+                            getJson(schedule.getStorageParams(), "ftpServer"),
+                            getJson(schedule.getStorageParams(), "ftpUser"),
+                            getJson(schedule.getStorageParams(), "ftpPassword"),
+                            getJson(schedule.getStorageParams(), "ftpDirectory")
+                    );
+                } else if ("file".equalsIgnoreCase(schedule.getType())) {
+                    String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupFileDb.sh";
+
+                    cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s >> /tmp/auto-file-cron.log 2>&1",
+                            cronExpression,
+                            scriptPath,
+                            schedule.getFolderPath(),
+                            schedule.getDaysKeep(),
+                            getJson(schedule.getStorageParams(), "ftpServer"),
+                            getJson(schedule.getStorageParams(), "ftpUser"),
+                            getJson(schedule.getStorageParams(), "ftpPassword"),
+                            getJson(schedule.getStorageParams(), "ftpDirectory")
+                    );
+                } else {
+                    System.out.println("❌ Unknown backup type: " + schedule.getType());
+                    return;
+                }
+
 
                 Process getCron = new ProcessBuilder("crontab", "-l").start();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(getCron.getInputStream()));
@@ -65,7 +148,6 @@ import java.util.concurrent.TimeUnit;
                 String line;
                 while ((line = reader.readLine()) != null) {
                     currentJobs.append(line).append("\n");
-                    System.out.println("✅ Cron job installed: " + cronJob);
                 }
                 getCron.waitFor();
 
@@ -88,18 +170,15 @@ import java.util.concurrent.TimeUnit;
                 System.out.println("CRONTAB INSTALL EXIT CODE: " + exitCode);
 
                 Files.deleteIfExists(tempCron);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+                System.out.println("✅ Cron job installed: " + cronJob);
+            } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-
-            private String getJson(JsonNode node, String key) {
+        private String getJson(JsonNode node, String key) {
             return (node != null && node.has(key)) ? node.get(key).asText() : "";
         }
-
         private String convertToCron(String frequency, String day, LocalTime time) {
             String timeStr = time.format(DateTimeFormatter.ofPattern("mm HH"));
             String[] timeParts = timeStr.split(" ");
