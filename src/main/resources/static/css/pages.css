@@ -1,155 +1,67 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    background: linear-gradient(to right, #0f172a, #1e3a8a);
-    color: white;
+    font-family: Arial, sans-serif;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     height: 100vh;
 }
-
-header {
-    background-color: #333;
-    color: white;
-    padding: 15px 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.menu {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.menu a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 10px;
-}
-
-.menu a, .dropdown {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    padding: 10px;
-}
-
-.menu a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #004080;
-    min-width: 150px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: white;
-    padding: 10px;
-    display: block;
-    text-decoration: none;
-}
-
-.dropdown-content a:hover {
-    background-color: #0056b3;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-main {
+.sidebar {
+    width: 220px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding-top: 1rem;
+}
+.sidebar a {
+    color: #ecf0f1;
+    padding: 1rem;
+    text-decoration: none;
+    display: block;
+}
+.sidebar a:hover {
+    background-color: #34495e;
+}
+.main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
     flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
 }
 
-input[type="text"], input[type="password"], select {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    width: 300px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    color: #333;
+.dashboard {
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
 }
 
-.buttons {
-    display: flex;
-    gap: 10px;
+.block {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    font-weight: bold;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+.form-actions button {
+    margin-right: 1rem;
+}
+.button-group {
+    margin-bottom: 1rem;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-primary {
-    background: #4CAF50;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #45a049;
-}
-
-.btn-secondary {
-    background: #008CBA;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #007bb5;
-}
-
-.btn-danger {
-    background: #f44336;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #da190b;
-}
 
 .popup {
     display: none;
@@ -196,18 +108,32 @@ button {
 .popup button:hover {
     background-color: #218838;
 }
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin: 5px 0;
+table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+th, td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background-color: #4CAF50;
+    color: white;
 }
 
-#submit {
-    align-self: flex-start;
-}
-
-label {
-    margin-bottom: 5px;
+.show-all-btn {
+    margin-top: 10px;
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
 }

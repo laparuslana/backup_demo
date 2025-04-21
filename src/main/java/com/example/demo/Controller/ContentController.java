@@ -30,4 +30,9 @@ public class ContentController {
     public String storage(){
         return "storage_settings";
     }
+
+    @GetMapping("/history")
+    public String history(){
+        return "history";
+    }
 }

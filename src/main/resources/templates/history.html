@@ -20,21 +20,13 @@
 </head>
 <body>
 <div class="sidebar">
-    <a href="" onclick="showDashboard()">Dashboard</a>
+    <a href="/admin">Dashboard</a>
     <a href="#" onclick="showSection('settings')">Settings</a>
     <a href="#" onclick="showSection('backup')">Backup</a>
     <a href="#" onclick="showSection('recovery')">Recovery</a>
     <a href="/logout">Log Out</a>
 </div>
-<div class="main" id="mainContent">
-
-    <div class="block" id="block3">
-        <h3>Chart</h3>
-    </div>
-    <div class="block" id="block4">
-        <h3>Diagram</h3>
-    </div>
-
+<div class="dashboard" id="mainContent">
 </div>
 <div class="popup" id="backupPopup">
     <div class="popup-content">
@@ -295,6 +287,8 @@
             .catch(err => console.error('Error fetching backups:', err));
 
 
+
+
     const main = document.getElementById('mainContent');
 
     function showSection(section) {
@@ -366,37 +360,35 @@
 
     function showDashboard() {
         document.getElementById("mainContent").innerHTML = `
-        <div class="block" id="block1">
         <h2>History statistics</h2>
-        <table id="backupPreviewTable" class="display">
+        <table id="backupTable" class="display">
         <thead>
             <tr>
                 <th>Status</th>
                 <th>Date</th>
                 <th>Database Name</th>
+                <th>Backup Location</th>
+                <th>Retention Period</th>
+                <th>User</th>
             </tr>
         </thead>
         <tbody></tbody>
         </table>
-        <a class="show-all-btn" href="/history">Show All</a>
-        </div>
-
-        <div class="block" id="block2">
-        <table id="restorePreviewTable" class="display">
+        <table id="restoreTable" class="display">
         <thead>
             <tr>
                 <th>Status</th>
                 <th>Date</th>
                 <th>Backup File</th>
+                <th>Source Database</th>
+                <th>User</th>
             </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <a class="show-all-btn" href="/history">Show All</a>
-        </div>
     `;
-        loadBackupPreviewHistory();
-        loadRestorePreviewHistory();
+        loadBackupHistory();
+        loadRestoreHistory();
     }
 </script>
 

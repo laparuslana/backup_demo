@@ -4,30 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/pages.css">
     <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
 <header>
     <h1>User Dashboard</h1>
-    <div class="menu">
-        <a href="/index">Home</a>
+    <div class="sidebar">
+        <a href="" onclick="showDashboard()">Dashboard</a>
         <a href="#" onclick="openSettingsModal()">Settings</a>
         <a href="/logout">Logout</a>
     </div>
     <script src="/js/listHistory.js"></script>
 </header>
-<main>
-    <input type="text" placeholder="Enter text here...">
-    <h2>Backup history statistics</h2>
+<div class="main" id="mainContent">
+    <h2>History statistics</h2>
     <table id="backupTable">
-<tr>
-    <th>Status</th>
-    <th>Date</th>
-    <th>Database Name</th>
-    <th>Backup Location</th>
-    <th>Retention Period</th>
-    <th>User</th>
-</tr>
+        <tr>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Database Name</th>
+            <th>Backup Location</th>
+            <th>Retention Period</th>
+            <th>User</th>
+        </tr>
     </table>
     <table id="restoreTable">
         <tr>
@@ -38,6 +38,7 @@
             <th>User</th>
         </tr>
     </table>
+</div>
     <div class="button">
         <a href="http://localhost:8080/req/history/download" >Download History</a>
         <button onclick="contactAdmin()">Contact Admin</button>
@@ -60,8 +61,6 @@
             <button onclick="updateProfile()">Save Changes</button>
         </div>
     </div>
-
-</main>
 <script>
     function openSettingsModal() {
         document.getElementById("settingsModal").style.display = "flex";

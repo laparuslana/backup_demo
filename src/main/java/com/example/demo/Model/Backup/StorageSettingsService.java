@@ -1,5 +1,7 @@
 package com.example.demo.Model.Backup;
 
+import com.example.demo.Model.UserManagement.MyAppUser;
+import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import com.example.demo.Security.AesEncryptor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -34,6 +37,13 @@ public class StorageSettingsService {
     public void saveSettings(Map<String, Object> settings) throws Exception {
         Files.createDirectories(settingsFile.getParent());
         objectMapper.writeValue(settingsFile.toFile(), settings);
+    }
+
+    @Autowired
+    private BafSettingsRepository bafSettingsRepository;
+
+    public void saveBafSettings(BafSettings bafSettings) {
+            bafSettingsRepository.save(bafSettings);
     }
 
     public Map<String, Object> getSettingsForType(String type) throws IOException {

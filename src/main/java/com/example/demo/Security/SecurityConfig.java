@@ -75,6 +75,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/backup/**", "/js/**").permitAll()
                     .requestMatchers("/api/restore/**", "/js/**").permitAll()
                     .requestMatchers("/api/storage-settings/**", "/js/**").permitAll()
+                    .requestMatchers("/history","/css/**","/js/**").permitAll()
                     .anyRequest().authenticated()
             )
             .build();

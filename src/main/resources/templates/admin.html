@@ -1,86 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="/css/pages.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="/js/listHistory.js"></script>
+    <script src="/js/users.js" defer></script>
+        <script src="/js/popupHandlers.js" defer></script>
+        <script src="/js/loadDatabases.js" defer></script>
+        <script src="/js/validation.js" defer></script>
+        <script src="/js/backup.js" defer></script>
+        <script src="/js/autoBackup.js" defer></script>
+        <script src="/js/restoreBackup.js" defer></script>
+
 </head>
 <body>
-<header>
-    <h1>Admin Panel</h1>
-    <div class="menu">
-        <a href="/admin">Home</a>
-        <div class="dropdown">
-            <a href="#control">Control Panel</a>
-            <div class="dropdown-content">
-                <a href="#" onclick="addUser()">Add User</a>
-                <a href="#" onclick="editUser()">Edit User</a>
-                <a href="#" onclick="deleteUser()">Delete User</a>
-            </div>
-        </div>
-        <a href="/storage_settings">Backup Storage Settings</a>
-        <a href="/logout">Logout</a>
-    </div>
-    <script src="/js/users.js" defer></script>
-    <script src="/js/popupHandlers.js" defer></script>
-    <script src="/js/loadDatabases.js" defer></script>
-    <script src="/js/storageHandlers.js" defer></script>
-    <script src="/js/validation.js" defer></script>
-    <script src="/js/backup.js" defer></script>
-    <script src="/js/autoBackup.js" defer></script>
-    <script src="/js/restoreBackup.js" defer></script>
-    <script src="/js/listHistory.js"></script>
-</header>
-<main>
-    <input type="text" placeholder="Enter text here...">
+<div class="sidebar">
+    <a href="" onclick="showDashboard()">Dashboard</a>
+    <a href="#" onclick="showSection('settings')">Settings</a>
+    <a href="#" onclick="showSection('backup')">Backup</a>
+    <a href="#" onclick="showSection('recovery')">Recovery</a>
+    <a href="/logout">Log Out</a>
+</div>
+<div class="main" id="mainContent">
 
-    <div style="margin-bottom: 1rem;">
-        <label for="basType">Select BAS type:</label>
-        <select id="basType" onchange="handleBasTypeChange()">
-            <option value="">-- Choose --</option>
-            <option value="file">File-based BAS</option>
-            <option value="server">Client-server BAS</option>
-        </select>
+    <div class="block" id="block3">
+        <h3>Chart</h3>
+    </div>
+    <div class="block" id="block4">
+        <h3>Diagram</h3>
     </div>
 
-    <div class="buttons">
-
-        <div id="server-buttons" style="display: none;">
-            <button onclick="openAutoPopup()" class="btn-primary">Automatic backup settings</button>
-            <button onclick="openPopup()" class="btn-secondary">Manually backup</button>
-            <button onclick="openRestorePopup()" class="btn-danger">Restore the copy</button>
-            <button onclick="openManageRestorePopup()" class="btn-danger">Manage Restored Backups</button>
-        </div>
-
-        <div id="file-buttons" style="display: none;">
-            <button onclick="openFilePopup()" class="btn-primary">File Database backup</button>
-            <button onclick="openFileRestorePopup()" class="btn-danger">Restore File Database</button>
-        </div>
-    </div>
-
-    <h2>History statistics</h2>
-    <table id="backupTable">
-        <tr>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Database Name</th>
-            <th>Backup Location</th>
-            <th>Retention Period</th>
-            <th>User</th>
-        </tr>
-    </table>
-    <table id="restoreTable">
-        <tr>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Backup File</th>
-            <th>Source Database</th>
-            <th>User</th>
-        </tr>
-    </table>
-</main>
-
+</div>
 <div class="popup" id="backupPopup">
     <div class="popup-content">
         <h3 style="color: #0f172a">Manually backup</h3>
@@ -340,12 +295,119 @@
             .catch(err => console.error('Error fetching backups:', err));
 
 
-        function handleBasTypeChange() {
-            const type = document.getElementById("basType").value;
+    const main = document.getElementById('mainContent');
 
-            document.getElementById("server-buttons").style.display = (type === "server") ? "block" : "none";
-            document.getElementById("file-buttons").style.display = (type === "file") ? "block" : "none";
+    function showSection(section) {
+        if (section === 'settings') {
+            main.innerHTML = `
+                    <h2>User Settings</h2>
+<div class="button-group">
+                    <button onclick="addUser()">Add User</button>
+                    <button onclick="editUser()">Edit User</button>
+                    <button onclick="deleteUser()">Delete User</button>
+</div>
+<h2>Storage Settings</h2>
+                    <form id="storageSettingsForm">
+    <h4>Local Storage</h4>
+    <label>Path:</label>
+    <input type="text" id="localPath" name="localPath" required />
+
+    <h4>FTP Storage</h4>
+    <label>Host:</label>
+    <input type="text" id="ftpHost" name="ftpHost" required />
+    <label>Username:</label>
+    <input type="text" id="ftpUser" name="ftpUser" required />
+    <label>Password:</label>
+    <input type="password" id="ftpPassword" name="ftpPassword" required />
+    <label>Remote Path:</label>
+    <input type="text" id="ftpPath" name="ftpPath" required />
+
+    <button type="submit">Save Settings</button>
+</form>
+
+                    <h2>BAF Settings</h2>
+                    <form action="/api/storage-settings/baf" method="post" id="bafSettingsForm">
+
+                        <label>Type BAF:</label>
+                        <input type="radio" name="bafType" value="file" checked> File based
+                        <input type="radio" name="bafType" value="server"> Server based
+
+                        <label>BAF Directory Path:</label>
+                        <input type="text" id="bafPath" value="/path/to/baf/">
+
+                        <button type="button" onclick="saveBafSettings()">Save</button>
+
+                    </form>
+                `;
+        } else if (section === 'backup') {
+            main.innerHTML = '<h2>Backup</h2>' + (currentBafPath === 'file' ? `
+                    <div class="button-group">
+                        <button onclick="openFilePopup()">File Database backup</button>
+                    </div>
+                ` : `
+                    <div class="button-group">
+                        <button onclick="openAutoPopup()">Automatic backup settings</button>
+                        <button onclick="openPopup()">Manually backup</button>
+                    </div>
+                `);
+        } else if (section === 'recovery') {
+            main.innerHTML = '<h2>Recovery</h2>' + (currentBafPath === 'file' ? `
+                    <div class="button-group">
+                        <button onclick="openFileRestorePopup()">Restore File Database</button>
+                    </div>
+                ` : `
+                    <div class="button-group">
+                        <button onclick="openRestorePopup()">Restore the copy</button>
+                        <button onclick="openManageRestorePopup()">Manage Restored Backups</button>
+                    </div>
+                `);
         }
+    }
+
+    function showDashboard() {
+        document.getElementById("mainContent").innerHTML = `
+        <div class="block" id="block1">
+        <h2>History statistics</h2>
+        <table id="backupPreviewTable" class="display">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Database Name</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+        <a class="show-all-btn" href="/history">Show All</a>
+        </div>
+
+        <div class="block" id="block2">
+        <table id="restorePreviewTable" class="display">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Backup File</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <a class="show-all-btn" href="/history">Show All</a>
+        </div>
+    `;
+        loadBackupPreviewHistory();
+        loadRestorePreviewHistory();
+    }
 </script>
+
+<script>
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadBafSettings().then(() => {
+            showDashboard();
+        })
+    })
+</script>
+
 </body>
 </html>
