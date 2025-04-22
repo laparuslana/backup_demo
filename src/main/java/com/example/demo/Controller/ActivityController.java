@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.Model.Backup.ActivityChartService;
-import com.example.demo.Model.Backup.ChartDTO;
+import com.example.demo.Model.Common.ActivityChartService;
+import com.example.demo.Model.Common.ChartDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

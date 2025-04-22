@@ -23,8 +23,10 @@ body {
 }
 .main {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
+    height: 100%;
+    width: 100%;
     gap: 20px;
     flex-grow: 1;
     padding: 2rem;
@@ -32,15 +34,17 @@ body {
 }
 
 .dashboard {
+    display: block !important;
     flex-grow: 1;
     padding: 2rem;
     overflow-y: auto;
 }
 
 .block {
+    font-size: 0.6rem;
     background: #f5f5f5;
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 5px;
+    padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 .form-group {
@@ -62,7 +66,6 @@ body {
     margin-bottom: 1rem;
 }
 
-
 .popup {
     display: none;
     position: fixed;
@@ -71,21 +74,24 @@ body {
     transform: translate(-50%, -50%);
     width: 400px;
     max-height: 500px;
-    overflow-y: auto;
-    background-color: white;
+    background-color: rgba(0,0,0,0.2);
     justify-content: center;
     align-items: center;
     color: #333;
     border-radius: 5px;
+    z-index: 999;
 }
 
 .popup-content {
     background-color: white;
     padding: 20px;
     border-radius: 5px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     width: 400px;
     max-height: 500px;
     color: #333;
+    overflow: auto;
+    z-index: 1000;
 }
 
 .popup input, .popup select {
@@ -109,6 +115,7 @@ body {
     background-color: #218838;
 }
 table {
+    font-size: inherit;
     table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
@@ -119,7 +126,7 @@ th, td {
     white-space: nowrap;
     text-overflow: ellipsis;
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 8px;
     text-align: center;
 }
 th {
@@ -136,4 +143,10 @@ th {
     padding: 5px 12px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.chart-block canvas{
+    width: 100% !important;
+    height: auto !important;
+
 }

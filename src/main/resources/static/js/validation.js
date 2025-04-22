@@ -90,3 +90,17 @@ function loadBafSettings() {
         })
         .catch(err => console.error('Error loading BAF settings:', err));
 }
+
+
+function loadActiveSettings() {
+    return fetch('/api/storage-settings/get-baf-settings')
+        .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch BAF settings');
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById("bafTypeValue").textContent = data.bafType || '';
+            document.getElementById("bafPathValue").textContent = data.bafPath || '';
+        })
+        .catch(err => console.error('Error loading BAF settings:', err));
+}

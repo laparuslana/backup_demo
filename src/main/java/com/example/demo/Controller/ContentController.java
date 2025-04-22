@@ -26,11 +26,6 @@ public class ContentController {
         return "admin";
     }
 
-    @GetMapping("/storage_settings")
-    public String storage(){
-        return "storage_settings";
-    }
-
     @GetMapping("/history")
     public String history(){
         return "history";

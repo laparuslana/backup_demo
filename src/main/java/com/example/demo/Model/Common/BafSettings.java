@@ -1,4 +1,4 @@
-package com.example.demo.Model.Backup;
+package com.example.demo.Model.Common;
 
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.fasterxml.jackson.annotation.JsonBackReference;

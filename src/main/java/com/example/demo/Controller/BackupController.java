@@ -3,7 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Backup.BackupRequest;
 import com.example.demo.Model.Backup.BackupSchedule;
 import com.example.demo.Model.Backup.BackupService;
-import com.example.demo.Model.Backup.StorageSettingsService;
+import com.example.demo.Model.Common.StorageSettingsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.Backup.BafSettings;
-import com.example.demo.Model.Backup.BafSettingsRepository;
-import com.example.demo.Model.Backup.StorageSettingsService;
+import com.example.demo.Model.Common.BafSettings;
+import com.example.demo.Model.Common.BafSettingsRepository;
+import com.example.demo.Model.Common.StorageSettingsService;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

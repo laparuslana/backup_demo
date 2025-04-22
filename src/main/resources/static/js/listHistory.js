@@ -40,7 +40,7 @@ function loadRestorePreviewHistory() {
             const tbody = table.querySelector("tbody");
             tbody.innerHTML = "";
 
-            data.slice(0, 5).forEach(restore => {
+            data.slice(0, 3).forEach(restore => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${restore.status}</td>
@@ -69,7 +69,7 @@ function loadBackupPreviewHistory() {
             const tbody = table.querySelector("tbody");
             tbody.innerHTML = "";
 
-            data.slice(0, 5).forEach(backup => {
+            data.slice(0, 3).forEach(backup => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${backup.status}</td>
