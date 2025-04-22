@@ -37,6 +37,37 @@ event.preventDefault();
         .catch(error => alert("❌ Error saving settings: " + error));
 
 }
+function getActivityStats() {
+    fetch('/api/activity-stats')
+        .then(res => res.json())
+        .then(data => {
+            const labels = data.map(d => d.date);
+            const backupCounts = data.map(d => d.backupCount);
+            const restoreCounts = data.map(d => d.restoreCount);
+
+            new Chart(document.getElementById('activityChart'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Backups',
+                            data: backupCounts,
+                            borderColor: 'blue',
+                            fill: false
+                        },
+                        {
+                            label: 'Restores',
+                            data: restoreCounts,
+                            borderColor: 'green',
+                            fill: false
+                        }
+                    ]
+                }
+            });
+        });
+}
+
 
 let currentBafPath= '';
 
