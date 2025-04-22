@@ -1,6 +1,8 @@
 package com.example.demo.Model.Restore;
 
 
+import com.example.demo.Model.Common.BafSettings;
+import com.example.demo.Model.Common.BafSettingsRepository;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class RestoreService {
+
+    @Autowired
+    private BafSettingsRepository bafSettingsRepository;
 
     public List<String> listBackupFilesFromFtp(String host, String user, String password, String directory) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/listFilesFtp.sh", host, user, password, directory);
@@ -89,10 +92,20 @@ public class RestoreService {
             return status;
         }
 
-    public String switchDb(String bafPath, String clusterAd, String clusterUser, String clusterPass, String infobase) throws IOException, InterruptedException {
+    public String switchDb(String clusterAd, String clusterUser, String clusterPass, String infobase) throws IOException, InterruptedException {
         StringBuilder output = new StringBuilder();
         String status;
+        String bafPath = "";
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Optional<BafSettings> settings = bafSettingsRepository.findByUserId(user.getId());
+
+        if (settings.isPresent()) {
+            BafSettings baf = settings.get();
+            bafPath = baf.getBafPath();
+        }
         ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, infobase);
         pb.redirectErrorStream(true);
         Process process = pb.start();
@@ -120,8 +133,20 @@ public class RestoreService {
     private MyAppUserRepository myAppUserRepository;
 
     public String restore(RestoreRequest restoreRequest) {
+        String bafPath = "";
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<BafSettings> settings = bafSettingsRepository.findByUserId(user.getId());
+
+        if (settings.isPresent()) {
+            BafSettings baf = settings.get();
+            bafPath = baf.getBafPath();
+        }
+
         String command = buildRestoreCommand(
-                restoreRequest.getRes_bafPath(),
+                bafPath,
                 restoreRequest.getTestDbName(),
                 restoreRequest.getRestoreDbServer(),
                 restoreRequest.getRestoreDbUser(),
@@ -134,10 +159,6 @@ public class RestoreService {
                 restoreRequest.getFullPath(),
                 restoreRequest.getRes_storageType()
         );
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
         String backupFileName = restoreRequest.getBackupFile();
 
@@ -209,8 +230,19 @@ public class RestoreService {
         restoreHistoryRepository.save(restoreHistory);
     }
 
-    public List<String> getInfobases(String bafPath, String clusterAd, String clusterUser, String clusterPass) {
+    public List<String> getInfobases(String clusterAd, String clusterUser, String clusterPass) {
         List<String> databases = new ArrayList<>();
+        String bafPath = "";
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        MyAppUser user = myAppUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<BafSettings> settings = bafSettingsRepository.findByUserId(user.getId());
+
+        if (settings.isPresent()) {
+            BafSettings baf = settings.get();
+            bafPath = baf.getBafPath();
+        }
         try {
             String[] command = {
                     "/bin/bash", "src/main/resources/scripts/listInfobases.sh",

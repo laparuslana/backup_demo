@@ -5,15 +5,6 @@ import java.util.Map;
 
 public class RestoreRequest {
 
-    public String getRes_bafPath() {
-        return res_bafPath;
-    }
-
-    public void setRes_bafPath(String res_bafPath) {
-        this.res_bafPath = res_bafPath;
-    }
-
-    private String res_bafPath;
     private String testDbName;
     private String restoreDbServer;
     private String restoreDbUser;

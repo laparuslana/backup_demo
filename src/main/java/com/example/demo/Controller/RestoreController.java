@@ -159,24 +159,22 @@ public class RestoreController {
 
 
     @PostMapping(value = "/switch", produces = "application/json")
-    public ResponseEntity<Map<String, String>> switchDB(@RequestParam String bafPath,
-                                                        @RequestParam String clusterAd,
+    public ResponseEntity<Map<String, String>> switchDB(@RequestParam String clusterAd,
                                                         @RequestParam String clusterUser,
                                                         @RequestParam String clusterPass,
                                                         @RequestParam String infobase) throws IOException, InterruptedException {
         Map<String, String> response = new HashMap<>();
 
-        String result = restoreService.switchDb(bafPath, clusterAd, clusterUser, clusterPass, infobase);
+        String result = restoreService.switchDb(clusterAd, clusterUser, clusterPass, infobase);
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
 
 
     @GetMapping("/listInfobases")
-    public List<String> listDatabases(@RequestParam String bafPath,
-                                      @RequestParam String clusterAd,
+    public List<String> listDatabases(@RequestParam String clusterAd,
                                       @RequestParam String clusterUser,
                                       @RequestParam String clusterPass) {
-        return restoreService.getInfobases(bafPath, clusterAd, clusterUser, clusterPass);
+        return restoreService.getInfobases(clusterAd, clusterUser, clusterPass);
     }
 }
