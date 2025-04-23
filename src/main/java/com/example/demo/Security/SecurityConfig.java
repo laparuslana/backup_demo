@@ -56,7 +56,7 @@ public class SecurityConfig {
             if (roles.contains("ROLE_ADMIN")) {
                 response.sendRedirect("/admin");
             } else {
-                response.sendRedirect("/index");
+                response.sendRedirect("/user");
             }
         })
                         )

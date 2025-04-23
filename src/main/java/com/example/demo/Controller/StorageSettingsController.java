@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Common.BafSettings;
 import com.example.demo.Model.Common.BafSettingsRepository;
 import com.example.demo.Model.Common.StorageSettingsService;
+import com.example.demo.Model.Common.StorageDTO;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +35,10 @@ public class StorageSettingsController {
         this.storageSettingsService = storageSettingsService;
     }
 
-    @GetMapping("/load")
-    public ResponseEntity<?> getAllSettings() {
-        try {
-            return ResponseEntity.ok(storageSettingsService.loadSettings());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Could not load settings"));
-        }
-    }
-
     @PostMapping("/save")
-    public ResponseEntity<?> saveSettings(@RequestBody Map<String, Object> settings) {
+    public ResponseEntity<?> saveSettigs(@RequestBody StorageDTO dto) {
         try {
-            storageSettingsService.saveSettings(settings);
+            storageSettingsService.saveSettings(dto);
             return ResponseEntity.ok(Map.of("message", "Settings saved"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -82,14 +73,6 @@ public class StorageSettingsController {
         } else {
             return ResponseEntity.ok(Map.of());
         }
-    }
 
-    @GetMapping(params = "type")
-    public ResponseEntity<?> getSettingsForType(@RequestParam String type) {
-        try {
-            return ResponseEntity.ok(storageSettingsService.getSettingsForType(type));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
     }
 }

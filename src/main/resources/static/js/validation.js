@@ -33,10 +33,11 @@ event.preventDefault();
             }
             return response.text();
         })
-        .then(data => alert("✅ Baf settings saved!"))
+        .then(data => alert("✅ Storage settings saved!"))
         .catch(error => alert("❌ Error saving settings: " + error));
 
 }
+
 function getActivityStats() {
     fetch('/api/activity-stats')
         .then(res => res.json())

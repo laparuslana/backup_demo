@@ -8,7 +8,6 @@ submitButom.addEventListener('click', async(event) => {
     event.preventDefault();
 
     let restoreData = {
-        res_bafPath: document.getElementById("res_bafPath").value,
         testDbName: document.getElementById("testDbName").value,
         restoreDbServer: document.getElementById("restoreDbServer").value,
         restoreDbUser: document.getElementById("restoreDbUser").value,
@@ -71,7 +70,6 @@ const submitRestore = document.getElementById("submitFileRestore");
 submitRestore.addEventListener('click', async(event) => {
     event.preventDefault();
 
-    const type = "ftp";
     const restorePath = document.getElementById("restorePath").value;
     const restoreFile = document.getElementById("restoreFile").value;
 
@@ -135,7 +133,6 @@ const submitButon = document.getElementById("submitSwitch");
 submitButon.addEventListener('click', (event) => {
     event.preventDefault();
 
-    const man_bafPath = document.getElementById("man_bafPath").value;
     const man_clusterAdmin = document.getElementById("man_clusterAdmin").checked;
     const sourceDbName = document.getElementById("sourceDbName").value;
     const confirmAction = document.getElementById("confirmAction").checked;
@@ -153,7 +150,7 @@ submitButon.addEventListener('click', (event) => {
         return;
     }
 
-    fetch(`/api/restore/switch?bafPath=${encodeURIComponent(man_bafPath)}&clusterAd=${encodeURIComponent(man_clusterAdmin)}&clusterUser=${encodeURIComponent(man_clusterUsername)}&clusterPass=${encodeURIComponent(man_clusterPassword)}&infobase=${encodeURIComponent(sourceDbName)}`,
+    fetch(`/api/restore/switch?clusterAd=${encodeURIComponent(man_clusterAdmin)}&clusterUser=${encodeURIComponent(man_clusterUsername)}&clusterPass=${encodeURIComponent(man_clusterPassword)}&infobase=${encodeURIComponent(sourceDbName)}`,
         {
             method: "POST",
             headers: {

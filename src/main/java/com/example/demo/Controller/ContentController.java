@@ -16,9 +16,9 @@ public class ContentController {
         return "signup";
     }
 
-    @GetMapping("/index")
+    @GetMapping("/user")
     public String home(){
-        return "index";
+        return "user";
     }
 
     @GetMapping("/admin")

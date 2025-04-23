@@ -122,24 +122,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const man_bafPath = document.getElementById("man_bafPath");
     const man_clusterAdmin = document.getElementById("man_clusterAdmin");
     const man_clusterUsername = document.getElementById("man_clusterUsername");
     const man_clusterPassword = document.getElementById("man_clusterPassword");
     const sourceDbName = document.getElementById("sourceDbName");
 
-    man_bafPath.addEventListener("change", loadInfobases)
     man_clusterAdmin.addEventListener("change", loadInfobases)
     man_clusterUsername.addEventListener("change", loadInfobases);
     man_clusterPassword.addEventListener("change", loadInfobases);
 
     function loadInfobases() {
-        const bafPath = man_bafPath.value;
         const clusterAd = man_clusterAdmin.checked;
         const clusterUser = man_clusterUsername.value;
         const clusterPass = man_clusterPassword.value;
 
-        fetch(`/api/restore/listInfobases?bafPath=${encodeURIComponent(bafPath)}&clusterAd=${encodeURIComponent(clusterAd)}&clusterUser=${encodeURIComponent(clusterUser)}&clusterPass=${encodeURIComponent(clusterPass)}`)
+        fetch(`/api/restore/listInfobases?clusterAd=${encodeURIComponent(clusterAd)}&clusterUser=${encodeURIComponent(clusterUser)}&clusterPass=${encodeURIComponent(clusterPass)}`)
             .then(response => response.json())
             .then(data => {
                 sourceDbName.innerHTML = "";

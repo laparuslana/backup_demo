@@ -14,6 +14,7 @@
         <script src="/js/popupHandlers.js" defer></script>
         <script src="/js/loadDatabases.js" defer></script>
         <script src="/js/validation.js" defer></script>
+    <script src="/js/storage_settings.js" defer></script>
         <script src="/js/backup.js" defer></script>
         <script src="/js/autoBackup.js" defer></script>
         <script src="/js/restoreBackup.js" defer></script>
@@ -127,9 +128,6 @@
                 <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>
             </div>
 
-<!--            <label for="res_bafPath">BAF Path:</label>-->
-<!--            <input type="text" id="res_bafPath" name="res_bafPath" placeholder="BAF Path" required>-->
-
             <label for="restoreDbServer">Cluster Server:</label>
             <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="DB Server" required>
 
@@ -173,9 +171,6 @@
                 <label for="man_clusterPassword">Cluster Password:</label>
                 <input type="password" id="man_clusterPassword" placeholder="Cluster Password"><br>
             </div>
-
-<!--            <label for="man_bafPath">BAF Path:</label>-->
-<!--            <input type="text" id="man_bafPath" name="man_bafPath" placeholder="BAF Path" required>-->
 
             <label for="man_dbServer">DB Server:</label>
             <input type="text" id="man_dbServer" name="man_dbServer" placeholder="DB Server" required>
@@ -304,22 +299,19 @@
 </div>
 
 <h2>Storage Settings</h2>
-                    <form id="storageSettingsForm">
-    <h4>Local Storage</h4>
-    <label>Path:</label>
-    <input type="text" id="localPath" name="localPath" required />
+<form action="/api/storage-settings/savee" method="post" id="storageSettingsForm">
+    <label>Name:</label>
+    <input type="text" id="name" name="name" required />
 
-    <h4>FTP Storage</h4>
-    <label>Host:</label>
-    <input type="text" id="ftpHost" name="ftpHost" required />
-    <label>Username:</label>
-    <input type="text" id="ftpUser" name="ftpUser" required />
-    <label>Password:</label>
-    <input type="password" id="ftpPassword" name="ftpPassword" required />
-    <label>Remote Path:</label>
-    <input type="text" id="ftpPath" name="ftpPath" required />
+    <label>Storage Type:</label>
+    <select name="type" id="storageType" required>
+    <option value="LOCAL">LOCAL</option>
+    <option value="FTP">FTP</option>
+</select>
 
-    <button type="submit">Save Settings</button>
+<div id="dynamicFields"></div>
+
+    <button type="button" onclick="saveStorageForm()">Save Settings</button>
 </form>
 
                     <h2>BAF Settings</h2>
@@ -336,6 +328,8 @@
 
                     </form>
                 `;
+            attachFields();
+
         } else if (section === 'backup') {
             main.innerHTML = '<h2>Backup</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">
@@ -410,7 +404,29 @@
         loadActiveSettings();
     }
 </script>
+<script>
+    const fieldTemplates = {
+        FTP: ['ftp_user', 'ftp_password', 'ftp_host'],
+        LOCAL: ['directory']
+    };
 
+    function attachFields() {
+        const dynamicFields = document.getElementById("dynamicFields");
+        const typeSelect = document.getElementById("storageType");
+
+
+        typeSelect.addEventListener('change', () => {
+            dynamicFields.innerHTML = '';
+            const fields = fieldTemplates[typeSelect.value] || [];
+            fields.forEach(key => {
+                dynamicFields.innerHTML += `
+            <label>${key}:</label>
+            <input type="text" name="${key}" required><br>
+`;
+            });
+        });
+    }
+</script>
 <script>
 
     window.addEventListener('DOMContentLoaded', () => {

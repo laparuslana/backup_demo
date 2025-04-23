@@ -20,34 +20,39 @@ public class StorageSettingsService {
     @Autowired
     private AesEncryptor aesEncryptor;
 
-    private final Path settingsFile = Paths.get("config/storage-settings.json");
-    private final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-
-    public Map<String, Object> loadSettings() throws IOException {
-        if (!Files.exists(settingsFile)) {
-            return new HashMap<>();
-        }
-        String content = Files.readString(settingsFile);
-        return objectMapper.readValue(content, new TypeReference<>() {});
-    }
-
-    public void saveSettings(Map<String, Object> settings) throws Exception {
-        Files.createDirectories(settingsFile.getParent());
-        objectMapper.writeValue(settingsFile.toFile(), settings);
-    }
-
     @Autowired
     private BafSettingsRepository bafSettingsRepository;
 
     public void saveBafSettings(BafSettings bafSettings) {
-            bafSettingsRepository.save(bafSettings);
+        bafSettingsRepository.save(bafSettings);
     }
 
-    public Map<String, Object> getSettingsForType(String type) throws IOException {
-        Map<String, Object> all = loadSettings();
-        if (!all.containsKey(type)) {
-            throw new IllegalArgumentException("No settings for type: " + type);
+    @Autowired
+    private StorageTargetRepository repository;
+
+    public void saveSettings(StorageDTO dto) throws Exception {
+        Map<String, String> encrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : dto.getJsonParameters().entrySet()) {
+            encrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
         }
-        return (Map<String, Object>) all.get(type);
+
+        StorageTarget entity = new StorageTarget();
+        entity.setName(dto.getName());
+        entity.setType(dto.getType());
+        entity.setJsonParameters(encrypted);
+
+        repository.save(entity);
     }
+
+    public Map<String, String> getStorageParams(String name) throws Exception {
+        StorageTarget target = repository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Not Found"));
+
+        Map<String, String> decrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
+            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+        }
+        return decrypted;
+    }
+
 }
