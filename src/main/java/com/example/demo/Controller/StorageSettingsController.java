@@ -1,9 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.Common.BafSettings;
-import com.example.demo.Model.Common.BafSettingsRepository;
-import com.example.demo.Model.Common.StorageSettingsService;
-import com.example.demo.Model.Common.StorageDTO;
+import com.example.demo.Model.Common.*;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,6 +22,9 @@ import java.util.Optional;
 public class StorageSettingsController {
 
     private final StorageSettingsService storageSettingsService;
+
+    @Autowired
+    private StorageTargetRepository repository;
 
     @Autowired
     private MyAppUserRepository myAppUserRepository;
@@ -73,6 +74,13 @@ public class StorageSettingsController {
         } else {
             return ResponseEntity.ok(Map.of());
         }
+    }
 
+    @GetMapping("/names")
+    public List<String> getStorageSettings(@RequestParam String type) {
+        return repository.findAllByType(type)
+                .stream()
+                .map(StorageTarget::getName)
+                .toList();
     }
 }

@@ -14,8 +14,8 @@ submitButom.addEventListener('click', async(event) => {
         restoreDbPassword: document.getElementById("restoreDbPassword").value,
         res_storageType: document.getElementById("res_storageType").value,
         backupFile: document.getElementById("backupFile").value,
-        res_clusterAdmin: document.getElementById("res_clusterAdmin").checked
-
+        res_clusterAdmin: document.getElementById("res_clusterAdmin").checked,
+        res_nameSelect: document.getElementById("res_nameSelect").value
     };
 
     if (restoreData.res_clusterAdmin) {
@@ -73,7 +73,7 @@ submitRestore.addEventListener('click', async(event) => {
     const restorePath = document.getElementById("restorePath").value;
     const restoreFile = document.getElementById("restoreFile").value;
 
-    fetch(`/api/restore/file?type=ftp&restorePath=${encodeURIComponent(restorePath)}&restoreFile=${encodeURIComponent(restoreFile)}`, {
+    fetch(`/api/restore/file?restorePath=${encodeURIComponent(restorePath)}&restoreFile=${encodeURIComponent(restoreFile)}&name=ftp1`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

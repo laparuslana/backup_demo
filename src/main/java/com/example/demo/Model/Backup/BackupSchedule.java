@@ -1,11 +1,13 @@
 package com.example.demo.Model.Backup;
 
+import com.example.demo.Security.JsonMapConverter;
 import com.example.demo.Security.JsonNodeConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
 import java.util.Base64;
+import java.util.Map;
 
 @Entity
 @Table(name = "backup_settings")
@@ -48,14 +50,22 @@ public class BackupSchedule {
     @Column(name = "retention_period")
     private String daysKeep2;
 
-
     @Column(name = "storage_params", columnDefinition = "json")
-    @Convert(converter = JsonNodeConverter.class)
-    private JsonNode storageParams2;
+    @Convert(converter = JsonMapConverter.class)
+    private Map<String, String> storageParams2;
 
     @Column(name = "storage_type", nullable = false)
     private String storageType2;
 
+    public String getNameSelect2() {
+        return nameSelect2;
+    }
+
+    public void setNameSelect2(String nameSelect2) {
+        this.nameSelect2 = nameSelect2;
+    }
+
+    private String nameSelect2;
 
 
     public String getType() {
@@ -82,11 +92,11 @@ public class BackupSchedule {
         this.storageType2 = storageType2;
     }
 
-    public JsonNode getStorageParams2() {
+    public Map<String, String> getStorageParams2() {
         return storageParams2;
     }
 
-    public void setStorageParams2(JsonNode storageParams2) {
+    public void setStorageParams2(Map<String, String> storageParams2) {
         this.storageParams2 = storageParams2;
     }
 
@@ -178,14 +188,12 @@ public class BackupSchedule {
         this.daysKeep2 = daysKeep2;
     }
 
-    public JsonNode getStorageParams() {
+    public Map<String, String> getStorageParams() {
         return storageParams2;
     }
 
-    public void setStorageParams(JsonNode storageParams2) {
+    public void setStorageParams(Map<String, String> storageParams2) {
         this.storageParams2 = storageParams2;
     }
-
-
 
 }

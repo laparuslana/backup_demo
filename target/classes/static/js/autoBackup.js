@@ -39,7 +39,8 @@ submitButtom.addEventListener('click', (event) => {
         day: document.getElementById("day").value,
         time: document.getElementById("time").value,
         daysKeep2: document.getElementById("daysKeep2").value,
-        storageType2: document.getElementById("storageType2").value
+        storageType2: document.getElementById("storageType2").value,
+        nameSelect2: document.getElementById("nameSelect2").value
     };
 
 

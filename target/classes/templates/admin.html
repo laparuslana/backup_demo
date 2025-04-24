@@ -51,12 +51,17 @@
             </select>
 
             <label for="storageType">Storage Type:</label>
-            <select id="storageType" name="storageType" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <select id="storageType" name="storageType" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
 
-            <button type="submit" id="submit">Do backup</button>
+            <div id="nameWrapper" style="display:none;">
+                <label for="nameSelect">Choose Saved Name:</label>
+                <select id="nameSelect"></select>
+            </div>
+
+            <button type="submit" id="submit" >Do backup</button>
         </form>
         <button onclick="closePopup()">Close</button>
     </div>
@@ -82,10 +87,15 @@
             </select>
 
             <label for="storageType2">Storage Type:</label>
-            <select id="storageType2" name="storageType2" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <select id="storageType2" name="storageType2" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
+
+            <div id="nameWrapper2" style="display:none;">
+                <label for="nameSelect2">Choose Saved Name:</label>
+                <select id="nameSelect2"></select>
+            </div>
 
             <label for="daysKeep2">Days to keep backup:</label>
             <input type="number" id="daysKeep2" name="daysKeep2" min="7" placeholder="Days To Keep" required>
@@ -141,11 +151,18 @@
             <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="DB Password" required>
 
             <label for="storageType">Storage Type:</label>
-            <select id="res_storageType" name="res_storageType" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <label for="res_storageType"></label>
+            <select id="res_storageType" name="res_storageType" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
 
+            <div id="res_nameWrapper" style="display:none;">
+                <label for="res_nameSelect">Choose Saved Name:</label>
+                <select id="res_nameSelect"></select>
+            </div>
+
+            <button type="button" onclick="listFiles()">Select Backup File:</button>
             <label for="backupFile">Select Backup File:</label>
             <select id="backupFile" name="backupFile"></select>
 
@@ -186,6 +203,7 @@
                 <option value="">Loading...</option>
             </select>
 
+            <button type="button" onclick="loadInfobases()">Choose database to switch from:</button>
             <label for="sourceDbName">Database to switch from:</label>
             <select id="sourceDbName" name="sourceDbName" required>
                 <option value="">Loading...</option>
@@ -252,24 +270,69 @@
     </div>
 </div>
 <script>
-        document.getElementById("res_storageType").addEventListener("change", function () {
-            const type = this.value;
-            fetch(`/api/restore/list?type=${type}`)
-                .then(response => response.json())
-                .then(files => {
-                    const select = document.getElementById('backupFile');
-                    select.innerHTML = "";
-                    files.forEach(file => {
-                        const option = document.createElement('option');
-                        option.value = file;
-                        option.textContent = file;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(err => console.error('Error fetching backups:', err));
+    function loadNamesByType(type) {
+        if (!type) return;
+
+        fetch(`/api/storage-settings/names?type=${type}`)
+            .then(res => res.json())
+            .then(names => {
+                const nameSelect = document.getElementById("nameSelect");
+                nameSelect.innerHTML = "";
+
+                names.forEach(name => {
+                    const option = document.createElement("option");
+                    option.value=name;
+                    option.textContent=name;
+                    nameSelect.appendChild(option);
+                });
+
+                document.getElementById("nameWrapper").style.display = "block";
+
+        const nameSelect2 = document.getElementById("nameSelect2");
+        nameSelect2.innerHTML = "";
+
+        names.forEach(name => {
+            const option = document.createElement("option");
+            option.value=name;
+            option.textContent=name;
+            nameSelect2.appendChild(option);
         });
 
-        fetch(`/api/restore/archive?type=ftp`)
+        document.getElementById("nameWrapper2").style.display = "block";
+
+                const res_nameSelect = document.getElementById("res_nameSelect");
+                res_nameSelect.innerHTML = "";
+
+                names.forEach(name => {
+                    const option = document.createElement("option");
+                    option.value=name;
+                    option.textContent=name;
+                    res_nameSelect.appendChild(option);
+                });
+
+                document.getElementById("res_nameWrapper").style.display = "block";
+    });
+    }
+
+        // document.getElementById("res_storageType").addEventListener("change", function () {
+        //     const type = this.value;
+        //     const nameSelect = document.getElementById("res_nameSelect")
+        //     fetch(`/api/restore/list?type=${type}&nameSelect=${nameSelect}`)
+        //         .then(response => response.json())
+        //         .then(files => {
+        //             const select = document.getElementById('backupFile');
+        //             select.innerHTML = "";
+        //             files.forEach(file => {
+        //                 const option = document.createElement('option');
+        //                 option.value = file;
+        //                 option.textContent = file;
+        //                 select.appendChild(option);
+        //             });
+        //         })
+        //         .catch(err => console.error('Error fetching backups:', err));
+        // });
+
+        fetch(`/api/restore/archive?type=ftp&nameSelect=ftp1`)
             .then(response => response.json())
             .then(files => {
                 const select = document.getElementById('restoreFile');
@@ -299,7 +362,7 @@
 </div>
 
 <h2>Storage Settings</h2>
-<form action="/api/storage-settings/savee" method="post" id="storageSettingsForm">
+<form action="/api/storage-settings/save" method="post" id="storageSettingsForm">
     <label>Name:</label>
     <input type="text" id="name" name="name" required />
 
@@ -341,6 +404,7 @@
                         <button onclick="openPopup()">Manually backup</button>
                     </div>
                 `);
+
         } else if (section === 'recovery') {
             main.innerHTML = '<h2>Recovery</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">
@@ -426,6 +490,7 @@
             });
         });
     }
+
 </script>
 <script>
 

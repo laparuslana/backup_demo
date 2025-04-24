@@ -13,6 +13,16 @@ public class BackupRequest {
     private String retentionPeriod;
     private String storageType;
 
+    public String getNameSelect() {
+        return nameSelect;
+    }
+
+    public void setNameSelect(String nameSelect) {
+        this.nameSelect = nameSelect;
+    }
+
+    private String nameSelect;
+
     public Map<String, String> getStorageParams() {
         return storageParams;
     }

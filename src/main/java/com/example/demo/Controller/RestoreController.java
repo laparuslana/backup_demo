@@ -2,8 +2,12 @@ package com.example.demo.Controller;
 
 
 import com.example.demo.Model.Common.StorageSettingsService;
+import com.example.demo.Model.Common.StorageTarget;
+import com.example.demo.Model.Common.StorageTargetRepository;
 import com.example.demo.Model.Restore.RestoreRequest;
 import com.example.demo.Model.Restore.RestoreService;
+import com.example.demo.Security.AesEncryptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,21 +29,28 @@ public class RestoreController {
 
     private final RestoreService restoreService;
 
-    private final StorageSettingsService storageSettingsService;
-
-
-    public RestoreController(RestoreService restoreService, StorageSettingsService storageSettingsService) {
+    public RestoreController(RestoreService restoreService) {
         this.restoreService = restoreService;
-        this.storageSettingsService = storageSettingsService;
     }
+    @Autowired
+    private StorageTargetRepository repository;
+
+    @Autowired
+    private AesEncryptor aesEncryptor;
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> listBackupFiles(@RequestParam String type) throws Exception {
-        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+    public ResponseEntity<List<String>> listBackupFiles(@RequestParam String type,
+                                                        @RequestParam String nameSelect) throws Exception {
+        StorageTarget target = repository.findByName(nameSelect)
+                .orElseThrow(() -> new RuntimeException("Not Found"));
 
-        if ("local".equals(type)) {
-            String dirPath = (String) config.get("backupLocation");
+        Map<String, String> decrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
+            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+        }
 
+        if ("LOCAL".equals(type)) {
+            String dirPath = decrypted.get("directory");
             try (Stream<Path> paths = Files.list(Paths.get(dirPath))) {
                 List<String> fileNames = paths
                         .filter(Files::isRegularFile)
@@ -52,12 +63,11 @@ public class RestoreController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Collections.singletonList("Error: " + e.getMessage()));
             }
-
-        } else if ("ftp".equals(type)) {
-            String ftpHost = (String) config.get("ftpServer");
-            String ftpUser = (String) config.get("ftpUser");
-            String ftpPassword = (String) config.get("ftpPassword");
-            String ftpDir = (String) config.get("ftpDirectory");
+        } else if ("FTP".equals(type)) {
+            String ftpHost = decrypted.get("ftp_host");
+            String ftpUser = decrypted.get("ftp_user");
+            String ftpPassword = decrypted.get("ftp_password");
+            String ftpDir = decrypted.get("ftp_directory");
 
             try {
                 List<String> ftpFiles = restoreService.listBackupFilesFromFtp(ftpHost, ftpUser, ftpPassword, ftpDir);
@@ -73,15 +83,22 @@ public class RestoreController {
 
 
     @GetMapping("/archive")
-    public ResponseEntity<List<String>> listArchiveFiles(@RequestParam String type) throws Exception {
-        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+    public ResponseEntity<List<String>> listArchiveFiles(@RequestParam String type,
+                                                         @RequestParam String nameSelect) throws Exception {
+        StorageTarget target = repository.findByName(nameSelect)
+                .orElseThrow(() -> new RuntimeException("Not Found"));
 
-            String ftpHost = (String) config.get("ftpServer");
-            String ftpUser = (String) config.get("ftpUser");
-            String ftpPassword = (String) config.get("ftpPassword");
-            String ftpDir = (String) config.get("ftpDirectory");
+        Map<String, String> decrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
+            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+        }
 
-            try {
+        String ftpHost = decrypted.get("ftp_host");
+        String ftpUser = decrypted.get("ftp_user");
+        String ftpPassword = decrypted.get("ftp_password");
+        String ftpDir = decrypted.get("ftp_directory");
+
+        try {
                 List<String> ftpFiles = restoreService.listArchiveFilesFromFtp(ftpHost, ftpUser, ftpPassword, ftpDir);
                 return ResponseEntity.ok(ftpFiles);
             } catch (IOException | InterruptedException e) {
@@ -91,7 +108,6 @@ public class RestoreController {
 
     }
 
-
     @PostMapping(value = "/backup", consumes = "application/json")
     public ResponseEntity<Map<String, String>> restoreBackup(@RequestBody RestoreRequest restoreRequest) throws Exception {
         Map<String, String> response = new HashMap<>();
@@ -99,20 +115,25 @@ public class RestoreController {
         String type = restoreRequest.getRes_storageType();
         String fileName = restoreRequest.getBackupFile();
 
-        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+        String name = restoreRequest.getRes_nameSelect();
+        StorageTarget target = repository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Not Found"));
+
+        Map<String, String> decrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
+            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+        }
 
         String fullPath = "";
-        if ("local".equals(type)) {
-            String localPath = (String) config.get("backupLocation");
+        if ("LOCAL".equals(type)) {
+            String localPath = decrypted.get("directory");
             fullPath = Paths.get(localPath, fileName).toString();
-        } else if ("ftp".equals(type)) {
-            String ftpDirectory = (String) config.get("ftpDirectory");
-
+        } else if ("FTP".equals(type)) {
             Map<String, String> ftpParams = new HashMap<>();
-            ftpParams.put("ftpServer", (String) config.get("ftpServer"));
-            ftpParams.put("ftpUser", (String) config.get("ftpUser"));
-            ftpParams.put("ftpPassword", (String) config.get("ftpPassword"));
-            ftpParams.put("ftpDirectory", ftpDirectory);
+            ftpParams.put("ftpServer", decrypted.get("ftp_host"));
+            ftpParams.put("ftpUser", decrypted.get("ftp_user"));
+            ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
+            ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
             restoreRequest.setStorageParams(ftpParams);
         } else {
             throw new IllegalArgumentException("Unknown storage type: " + type);
@@ -140,23 +161,29 @@ public class RestoreController {
     }
 
     @PostMapping(value = "/file", produces = "application/json")
-    public ResponseEntity<Map<String, String>> restoreFileDb(@RequestParam String type,
-                                                          @RequestParam String restorePath,
-                                                          @RequestParam String restoreFile) throws IOException, InterruptedException {
+    public ResponseEntity<Map<String, String>> restoreFileDb(@RequestParam String restorePath,
+                                                          @RequestParam String restoreFile,
+                                                             @RequestParam String name) throws Exception {
         Map<String, String> response = new HashMap<>();
 
-        Map<String, Object> config = storageSettingsService.getSettingsForType(type);
+        StorageTarget target = repository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Not Found"));
 
-        String ftpHost = (String) config.get("ftpServer");
-        String ftpUser = (String) config.get("ftpUser");
-        String ftpPassword = (String) config.get("ftpPassword");
-        String ftpDir = (String) config.get("ftpDirectory");
+        Map<String, String> decrypted = new HashMap<>();
+        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
+            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+        }
+
+        String ftpHost = decrypted.get("ftp_host");
+        String ftpUser = decrypted.get("ftp_user");
+        String ftpPassword = decrypted.get("ftp_password");
+        String ftpDir = decrypted.get("ftp_directory");
+
 
         String result = restoreService.restoreFileDb(restorePath, restoreFile, ftpHost, ftpUser, ftpPassword, ftpDir);
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping(value = "/switch", produces = "application/json")
     public ResponseEntity<Map<String, String>> switchDB(@RequestParam String clusterAd,

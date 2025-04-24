@@ -19,6 +19,16 @@ public class RestoreRequest {
     private Map<String, String> storageParams;
     private String fullPath;
 
+    public String getRes_nameSelect() {
+        return res_nameSelect;
+    }
+
+    public void setRes_nameSelect(String res_nameSelect) {
+        this.res_nameSelect = res_nameSelect;
+    }
+
+    private String res_nameSelect;
+
     public String getTest_database() {
         return test_database;
     }

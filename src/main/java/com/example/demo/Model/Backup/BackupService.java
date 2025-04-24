@@ -36,9 +36,9 @@ public class BackupService {
                 request.getStorageParams()
         );
         String storagePath;
-        if (Objects.equals(request.getStorageType(), "local")) {
+        if (Objects.equals(request.getStorageType(), "LOCAL")) {
             storagePath = request.getBackupLocation();
-        } else if (Objects.equals(request.getStorageType(), "ftp")) {
+        } else if (Objects.equals(request.getStorageType(), "FTP")) {
             storagePath = request.getStorageParams().get("ftpDirectory");
         } else {
             throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());

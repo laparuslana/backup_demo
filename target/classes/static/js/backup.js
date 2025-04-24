@@ -8,7 +8,8 @@ submitButttom.addEventListener('click', (event) => {
         dbServer: document.getElementById("dbServer").value,
         dbUser: document.getElementById("dbUser").value,
         dbPassword: document.getElementById("dbPassword").value,
-        storageType: document.getElementById("storageType").value
+        storageType: document.getElementById("storageType").value,
+        nameSelect: document.getElementById("nameSelect").value
     };
 
 
