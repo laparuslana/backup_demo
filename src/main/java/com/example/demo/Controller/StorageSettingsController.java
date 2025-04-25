@@ -38,7 +38,7 @@ public class StorageSettingsController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveSettigs(@RequestBody StorageDTO dto) {
+    public ResponseEntity<?> saveSettings(@RequestBody StorageDTO dto) {
         try {
             storageSettingsService.saveSettings(dto);
             return ResponseEntity.ok(Map.of("message", "Settings saved"));

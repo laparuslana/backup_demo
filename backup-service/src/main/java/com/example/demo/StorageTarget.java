@@ -1,6 +1,6 @@
-package com.example.demo.Model.Common;
+package com.example.demo;
 
-import com.example.demo.Security.JsonMapConverter;
+import com.example.demo.JsonMapConverter;
 import jakarta.persistence.*;
 
 import java.util.Map;

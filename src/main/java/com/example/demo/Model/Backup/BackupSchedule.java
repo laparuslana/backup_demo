@@ -2,12 +2,8 @@ package com.example.demo.Model.Backup;
 
 import com.example.demo.Model.Common.StorageTarget;
 import com.example.demo.Security.JsonMapConverter;
-import com.example.demo.Security.JsonNodeConverter;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 
-import java.time.LocalTime;
-import java.util.Base64;
 import java.util.Map;
 
 @Entity
@@ -107,14 +103,6 @@ public class BackupSchedule {
 
     public void setStorageParams2(Map<String, String> storageParams2) {
         this.storageParams2 = storageParams2;
-    }
-
-    private String encrypt(String data) {
-        return Base64.getEncoder().encodeToString(data.getBytes());
-    }
-
-    private String decrypt(String encryptedData) {
-        return new String(Base64.getDecoder().decode(encryptedData));
     }
 
     public Long getId() {

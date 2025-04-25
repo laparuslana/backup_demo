@@ -93,11 +93,15 @@ public class BackupController {
            backupSchedule.setStorageTarget(target);
            backupSchedule.setDaysKeep2((String) request.get("daysKeep2"));
 
+           Map<String, String> encrypted = new HashMap<>();
            Map<String, String> dbParams = new HashMap<>();
            dbParams.put("dbServer", (String) request.get("dbServer2"));
            dbParams.put("dbUser", (String) request.get("dbUser2"));
            dbParams.put("dbPassword", (String) request.get("dbPassword2"));
-           backupSchedule.setDbParams(dbParams);
+           for (Map.Entry<String, String> entry : dbParams.entrySet()) {
+               encrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
+           }
+           backupSchedule.setDbParams(encrypted);
 
            Map<String, String> scheduleParams = new HashMap<>();
            scheduleParams.put("frequency", (String) request.get("frequency"));
@@ -108,12 +112,17 @@ public class BackupController {
            if ("LOCAL".equals(storageType)) {
                    backupSchedule.setBackupLocation2(decrypted.get("directory"));
                } else if ("FTP".equals(storageType)) {
+               Map<String, String> ftpEncrypted = new HashMap<>();
                    Map<String, String> ftpParams = new HashMap<>();
                    ftpParams.put("ftpServer", decrypted.get("ftp_host"));
                    ftpParams.put("ftpUser", decrypted.get("ftp_user"));
                    ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
                    ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
-                   backupSchedule.setStorageParams2(ftpParams);
+               for (Map.Entry<String, String> entry : ftpParams.entrySet()) {
+                   ftpEncrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
+               }
+
+               backupSchedule.setStorageParams2(ftpEncrypted);
                }
 
            backupService.save(backupSchedule);
@@ -128,12 +137,16 @@ public class BackupController {
            for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
                decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
            }
+           Map<String, String> fileEncrypted = new HashMap<>();
            Map<String, String> ftpParams = new HashMap<>();
            ftpParams.put("ftpServer", decrypted.get("ftp_host"));
            ftpParams.put("ftpUser", decrypted.get("ftp_user"));
            ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
            ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
-           backupSchedule.setStorageParams2(ftpParams);
+           for (Map.Entry<String, String> entry : ftpParams.entrySet()) {
+               fileEncrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
+           }
+           backupSchedule.setStorageParams2(fileEncrypted);
            backupSchedule.setFolderPath((String) request.get("folderPath"));
 
            backupService.save(backupSchedule);
