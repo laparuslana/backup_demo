@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -77,10 +78,15 @@ public class StorageSettingsController {
     }
 
     @GetMapping("/names")
-    public List<String> getStorageSettings(@RequestParam String type) {
+    public List<Map<String, Object>> getStorageSettings(@RequestParam String type) {
         return repository.findAllByType(type)
                 .stream()
-                .map(StorageTarget::getName)
-                .toList();
+                .map(target -> {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("id", target.getId());
+                            map.put("name", target.getName());
+                            return map;
+                        })
+                .collect(Collectors.toList());
     }
 }

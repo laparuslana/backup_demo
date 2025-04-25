@@ -40,7 +40,7 @@ submitButtom.addEventListener('click', (event) => {
         time: document.getElementById("time").value,
         daysKeep2: document.getElementById("daysKeep2").value,
         storageType2: document.getElementById("storageType2").value,
-        nameSelect2: document.getElementById("nameSelect2").value
+        storageSettingId: document.getElementById("nameSelect2").value
     };
 
 
@@ -99,7 +99,8 @@ submitFile.addEventListener('click', (event) => {
         day: document.getElementById("fileDay").value,
         time: document.getElementById("fileTime").value,
         daysKeep2: document.getElementById("daysKeep").value,
-        storageType2: "ftp"
+        storageType2: "ftp",
+        storageSettingId: document.getElementById("nameSelect2").value
         };
 
     fetch("/api/backup/save", {

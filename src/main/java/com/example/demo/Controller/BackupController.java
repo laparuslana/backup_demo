@@ -71,20 +71,39 @@ public class BackupController {
 
    @PostMapping(value = "/save", consumes = "application/json")
 
-    public ResponseEntity<?> saveSettings(@RequestBody BackupSchedule backupSchedule) throws Exception {
-       String type = backupSchedule.getType();
+    public ResponseEntity<?> saveSettings(@RequestBody Map<String, Object> request) throws Exception {
+       String type = (String) request.get("type");
 
        if ("database".equals(type)) {
 
-           String storageType = backupSchedule.getStorageType2();
-           String name = backupSchedule.getNameSelect2();
-           StorageTarget target = repository.findByName(name)
+           String storageType = (String) request.get("storageType2");
+           Long storageId = Long.valueOf((String) request.get("storageSettingId"));
+           StorageTarget target = repository.findById(storageId)
                    .orElseThrow(() -> new RuntimeException("Not Found"));
 
            Map<String, String> decrypted = new HashMap<>();
            for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
                decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
            }
+
+           BackupSchedule backupSchedule = new BackupSchedule();
+           backupSchedule.setType(type);
+           backupSchedule.setDatabaseName2((String) request.get("databaseName2"));
+           backupSchedule.setStorageType2(storageType);
+           backupSchedule.setStorageTarget(target);
+           backupSchedule.setDaysKeep2((String) request.get("daysKeep2"));
+
+           Map<String, String> dbParams = new HashMap<>();
+           dbParams.put("dbServer", (String) request.get("dbServer2"));
+           dbParams.put("dbUser", (String) request.get("dbUser2"));
+           dbParams.put("dbPassword", (String) request.get("dbPassword2"));
+           backupSchedule.setDbParams(dbParams);
+
+           Map<String, String> scheduleParams = new HashMap<>();
+           scheduleParams.put("frequency", (String) request.get("frequency"));
+           scheduleParams.put("day", (String) request.get("day"));
+           scheduleParams.put("time", (String) request.get("time"));
+           backupSchedule.setScheduleParams(scheduleParams);
 
            if ("LOCAL".equals(storageType)) {
                    backupSchedule.setBackupLocation2(decrypted.get("directory"));
@@ -100,8 +119,9 @@ public class BackupController {
            backupService.save(backupSchedule);
 
        } else if ("file".equals(type)) {
-           String name = backupSchedule.getNameSelect2();
-           StorageTarget target = repository.findByName(name)
+           BackupSchedule backupSchedule = new BackupSchedule();
+           Long storageId = Long.valueOf((String) request.get("storageSettingId"));
+           StorageTarget target = repository.findById(storageId)
                    .orElseThrow(() -> new RuntimeException("Not Found"));
 
            Map<String, String> decrypted = new HashMap<>();
@@ -114,6 +134,7 @@ public class BackupController {
            ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
            ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
            backupSchedule.setStorageParams2(ftpParams);
+           backupSchedule.setFolderPath((String) request.get("folderPath"));
 
            backupService.save(backupSchedule);
        }

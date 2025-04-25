@@ -247,6 +247,17 @@
             <label for="fileTime">Time:</label>
             <input type="time" id="fileTime" name="fileTime" required>
 
+            <label for="storageType">Storage Type:</label>
+            <label for="file_storageType"></label>
+            <select id="file_storageType" name="file_storageType" onchange="loadNamesByType(this.value)">
+                <option value="FTP">FTP</option>
+            </select>
+
+            <div id="file_nameWrapper" style="display:none;">
+                <label for="file_nameSelect">Choose Saved Name:</label>
+                <select id="file_nameSelect"></select>
+            </div>
+
             <button type="submit" id="filesubmit">Do backup</button>
         </form>
         <button onclick="closeFilePopup()">Close</button>
@@ -278,10 +289,10 @@
                 const nameSelect = document.getElementById("nameSelect");
                 nameSelect.innerHTML = "";
 
-                names.forEach(name => {
+                names.forEach(setting => {
                     const option = document.createElement("option");
-                    option.value=name;
-                    option.textContent=name;
+                    option.value=setting.name;
+                    option.textContent=setting.name;
                     nameSelect.appendChild(option);
                 });
 
@@ -290,10 +301,10 @@
         const nameSelect2 = document.getElementById("nameSelect2");
         nameSelect2.innerHTML = "";
 
-        names.forEach(name => {
+        names.forEach(setting => {
             const option = document.createElement("option");
-            option.value=name;
-            option.textContent=name;
+            option.value=setting.id;
+            option.textContent=setting.name;
             nameSelect2.appendChild(option);
         });
 
@@ -302,14 +313,27 @@
                 const res_nameSelect = document.getElementById("res_nameSelect");
                 res_nameSelect.innerHTML = "";
 
-                names.forEach(name => {
+                names.forEach(setting => {
                     const option = document.createElement("option");
-                    option.value=name;
-                    option.textContent=name;
+                    option.value=setting.name;
+                    option.textContent=setting.name;
                     res_nameSelect.appendChild(option);
                 });
 
                 document.getElementById("res_nameWrapper").style.display = "block";
+
+
+        const file_nameSelect = document.getElementById("file_nameSelect");
+        file_nameSelect.innerHTML = "";
+
+        names.forEach(setting => {
+            const option = document.createElement("option");
+            option.value=setting.name;
+            option.textContent=setting.name;
+            file_nameSelect.appendChild(option);
+        });
+
+        document.getElementById("file_nameWrapper").style.display = "block";
     });
     }
 

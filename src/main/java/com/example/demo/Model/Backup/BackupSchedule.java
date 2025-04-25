@@ -1,5 +1,6 @@
 package com.example.demo.Model.Backup;
 
+import com.example.demo.Model.Common.StorageTarget;
 import com.example.demo.Security.JsonMapConverter;
 import com.example.demo.Security.JsonNodeConverter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,23 +27,13 @@ public class BackupSchedule {
     @Column(name = "database_name")
     private String databaseName2;
 
-    @Column(name = "frequency")
-    private String frequency;
+    @Column(name = "schedule_params", columnDefinition = "json")
+    @Convert(converter = JsonMapConverter.class)
+    private Map<String, String> scheduleParams;
 
-    @Column(name = "day")
-    private String day;
-
-    @Column(name = "time")
-    private LocalTime time;
-
-    @Column(name = "db_server")
-    private String dbServer2;
-
-    @Column(name = "db_user")
-    private String dbUser2;
-
-    @Column(name = "db_password")
-    private String dbPassword2;
+    @Column(name = "db_params", columnDefinition = "json")
+    @Convert(converter = JsonMapConverter.class)
+    private Map<String, String> dbParams;
 
     @Column(name = "backup_location")
     private String backupLocation2;
@@ -57,15 +48,33 @@ public class BackupSchedule {
     @Column(name = "storage_type", nullable = false)
     private String storageType2;
 
-    public String getNameSelect2() {
-        return nameSelect2;
+    public StorageTarget getStorageTarget() {
+        return storageTarget;
     }
 
-    public void setNameSelect2(String nameSelect2) {
-        this.nameSelect2 = nameSelect2;
+    public void setStorageTarget(StorageTarget storageTarget) {
+        this.storageTarget = storageTarget;
     }
 
-    private String nameSelect2;
+    public Map<String, String> getDbParams() {
+        return dbParams;
+    }
+
+    public void setDbParams(Map<String, String> dbParams) {
+        this.dbParams = dbParams;
+    }
+
+    public Map<String, String> getScheduleParams() {
+        return scheduleParams;
+    }
+
+    public void setScheduleParams(Map<String, String> scheduleParams) {
+        this.scheduleParams = scheduleParams;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "storage_target_id")
+    private StorageTarget storageTarget;
 
 
     public String getType() {
@@ -122,54 +131,6 @@ public class BackupSchedule {
 
     public void setDatabaseName2(String databaseName2) {
         this.databaseName2 = databaseName2;
-    }
-
-    public String getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(String frequency) {
-        this.frequency = frequency;
-    }
-
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
-    }
-
-    public LocalTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalTime time) {
-        this.time = time;
-    }
-
-    public String getDbServer2() {
-        return dbServer2;
-    }
-
-    public void setDbServer2(String dbServer2) {
-        this.dbServer2 = dbServer2;
-    }
-
-    public String getDbUser2() {
-        return dbUser2;
-    }
-
-    public void setDbUser2(String dbUser2) {
-        this.dbUser2 = dbUser2;
-    }
-
-    public String getDbPassword2() {
-        return dbPassword2;
-    }
-
-    public void setDbPassword2(String dbPassword2) {
-        this.dbPassword2 = encrypt(dbPassword2);
     }
 
     public String getBackupLocation2() {
