@@ -1,7 +1,5 @@
 package com.example.demo;
-//
-//public class SpringContext {
-//}
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;

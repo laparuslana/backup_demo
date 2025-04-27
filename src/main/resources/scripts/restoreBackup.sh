@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Parameters for BAF
-#/opt/1cv8/i386/8.3.25.1374
 BAF_PATH=$1
 TEST_DB_NAME=$2
 DB_HOST=$3
@@ -19,12 +18,6 @@ FTP_DIRECTORY="${13}"
 FULL_PATH="${14}"
 STORAGE_TYPE="${15}"
 
-
-echo "FTP Server: $FTP_SERVER"
-echo "FTP User: $FTP_USER"
-echo "FTP Password: $FTP_PASSWORD"
-echo "FTP Directory: $FTP_DIRECTORY"
-echo "Full path: $FULL_PATH"
 
 LOCAL_DIR="/home/adminbs/ftp"
 
@@ -71,13 +64,20 @@ fi
 
 echo "Backup downloaded $LOCAL_DIR"
 
-# Step 1: Create the test database in the BAF cluster
+if [ "$CLUSTER_ADMIN" = "true" ]; then
+  INFOBASENEW=$(./rac infobase --cluster-user=$CLUSTER_USER --cluster-pwd=$CLUSTER_PASS --cluster=$cluster create \
+    --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
+    --locale=uk --db-user=$DB_USER --db-pwd=$DB_PASSWORD --license-distribution=allow | \
+    awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
+  else
+
+#Create the test database in the BAF cluster
 echo -e "\nCreating the test database in the BAF cluster..."
 INFOBASENEW=$(./rac infobase --cluster=$cluster create \
   --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
   --locale=uk --db-user=$DB_USER --db-pwd=$DB_PASSWORD --license-distribution=allow | \
   awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
-
+fi
 if [ $? -ne 0 ]; then
   echo "❌ Failed to create database in BAF"
   exit 1
@@ -98,8 +98,14 @@ fi
 
 
 if [ "$STORAGE_TYPE" = "local" ]; then
+if [ "$CLUSTER_ADMIN" = "true" ]; then
+  INFOBASENEW=$(./rac infobase --cluster-user=$CLUSTER_USER --cluster-pwd=$CLUSTER_PASS --cluster=$cluster create \
+    --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
+    --locale=uk --db-user=$DB_USER --db-pwd=$DB_PASSWORD --license-distribution=allow | \
+    awk '{FS=":"; RS="-"} {print $3}' | sed '2,$d')
 
-# Step 1: Create the test database in the BAF cluster
+  else
+# Create the test database in the BAF cluster
 echo -e "\nCreating the test database in the BAF cluster..."
 INFOBASENEW=$(./rac infobase --cluster=$cluster create \
   --create-database --name=$TEST_DB_NAME --dbms=PostgreSQL --db-server=$DB_HOST --db-name=$TEST_DB_NAME \
@@ -110,10 +116,10 @@ if [ $? -ne 0 ]; then
   echo "❌ Failed to create database in BAF"
   exit 1
 fi
-
+fi
 echo "✅ Database '$TEST_DB_NAME' created in BAF"
 
-# Step 2: Restore the backup into the test database using pg_restore
+# Restore the backup into the test database using pg_restore
 echo "Restoring backup into database '$TEST_DB_NAME'..."
 
 pg_restore -h "$DB_HOST" -p "5432" -U "$DB_USER" --clean --if-exists -d "$TEST_DB_NAME" -c "$FULL_PATH"

@@ -153,3 +153,26 @@ function loadDatabases() {
     })
     .catch(err => console.error('Error fetching backups:', err));
 }
+
+
+function selectArchives() {
+    const restore_storageType = document.getElementById("restore_storageType");
+    const restore_nameSelect = document.getElementById("restore_nameSelect");
+
+    const type = restore_storageType.value;
+    const nameSelect = restore_nameSelect.value;
+
+    fetch(`/api/restore/archive?type=${encodeURIComponent(type)}&nameSelect=${encodeURIComponent(nameSelect)}`)
+        .then(response => response.json())
+        .then(files => {
+            const select = document.getElementById('restoreFile');
+            select.innerHTML = "";
+            files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file;
+                option.textContent = file;
+                select.appendChild(option);
+            });
+        })
+        .catch(err => console.error('Error fetching backups:', err));
+}

@@ -17,12 +17,6 @@ FTP_USER=$9
 FTP_PASSWORD="${10}"
 FTP_DIRECTORY="${11}"
 
-echo "FTP Server: $FTP_SERVER"
-echo "FTP User: $FTP_USER"
-echo "FTP Password: $FTP_PASSWORD"
-echo "FTP Directory: $FTP_DIRECTORY"
-
-
 if [ "$CLUSTER_ADMIN" = "true" ]; then
     echo "Cluster admin mode enabled."
     export PGPASSWORD="$CLUSTER_PASSWORD"
@@ -39,7 +33,7 @@ if [ "$STORAGE_TYPE" = "ftp" ]; then
 
     pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "${TEMP_BACKUP_DIR}/${DATABASE_NAME}_${DATA}_ftp.backup"
 
-echo "🌐 Connecting to FTP server: $FTP_SERVER"
+
 ftp -inv "$FTP_SERVER" <<EOF
 user $FTP_USER $FTP_PASSWORD
 lcd $TEMP_BACKUP_DIR
@@ -49,21 +43,21 @@ bye
 EOF
 
 sleep 10
-echo "FTP executed"
     if [ $? -eq 0 ]; then
-        echo "✅ FTP upload successful"
+      NOW=$(date +"%Y-%m-%d %H:%M:%S")
+      echo "[$NOW] FTP upload successful ${DATABASE_NAME}_${DATA}_ftp.backup to $FTP_DIRECTORY" >> /tmp/auto-db-cron.log
     else
-        echo "❌ FTP upload failed"
+        echo "❌ FTP upload failed ${DATABASE_NAME}_${DATA}_ftp.backup to $FTP_DIRECTORY" >> /tmp/auto-db-cron.log
         exit 1
     fi
 else
-  echo "Backup locally"
   pg_dump -h "$DB_SERVER" -p 5432 -U "$DB_USER" "$DATABASE_NAME" -c -Fc -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup"
 
   if [ -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup" ]; then
-      echo "✅ Backup successful: $DATABASE_NAME_$DATA.backup"
+    NOW=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[$NOW] Backup successful $DATABASE_NAME_$DATA.backup to $BACKUP_DIR" >> /tmp/auto-db-cron.log
   else
-      echo "❌ Error during local backup for database: $DATABASE_NAME"
+      echo "❌ Error during local backup for database $DATABASE_NAME to $BACKUP_DIR" >> /tmp/auto-db-cron.log
       exit 1
   fi
 
@@ -76,8 +70,6 @@ else
   fi
 
 fi
-
-ls -l "$BACKUP_DIR/"
 
 echo "✅ Backup process completed."
 

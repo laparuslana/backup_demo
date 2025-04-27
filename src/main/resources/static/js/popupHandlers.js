@@ -121,6 +121,20 @@ function closeFilePopup() {
 
 function openFileRestorePopup() {
     document.getElementById('fileRestorePopup').style.display = 'flex';
+
+    const type = document.getElementById("restore_storageType");
+    const nameSelect = document.getElementById("restore_nameSelect");
+
+    if (type && nameSelect) {
+        const triggerLoad = () => {
+            if (type.value && nameSelect.value) {
+                selectArchives();
+            }
+        };
+
+        type.addEventListener("blur", triggerLoad);
+        nameSelect.addEventListener("blur", triggerLoad);
+    }
 }
 
 function closeFileRestorePopup() {

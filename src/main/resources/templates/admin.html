@@ -271,6 +271,17 @@
             <label for="restorePath">Restore Path:</label>
             <input type="text" id="restorePath" name="restorePath" placeholder="Restore Path" required>
 
+            <label for="storageType">Storage Type:</label>
+            <label for="restore_storageType"></label>
+            <select id="restore_storageType" name="restore_storageType" onchange="loadNamesByType(this.value)">
+                <option value="FTP">FTP</option>
+            </select>
+
+            <div id="restore_nameWrapper" style="display:none;">
+                <label for="restore_nameSelect">Choose Saved Name:</label>
+                <select id="restore_nameSelect"></select>
+            </div>
+
             <label for="restoreFile">Select Restore File:</label>
             <select id="restoreFile" name="restoreFile"></select>
 
@@ -333,25 +344,21 @@
             file_nameSelect.appendChild(option);
         });
 
-        document.getElementById("file_nameWrapper").style.display = "block";
+        document.getElementById("restore_nameWrapper").style.display = "block";
+
+                const restore_nameSelect = document.getElementById("restore_nameSelect");
+                restore_nameSelect.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.name;
+                    option.textContent=setting.name;
+                    restore_nameSelect.appendChild(option);
+                });
+
+                document.getElementById("restore_nameWrapper").style.display = "block";
     });
     }
-
-
-        fetch(`/api/restore/archive?type=ftp&nameSelect=ftp1`)
-            .then(response => response.json())
-            .then(files => {
-                const select = document.getElementById('restoreFile');
-                select.innerHTML = "";
-                files.forEach(file => {
-                    const option = document.createElement('option');
-                    option.value = file;
-                    option.textContent = file;
-                    select.appendChild(option);
-                });
-            })
-            .catch(err => console.error('Error fetching backups:', err));
-
 
 
     const main = document.getElementById('mainContent');
@@ -409,7 +416,21 @@
                         <button onclick="openAutoPopup()">Automatic backup settings</button>
                         <button onclick="openPopup()">Manually backup</button>
                     </div>
-                `);
+                `) + `
+<div id="progressContainer"></div>`
+                + `<div>
+    <h2>Database Backup Logs</h2>
+    <pre id="dbLogs" class="log-box">Loading...</pre>
+</div>
+
+<div>
+    <h2>File Backup Logs</h2>
+    <pre id="fileLogs" class="log-box">Loading...</pre>
+</div>`;
+
+            fetchAndShowProgress();
+            setInterval(monitorLogs, 60000);
+            monitorLogs();
 
         } else if (section === 'recovery') {
             main.innerHTML = '<h2>Recovery</h2>' + (currentBafPath === 'file' ? `
@@ -422,6 +443,10 @@
                         <button onclick="openManageRestorePopup()">Manage Restored Backups</button>
                     </div>
                 `);
+//                 + `
+// <div id="progressRestoreContainer"></div>`;
+//
+//             fetchAndShowRestoreProgress();
         }
     }
 
@@ -495,6 +520,53 @@
 `;
             });
         });
+    }
+
+    let lastDbLogTime = 0;
+    let lastFileLogTime = 0;
+
+    function highlightLogs(text) {
+        const lines = text.split('\n').map(line => {
+            if (line.includes('✅') || line.toLowerCase().includes('success')) {
+                return `<div class="success">${line}</div>`;
+            } else if (line.includes('❌') || line.toLowerCase().includes('error') || line.toLowerCase().includes('fail')) {
+                return `<div class="error">${line}</div>`;
+            } else {
+                return `<div>${line}</div>`;
+            }
+        });
+        return lines.join('');
+    }
+
+    function checkDbLogs() {
+        fetch('api/logs/auto-db')
+            .then(response => response.json())
+            .then(data => {
+                if (parseInt(data.lastModified) > lastDbLogTime) {
+                    const dbLogs = document.getElementById('dbLogs');
+                    dbLogs.innerHTML = highlightLogs(data.content);
+                    dbLogs.scrollTop = dbLogs.scrollHeight;
+                    lastDbLogTime = parseInt(data.lastModified);
+                }
+            });
+    }
+
+    function checkFileLogs() {
+        fetch('api/logs/auto-file')
+            .then(response => response.json())
+            .then(data => {
+                if (parseInt(data.lastModified) > lastFileLogTime) {
+                    const fileLogs = document.getElementById('fileLogs');
+                    fileLogs.innerHTML = highlightLogs(data.content);
+                    fileLogs.scrollTop = fileLogs.scrollHeight;
+                    lastFileLogTime = parseInt(data.lastModified);
+                }
+            });
+    }
+
+    function monitorLogs() {
+        checkDbLogs();
+        checkFileLogs();
     }
 
 </script>

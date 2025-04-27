@@ -1,6 +1,8 @@
 package com.example.demo.Model.Backup;
 
 
+import com.example.demo.Model.Common.ProgressDTO;
+import com.example.demo.Model.Common.ProgressSession;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -69,6 +72,11 @@ public class BackupService {
     }
 
     private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
+        LocalDateTime initStartTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startTime = initStartTime.format(formatter);
+        ProgressSession.setProgress(new ProgressDTO(0, "Backup...", databaseName, startTime, LocalDateTime.now(), backup_location));
+
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -93,11 +101,15 @@ public class BackupService {
             }
 
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+            ProgressSession.setProgress(new ProgressDTO(100, "Done", databaseName, startTime, LocalDateTime.now(), backup_location));
+
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+            ProgressSession.setProgress(new ProgressDTO(0, "Fail", databaseName, startTime, LocalDateTime.now(), backup_location));
         }
+
         return output.toString();
     }
 

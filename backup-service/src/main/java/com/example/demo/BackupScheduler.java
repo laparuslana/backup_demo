@@ -65,7 +65,7 @@ import java.util.concurrent.TimeUnit;
                     if ("database".equalsIgnoreCase(schedule.getType())) {
                         String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
 
-                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s >> /tmp/auto-db-cron.log 2>&1",
+                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s",
                                 cronExpression,
                                 scriptPath,
                                 schedule.getDatabaseName2(),
@@ -83,7 +83,7 @@ import java.util.concurrent.TimeUnit;
                     } else if ("file".equalsIgnoreCase(schedule.getType())) {
                         String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupFileDb.sh";
 
-                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s >> /tmp/auto-file-cron.log 2>&1",
+                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s",
                                 cronExpression,
                                 scriptPath,
                                 schedule.getFolderPath(),

@@ -33,9 +33,10 @@ EOF
 
 echo "FTP executed"
     if [ $? -eq 0 ]; then
-        echo "✅ FTP upload successful"
+      NOW=$(date +"%Y-%m-%d %H:%M:%S")
+      echo "[$NOW] FTP upload successful $ARCHIVE_NAME to $FTP_DIRECTORY" >> /tmp/auto-file-cron.log
     else
-        echo "❌ FTP upload failed"
+        echo "[$NOW] FTP upload failed $ARCHIVE_NAME to $FTP_DIRECTORY" >> /tmp/auto-file-cron.log
         exit 1
     fi
 

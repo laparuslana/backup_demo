@@ -79,7 +79,3 @@ ls -l "$BACKUP_DIR/"
 echo "✅ Backup process completed."
 
 
-#PA7MieNAwc7HuniA
-#u340275-sub3@u340275-sub3.your-storagebox.de
-
-

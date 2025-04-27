@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Parameters for BAF
-# /opt/1cv8/i386/8.3.25.1374
 BAF_PATH=$1
 CLUSTER_ADMIN=$2
 CLUSTER_USER=$3

@@ -1,8 +1,7 @@
 package com.example.demo.Model.Restore;
 
 
-import com.example.demo.Model.Common.BafSettings;
-import com.example.demo.Model.Common.BafSettingsRepository;
+import com.example.demo.Model.Common.*;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -188,6 +188,11 @@ public class RestoreService {
 
 
     private String executeRestoreCommand(String command, MyAppUser user, String backupFile, String sourceDatabase) {
+        LocalDateTime initStartTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startTime = initStartTime.format(formatter);
+        //ProgressSession.setRestoreProgress(new ProgressRestoreDTO(0, "Backup...", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
+
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -212,10 +217,12 @@ public class RestoreService {
             }
 
             logRestore(status, user, backupFile, sourceDatabase);
+           // ProgressSession.setRestoreProgress(new ProgressRestoreDTO(100, "Done", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
             logRestore(status, user, backupFile, sourceDatabase);
+           // ProgressSession.setRestoreProgress(new ProgressRestoreDTO(0, "Fail", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
         }
         return output.toString();
     }
