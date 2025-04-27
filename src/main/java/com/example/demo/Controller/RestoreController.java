@@ -83,8 +83,7 @@ public class RestoreController {
 
 
     @GetMapping("/archive")
-    public ResponseEntity<List<String>> listArchiveFiles(@RequestParam String type,
-                                                         @RequestParam String nameSelect) throws Exception {
+    public ResponseEntity<List<String>> listArchiveFiles(@RequestParam String nameSelect) throws Exception {
         StorageTarget target = repository.findByName(nameSelect)
                 .orElseThrow(() -> new RuntimeException("Not Found"));
 

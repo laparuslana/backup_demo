@@ -47,7 +47,7 @@ sleep 10
       NOW=$(date +"%Y-%m-%d %H:%M:%S")
       echo "[$NOW] FTP upload successful ${DATABASE_NAME}_${DATA}_ftp.backup to $FTP_DIRECTORY" >> /tmp/auto-db-cron.log
     else
-        echo "❌ FTP upload failed ${DATABASE_NAME}_${DATA}_ftp.backup to $FTP_DIRECTORY" >> /tmp/auto-db-cron.log
+        echo "[$NOW] FTP upload failed ${DATABASE_NAME}_${DATA}_ftp.backup to $FTP_DIRECTORY" >> /tmp/auto-db-cron.log
         exit 1
     fi
 else
@@ -55,9 +55,9 @@ else
 
   if [ -f "$BACKUP_DIR/$DATABASE_NAME"_"$DATA.backup" ]; then
     NOW=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "[$NOW] Backup successful $DATABASE_NAME_$DATA.backup to $BACKUP_DIR" >> /tmp/auto-db-cron.log
+    echo "[$NOW] Backup successful ${DATABASE_NAME}_${DATA}.backup to $BACKUP_DIR" >> /tmp/auto-db-cron.log
   else
-      echo "❌ Error during local backup for database $DATABASE_NAME to $BACKUP_DIR" >> /tmp/auto-db-cron.log
+      echo "[$NOW] Error during local backup for database $DATABASE_NAME to $BACKUP_DIR" >> /tmp/auto-db-cron.log
       exit 1
   fi
 

@@ -527,9 +527,9 @@
 
     function highlightLogs(text) {
         const lines = text.split('\n').map(line => {
-            if (line.includes('✅') || line.toLowerCase().includes('success')) {
+            if (line.includes('✅') || line.toLowerCase().includes('successful')) {
                 return `<div class="success">${line}</div>`;
-            } else if (line.includes('❌') || line.toLowerCase().includes('error') || line.toLowerCase().includes('fail')) {
+            } else if (line.includes('❌') || line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) {
                 return `<div class="error">${line}</div>`;
             } else {
                 return `<div>${line}</div>`;

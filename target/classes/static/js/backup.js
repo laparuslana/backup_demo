@@ -50,8 +50,7 @@ function fetchAndShowProgress() {
     fetch('/api/progress')
         .then(response => {
             if (response.status === 204) {
-                const container = document.getElementById('progressContainer').innerHTML = 'No active progress';
-                container.style.display = 'none';
+                document.getElementById('progressContainer').innerHTML = 'No active progress';
                 clearInterval(progressInterval);
                 return;
             }
@@ -59,9 +58,6 @@ function fetchAndShowProgress() {
         })
         .then(progress => {
             if (!progress) return;
-
-            const container = document.getElementById('progressContainer').innerHTML = 'No active progress';
-            container.style.display = 'block';
 
             const progressHtml = `
         <div class="progress-bar">

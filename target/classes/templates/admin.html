@@ -417,7 +417,7 @@
                         <button onclick="openPopup()">Manually backup</button>
                     </div>
                 `) + `
-<div id="progressContainer" style="display: none;"></div>`
+<div id="progressContainer"></div>`
                 + `<div>
     <h2>Database Backup Logs</h2>
     <pre id="dbLogs" class="log-box">Loading...</pre>
@@ -527,9 +527,9 @@
 
     function highlightLogs(text) {
         const lines = text.split('\n').map(line => {
-            if (line.includes('✅') || line.toLowerCase().includes('success')) {
+            if (line.includes('✅') || line.toLowerCase().includes('successful')) {
                 return `<div class="success">${line}</div>`;
-            } else if (line.includes('❌') || line.toLowerCase().includes('error') || line.toLowerCase().includes('fail')) {
+            } else if (line.includes('❌') || line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) {
                 return `<div class="error">${line}</div>`;
             } else {
                 return `<div>${line}</div>`;
