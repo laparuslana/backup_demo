@@ -188,11 +188,6 @@ public class RestoreService {
 
 
     private String executeRestoreCommand(String command, MyAppUser user, String backupFile, String sourceDatabase) {
-        LocalDateTime initStartTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String startTime = initStartTime.format(formatter);
-        //ProgressSession.setRestoreProgress(new ProgressRestoreDTO(0, "Backup...", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
-
         StringBuilder output = new StringBuilder();
         String status;
 
@@ -217,12 +212,10 @@ public class RestoreService {
             }
 
             logRestore(status, user, backupFile, sourceDatabase);
-           // ProgressSession.setRestoreProgress(new ProgressRestoreDTO(100, "Done", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Error executing backup: " + e.getMessage();
             logRestore(status, user, backupFile, sourceDatabase);
-           // ProgressSession.setRestoreProgress(new ProgressRestoreDTO(0, "Fail", backupFile, startTime, LocalDateTime.now(), sourceDatabase));
         }
         return output.toString();
     }

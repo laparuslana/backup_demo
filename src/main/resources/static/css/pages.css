@@ -14,31 +14,6 @@
 .error {
     color: #f44336;
 }
-/*#progressRestoreContainer {*/
-/*    width: 100%;*/
-/*    max-width: 500px;*/
-/*    margin: 20px auto;*/
-/*    padding: 15px;*/
-/*    background-color: #ffffff;*/
-/*    border: 2px solid #007BFF;*/
-/*    border-radius: 12px;*/
-/*    box-shadow: 0 4px 8px rgba(0,0,0,0.1);*/
-/*    text-align: center;*/
-/*    font-family: Arial, sans-serif;*/
-/*}*/
-
-/*#progressRestoreContainer {*/
-/*    margin: 5px 0;*/
-/*    font-size: 16px;*/
-/*    color: #333;*/
-/*}*/
-
-/*#progressRestoreContainer small {*/
-/*    display: block;*/
-/*    margin-top: 10px;*/
-/*    color: #666;*/
-/*    font-size: 12px;*/
-/*}*/
 
 #progressContainer {
     width: 100%;

@@ -1,3 +1,16 @@
+function loadAllUsers() {
+    fetch('req/users/all')
+        .then(response => response.json())
+        .then(users => {
+            const tableBody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
+            users.forEach(user => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = user.username;
+                row.insertCell(1).textContent = user.role;
+            });
+        });
+}
+
 function addUser() {
     let username, email, password, role;
 
@@ -32,16 +45,19 @@ function addUser() {
         body: JSON.stringify({username, email, password, role})
     })
         .then(response => response.json())
-        .then(data => alert(data.message))
+        .then(data => {
+            alert(data.message);
+            loadAllUsers();
+        })
         .catch(error => alert("Error: " + error));
 }
 
 function editUser() {
-    let userId, newUsername, newEmail, newPassword, newRole;
+    let userName, newUsername, newEmail, newPassword, newRole;
 
-    while (!userId) {
-        userId = prompt("Enter User ID to edit:");
-        if (userId === null) return;
+    while (!userName) {
+        userName = prompt("Enter Username to edit:");
+        if (userName === null) return;
     }
 
     while (!newUsername) {
@@ -71,23 +87,29 @@ function editUser() {
         alert("Invalid role! Only USER or ADMIN allowed.");
     }
 
-    fetch(`/req/users/edit/${userId}`, {
+    fetch(`/req/users/edit/${userName}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username: newUsername, email: newEmail, password: newPassword, role: newRole})
     })
         .then(response => response.json())
-        .then(data => alert(data.message))
+        .then(data => {
+            alert(data.message);
+            loadAllUsers();
+        })
         .catch(error => alert("Error: " + error));
 }
 
 function deleteUser() {
-    let userId = prompt("Enter User ID to delete:");
-    if (userId) {
-        fetch(`/req/users/delete/${userId}`, {
+    let userName = prompt("Enter Username to delete:");
+    if (userName) {
+        fetch(`/req/users/delete/${userName}`, {
             method: 'DELETE'
         }).then(response => response.json())
-            .then(data => alert(data.message))
+            .then(data => {
+                alert(data.message);
+                loadAllUsers();
+            })
             .catch(error => alert("Error: " + error));
     }
 }

@@ -39,14 +39,6 @@ public class ActivityController {
         }
         return ResponseEntity.ok(progress);
     }
-//    @GetMapping("/restoreProgress")
-//    public ResponseEntity<ProgressRestoreDTO> getRestoreProgress() {
-//        ProgressRestoreDTO progress = ProgressSession.getCurrentRestoreProgress();
-//        if (progress == null) {
-//            return ResponseEntity.noContent().build();
-//        }
-//        return ResponseEntity.ok(progress);
-//    }
 
     @GetMapping("/logs/auto-db")
     public ResponseEntity<Map<String, String>> getAutoDbLogs() {

@@ -60,57 +60,8 @@ submitButom.addEventListener('click', async(event) => {
         .then(data => alert("✅ Restore started successfully!"))
         .catch(error => alert("❌ Error starting restore: " + error));
 });
-//
-// let progressInterval;
-// let simulatedProgress = 0;
-// let realProgress = 0;
-// function startRestoreProgressAutoUpdate() {
-//     simulatedProgress = 0;
-//     realProgress = 0;
-//     if (progressInterval) clearInterval(progressInterval);
-//
-//     progressInterval = setInterval(() => {
-//         fetchAndShowRestoreProgress();
-//     }, 3000);
-//  }
-//
-//
-// function fetchAndShowRestoreProgress() {
-//     fetch('/api/restoreProgress')
-//         .then(response => {
-//             if (response.status === 204) {
-//                 document.getElementById('progressRestoreContainer').innerHTML = 'No active progress';
-//                 clearInterval(progressInterval);
-//                 return;
-//             }
-//             return response.json();
-//         })
-//         .then(progress => {
-//             if (!progress) return;
-//
-//             const progressHtml = `
-//         <div class="progress-bar">
-//             <div class="progress-fill" style="width: ${progress.percent}%; transition: width 0.5s;"></div>
-//         </div>
-//         <p>${progress.percent}% ${progress.status}</p>
-//         <small>Backup file: ${progress.backupFile} | Soure Database: ${progress.sourceDatabase}</small>
-//         <small>Started: ${progress.startTime} | Updated: ${progress.updateTime}</small>
 
-//     `;
-//             document.getElementById('progressRestoreContainer').innerHTML = progressHtml;
-//
-//             realProgress = progress.percent;
-//
-//             if (realProgress >= 100) {
-//                 clearInterval(progressInterval);
-//             }
-//         })
-//         .catch(error => {
-//             document.getElementById('progressRestoreContainer').innerHTML = 'No active progress';
-//             clearInterval(progressInterval);
-//         });
-// }
-//
+
 
 document.getElementById("res_clusterAdmin").addEventListener("change", function () {
     const clusterCredentials = document.getElementById("res_clusterCredentials");
