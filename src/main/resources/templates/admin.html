@@ -368,6 +368,14 @@
         if (section === 'settings') {
             main.innerHTML = `
                     <h2>User Settings</h2>
+                    <table id="usersTable">
+                    <thread>
+                    <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+</tr>
+</thread>
+</table>
 <div class="button-group">
                     <button onclick="addUser()">Add User</button>
                     <button onclick="editUser()">Edit User</button>
@@ -378,6 +386,8 @@
 <form action="/api/storage-settings/save" method="post" id="storageSettingsForm">
     <label>Name:</label>
     <input type="text" id="name" name="name" required />
+
+    <br><br>
 
     <label>Storage Type:</label>
     <select name="type" id="storageType" required>
@@ -397,6 +407,8 @@
                         <input type="radio" name="bafType" value="file" checked> File based
                         <input type="radio" name="bafType" value="server"> Server based
 
+                        <br><br>
+
                         <label>BAF Directory Path:</label>
                         <input type="text" id="bafPath" value="/path/to/baf/">
 
@@ -404,6 +416,7 @@
 
                     </form>
                 `;
+            loadAllUsers();
             attachFields();
 
         } else if (section === 'backup') {

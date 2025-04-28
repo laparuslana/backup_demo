@@ -20,6 +20,11 @@ public class UserController {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @GetMapping("/all")
+    public List<MyAppUser> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody MyAppUser user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -31,9 +36,9 @@ public class UserController {
         return ResponseEntity.ok(Collections.singletonMap("message", "User added successfully"));
     }
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody MyAppUser updateduser) {
-        return userRepository.findById(id).map(user -> {
+    @PutMapping("/edit/{userName}")
+    public ResponseEntity<?> editUser(@PathVariable String userName, @RequestBody MyAppUser updateduser) {
+        return userRepository.findByUsername(userName).map(user -> {
             if (!user.getUsername().equals(updateduser.getUsername()) &&
                 userRepository.findByUsername(updateduser.getUsername()).isPresent()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -51,10 +56,11 @@ public class UserController {
             return ResponseEntity.ok(Collections.singletonMap("message", "User updated successfully"));
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "User not found")));
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
+    @DeleteMapping("/delete/{userName}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userName) {
+        Optional<MyAppUser> userOpt = userRepository.findByUsername(userName);
+        if (userOpt.isPresent()) {
+            userRepository.deleteByUsername(userName);
             return ResponseEntity.ok(Collections.singletonMap("message", "User deleted successfully"));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "User not found"));

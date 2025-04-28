@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor 
+@AllArgsConstructor
 public class MyAppUserService implements UserDetailsService{
-    
+
     @Autowired
     private MyAppUserRepository repository;
-    
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
+
         Optional<MyAppUser> user = repository.findByUsername(username);
         if (user.isPresent()) {
             var userObj = user.get();
@@ -28,7 +28,7 @@ public class MyAppUserService implements UserDetailsService{
                     .username(userObj.getUsername())
                     .password(userObj.getPassword())
                     .authorities("ROLE_" + userObj.getRole())
-                    .build();    
+                    .build();
         }else{
             throw new UsernameNotFoundException(username);
         }
