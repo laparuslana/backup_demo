@@ -1,4 +1,4 @@
-package com.example.demo.Model.Common;
+package com.example.demo.Model.SettingsManagement;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

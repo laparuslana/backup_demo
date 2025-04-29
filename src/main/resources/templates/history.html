@@ -10,12 +10,13 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="/js/listHistory.js"></script>
     <script src="/js/users.js" defer></script>
-        <script src="/js/popupHandlers.js" defer></script>
-        <script src="/js/loadDatabases.js" defer></script>
-        <script src="/js/validation.js" defer></script>
-        <script src="/js/backup.js" defer></script>
-        <script src="/js/autoBackup.js" defer></script>
-        <script src="/js/restoreBackup.js" defer></script>
+    <script src="/js/popupHandlers.js" defer></script>
+    <script src="/js/loadDatabases.js" defer></script>
+    <script src="/js/validation.js" defer></script>
+    <script src="/js/settings.js" defer></script>
+    <script src="/js/backup.js" defer></script>
+    <script src="/js/autoBackup.js" defer></script>
+    <script src="/js/restoreBackup.js" defer></script>
 
 </head>
 <body>
@@ -48,12 +49,17 @@
             </select>
 
             <label for="storageType">Storage Type:</label>
-            <select id="storageType" name="storageType" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <select id="storageType" name="storageType" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
 
-            <button type="submit" id="submit">Do backup</button>
+            <div id="nameWrapper" style="display:none;">
+                <label for="nameSelect">Choose Saved Name:</label>
+                <select id="nameSelect"></select>
+            </div>
+
+            <button type="submit" id="submit" >Do backup</button>
         </form>
         <button onclick="closePopup()">Close</button>
     </div>
@@ -79,28 +85,33 @@
             </select>
 
             <label for="storageType2">Storage Type:</label>
-            <select id="storageType2" name="storageType2" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <select id="storageType2" name="storageType2" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
+
+            <div id="nameWrapper2" style="display:none;">
+                <label for="nameSelect2">Choose Saved Name:</label>
+                <select id="nameSelect2"></select>
+            </div>
 
             <label for="daysKeep2">Days to keep backup:</label>
             <input type="number" id="daysKeep2" name="daysKeep2" min="7" placeholder="Days To Keep" required>
 
-                <label for="frequency">Frequency:</label>
-                <select id="frequency" name="frequency">
-                    <option value="daily">Every Day</option>
-                    <option value="weekly">Every Week</option>
-                    <option value="monthly">Every Month</option>
-                </select>
+            <label for="frequency">Frequency:</label>
+            <select id="frequency" name="frequency">
+                <option value="daily">Every Day</option>
+                <option value="weekly">Every Week</option>
+                <option value="monthly">Every Month</option>
+            </select>
 
-                <div id="daySelection" style="display: none;">
-                    <label for="day">Day:</label>
-                    <select id="day" name="day"></select>
-                </div>
+            <div id="daySelection" style="display: none;">
+                <label for="day">Day:</label>
+                <select id="day" name="day"></select>
+            </div>
 
-                <label for="time">Time:</label>
-                <input type="time" id="time" name="time" required>
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" required>
 
             <button type="submit" id="autosubmit">Do backup</button>
         </form>
@@ -125,9 +136,6 @@
                 <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>
             </div>
 
-            <label for="res_bafPath">BAF Path:</label>
-            <input type="text" id="res_bafPath" name="res_bafPath" placeholder="BAF Path" required>
-
             <label for="restoreDbServer">Cluster Server:</label>
             <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="DB Server" required>
 
@@ -141,10 +149,16 @@
             <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="DB Password" required>
 
             <label for="storageType">Storage Type:</label>
-            <select id="res_storageType" name="res_storageType" required>
-                <option value="local">Local</option>
-                <option value="ftp">FTP</option>
+            <label for="res_storageType"></label>
+            <select id="res_storageType" name="res_storageType" onchange="loadNamesByType(this.value)">
+                <option value="LOCAL">LOCAL</option>
+                <option value="FTP">FTP</option>
             </select>
+
+            <div id="res_nameWrapper" style="display:none;">
+                <label for="res_nameSelect">Choose Saved Name:</label>
+                <select id="res_nameSelect"></select>
+            </div>
 
             <label for="backupFile">Select Backup File:</label>
             <select id="backupFile" name="backupFile"></select>
@@ -172,9 +186,6 @@
                 <input type="password" id="man_clusterPassword" placeholder="Cluster Password"><br>
             </div>
 
-            <label for="man_bafPath">BAF Path:</label>
-            <input type="text" id="man_bafPath" name="man_bafPath" placeholder="BAF Path" required>
-
             <label for="man_dbServer">DB Server:</label>
             <input type="text" id="man_dbServer" name="man_dbServer" placeholder="DB Server" required>
 
@@ -189,7 +200,7 @@
                 <option value="">Loading...</option>
             </select>
 
-            <label for="sourceDbName">Database to switch from:</label>
+            <button type="button" onclick="loadInfobases()">Choose database to switch from:</button>
             <select id="sourceDbName" name="sourceDbName" required>
                 <option value="">Loading...</option>
             </select>
@@ -199,8 +210,8 @@
                 <label for="confirmAction">I confirm that I reviewed the restored database and want to proceed.</label>
             </div>
 
-                <button type="submit" id="submitSwitch">Make Switch</button>
-                <button type="submit" id="submitDelete">Delete Restored Database</button>
+            <button type="submit" id="submitSwitch">Make Switch</button>
+            <button type="submit" id="submitDelete">Delete Restored Database</button>
 
         </form>
 
@@ -233,6 +244,17 @@
             <label for="fileTime">Time:</label>
             <input type="time" id="fileTime" name="fileTime" required>
 
+            <label for="storageType">Storage Type:</label>
+            <label for="file_storageType"></label>
+            <select id="file_storageType" name="file_storageType" onchange="loadNamesByType(this.value)">
+                <option value="FTP">FTP</option>
+            </select>
+
+            <div id="file_nameWrapper" style="display:none;">
+                <label for="file_nameSelect">Choose Saved Name:</label>
+                <select id="file_nameSelect"></select>
+            </div>
+
             <button type="submit" id="filesubmit">Do backup</button>
         </form>
         <button onclick="closeFilePopup()">Close</button>
@@ -246,6 +268,17 @@
             <label for="restorePath">Restore Path:</label>
             <input type="text" id="restorePath" name="restorePath" placeholder="Restore Path" required>
 
+            <label for="storageType">Storage Type:</label>
+            <label for="restore_storageType"></label>
+            <select id="restore_storageType" name="restore_storageType" onchange="loadNamesByType(this.value)">
+                <option value="FTP">FTP</option>
+            </select>
+
+            <div id="restore_nameWrapper" style="display:none;">
+                <label for="restore_nameSelect">Choose Saved Name:</label>
+                <select id="restore_nameSelect"></select>
+            </div>
+
             <label for="restoreFile">Select Restore File:</label>
             <select id="restoreFile" name="restoreFile"></select>
 
@@ -255,38 +288,74 @@
     </div>
 </div>
 <script>
-        document.getElementById("res_storageType").addEventListener("change", function () {
-            const type = this.value;
-            fetch(`/api/restore/list?type=${type}`)
-                .then(response => response.json())
-                .then(files => {
-                    const select = document.getElementById('backupFile');
-                    select.innerHTML = "";
-                    files.forEach(file => {
-                        const option = document.createElement('option');
-                        option.value = file;
-                        option.textContent = file;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(err => console.error('Error fetching backups:', err));
-        });
+    function loadNamesByType(type) {
+        if (!type) return;
 
-        fetch(`/api/restore/archive?type=ftp`)
-            .then(response => response.json())
-            .then(files => {
-                const select = document.getElementById('restoreFile');
-                select.innerHTML = "";
-                files.forEach(file => {
-                    const option = document.createElement('option');
-                    option.value = file;
-                    option.textContent = file;
-                    select.appendChild(option);
+        fetch(`/api/settings/get-storage-settings?type=${type}`)
+            .then(res => res.json())
+            .then(names => {
+                const nameSelect = document.getElementById("nameSelect");
+                nameSelect.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.name;
+                    option.textContent=setting.name;
+                    nameSelect.appendChild(option);
                 });
-            })
-            .catch(err => console.error('Error fetching backups:', err));
+
+                document.getElementById("nameWrapper").style.display = "block";
+
+                const nameSelect2 = document.getElementById("nameSelect2");
+                nameSelect2.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.id;
+                    option.textContent=setting.name;
+                    nameSelect2.appendChild(option);
+                });
+
+                document.getElementById("nameWrapper2").style.display = "block";
+
+                const res_nameSelect = document.getElementById("res_nameSelect");
+                res_nameSelect.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.name;
+                    option.textContent=setting.name;
+                    res_nameSelect.appendChild(option);
+                });
+
+                document.getElementById("res_nameWrapper").style.display = "block";
 
 
+                const file_nameSelect = document.getElementById("file_nameSelect");
+                file_nameSelect.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.name;
+                    option.textContent=setting.name;
+                    file_nameSelect.appendChild(option);
+                });
+
+                document.getElementById("restore_nameWrapper").style.display = "block";
+
+                const restore_nameSelect = document.getElementById("restore_nameSelect");
+                restore_nameSelect.innerHTML = "";
+
+                names.forEach(setting => {
+                    const option = document.createElement("option");
+                    option.value=setting.name;
+                    option.textContent=setting.name;
+                    restore_nameSelect.appendChild(option);
+                });
+
+                document.getElementById("restore_nameWrapper").style.display = "block";
+            });
+    }
 
 
     const main = document.getElementById('mainContent');
@@ -295,36 +364,46 @@
         if (section === 'settings') {
             main.innerHTML = `
                     <h2>User Settings</h2>
+                    <table id="usersTable">
+                    <thread>
+                    <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+</tr>
+</thread>
+</table>
 <div class="button-group">
                     <button onclick="addUser()">Add User</button>
                     <button onclick="editUser()">Edit User</button>
                     <button onclick="deleteUser()">Delete User</button>
 </div>
+
 <h2>Storage Settings</h2>
-                    <form id="storageSettingsForm">
-    <h4>Local Storage</h4>
-    <label>Path:</label>
-    <input type="text" id="localPath" name="localPath" required />
+<form action="/api/settings/storage-settings-save" method="post" id="storageSettingsForm">
+    <label>Name:</label>
+    <input type="text" id="name" name="name" required />
 
-    <h4>FTP Storage</h4>
-    <label>Host:</label>
-    <input type="text" id="ftpHost" name="ftpHost" required />
-    <label>Username:</label>
-    <input type="text" id="ftpUser" name="ftpUser" required />
-    <label>Password:</label>
-    <input type="password" id="ftpPassword" name="ftpPassword" required />
-    <label>Remote Path:</label>
-    <input type="text" id="ftpPath" name="ftpPath" required />
+    <br><br>
 
-    <button type="submit">Save Settings</button>
+    <label>Storage Type:</label>
+    <select name="type" id="storageType" required>
+    <option value="LOCAL">LOCAL</option>
+    <option value="FTP">FTP</option>
+</select>
+
+<div id="dynamicFields"></div>
+
+    <button type="button" onclick="saveStorageForm()">Save Settings</button>
 </form>
 
                     <h2>BAF Settings</h2>
-                    <form action="/api/storage-settings/baf" method="post" id="bafSettingsForm">
+                    <form action="/api/settings/baf-settings-save" method="post" id="bafSettingsForm">
 
                         <label>Type BAF:</label>
                         <input type="radio" name="bafType" value="file" checked> File based
                         <input type="radio" name="bafType" value="server"> Server based
+
+                        <br><br>
 
                         <label>BAF Directory Path:</label>
                         <input type="text" id="bafPath" value="/path/to/baf/">
@@ -333,6 +412,9 @@
 
                     </form>
                 `;
+            loadAllUsers();
+            attachFields();
+
         } else if (section === 'backup') {
             main.innerHTML = '<h2>Backup</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">
@@ -343,7 +425,22 @@
                         <button onclick="openAutoPopup()">Automatic backup settings</button>
                         <button onclick="openPopup()">Manually backup</button>
                     </div>
-                `);
+                `) + `
+<div id="progressContainer"></div>`
+                + `<div>
+    <h2>Database Backup Logs</h2>
+    <pre id="dbLogs" class="log-box">Loading...</pre>
+</div>
+
+<div>
+    <h2>File Backup Logs</h2>
+    <pre id="fileLogs" class="log-box">Loading...</pre>
+</div>`;
+
+            fetchAndShowProgress();
+            setInterval(monitorLogs, 60000);
+            monitorLogs();
+
         } else if (section === 'recovery') {
             main.innerHTML = '<h2>Recovery</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">

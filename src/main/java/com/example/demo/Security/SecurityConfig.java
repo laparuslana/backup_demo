@@ -70,13 +70,9 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/req/signup","/css/**","/js/**").permitAll()
-                    .requestMatchers("/storage_settings","/css/**","/js/**").permitAll()
                     .requestMatchers("/admin/**", "/js/**").hasRole("ADMIN")
-                    .requestMatchers("/api/backup/**", "/js/**").permitAll()
-                    .requestMatchers("/api/restore/**", "/js/**").permitAll()
-                    .requestMatchers("/api/storage-settings/**", "/js/**").permitAll()
-                    .requestMatchers("/api/activity-stats/**", "/js/**").permitAll()
-                    .requestMatchers("/api/progress/**", "/js/**").permitAll()
+                    .requestMatchers("/api/**", "/js/**").permitAll()
+                    .requestMatchers("/req/history/**","/js/**").permitAll()
                     .requestMatchers("/history","/css/**","/js/**").permitAll()
                     .anyRequest().authenticated()
             )

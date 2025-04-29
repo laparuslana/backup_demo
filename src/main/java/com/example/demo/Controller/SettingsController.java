@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Model.Common.*;
+import com.example.demo.Model.SettingsManagement.*;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +17,9 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/storage-settings")
+@RequestMapping("/api/settings")
 @CrossOrigin(origins = "*")
-public class StorageSettingsController {
+public class SettingsController {
 
     private final StorageSettingsService storageSettingsService;
 
@@ -33,11 +32,11 @@ public class StorageSettingsController {
     @Autowired
     private BafSettingsRepository bafSettingsRepository;
 
-    public StorageSettingsController(StorageSettingsService storageSettingsService) {
+    public SettingsController(StorageSettingsService storageSettingsService) {
         this.storageSettingsService = storageSettingsService;
     }
 
-    @PostMapping("/save")
+    @PostMapping("/storage-settings-save")
     public ResponseEntity<?> saveSettings(@RequestBody StorageDTO dto) {
         try {
             storageSettingsService.saveSettings(dto);
@@ -48,7 +47,7 @@ public class StorageSettingsController {
         }
     }
 
-    @PostMapping(value="/baf", consumes = "application/json")
+    @PostMapping(value="/baf-settings-save", consumes = "application/json")
     public ResponseEntity<?> saveBafSettings(@RequestBody BafSettings bafSettings) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         MyAppUser user = myAppUserRepository.findByUsername(username)
@@ -77,7 +76,7 @@ public class StorageSettingsController {
         }
     }
 
-    @GetMapping("/names")
+    @GetMapping("/get-storage-settings")
     public List<Map<String, Object>> getStorageSettings(@RequestParam String type) {
         return repository.findAllByType(type)
                 .stream()

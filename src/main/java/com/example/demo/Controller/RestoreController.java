@@ -1,9 +1,8 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.Model.Common.StorageSettingsService;
-import com.example.demo.Model.Common.StorageTarget;
-import com.example.demo.Model.Common.StorageTargetRepository;
+import com.example.demo.Model.SettingsManagement.StorageTarget;
+import com.example.demo.Model.SettingsManagement.StorageTargetRepository;
 import com.example.demo.Model.Restore.RestoreRequest;
 import com.example.demo.Model.Restore.RestoreService;
 import com.example.demo.Security.AesEncryptor;

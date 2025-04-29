@@ -14,7 +14,7 @@
         <script src="/js/popupHandlers.js" defer></script>
         <script src="/js/loadDatabases.js" defer></script>
         <script src="/js/validation.js" defer></script>
-    <script src="/js/storage_settings.js" defer></script>
+    <script src="/js/settings.js" defer></script>
         <script src="/js/backup.js" defer></script>
         <script src="/js/autoBackup.js" defer></script>
         <script src="/js/restoreBackup.js" defer></script>
@@ -293,7 +293,7 @@
     function loadNamesByType(type) {
         if (!type) return;
 
-        fetch(`/api/storage-settings/names?type=${type}`)
+        fetch(`/api/settings/get-storage-settings?type=${type}`)
             .then(res => res.json())
             .then(names => {
                 const nameSelect = document.getElementById("nameSelect");
@@ -382,7 +382,7 @@
 </div>
 
 <h2>Storage Settings</h2>
-<form action="/api/storage-settings/save" method="post" id="storageSettingsForm">
+<form action="/api/settings/storage-settings-save" method="post" id="storageSettingsForm">
     <label>Name:</label>
     <input type="text" id="name" name="name" required />
 
@@ -400,7 +400,7 @@
 </form>
 
                     <h2>BAF Settings</h2>
-                    <form action="/api/storage-settings/baf" method="post" id="bafSettingsForm">
+                    <form action="/api/settings/baf-settings-save" method="post" id="bafSettingsForm">
 
                         <label>Type BAF:</label>
                         <input type="radio" name="bafType" value="file" checked> File based
@@ -581,9 +581,7 @@
 <script>
 
     window.addEventListener('DOMContentLoaded', () => {
-        loadBafSettings().then(() => {
             showDashboard();
-        })
     })
 </script>
 

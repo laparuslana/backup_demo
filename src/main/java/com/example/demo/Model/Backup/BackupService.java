@@ -1,8 +1,8 @@
 package com.example.demo.Model.Backup;
 
 
-import com.example.demo.Model.Common.ProgressDTO;
-import com.example.demo.Model.Common.ProgressSession;
+import com.example.demo.Model.SettingsManagement.ProgressDTO;
+import com.example.demo.Model.SettingsManagement.ProgressSession;
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.example.demo.Model.UserManagement.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
