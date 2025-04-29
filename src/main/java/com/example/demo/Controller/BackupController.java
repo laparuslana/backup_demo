@@ -124,7 +124,8 @@ public class BackupController {
            backupService.save(backupSchedule);
 
        } else if ("file".equals(type)) {
-           BackupSchedule backupSchedule = new BackupSchedule();
+           String storageType = (String) request.get("storageType2");
+
            Long storageId = Long.valueOf((String) request.get("storageSettingId"));
            StorageTarget target = repository.findById(storageId)
                    .orElseThrow(() -> new RuntimeException("Not Found"));
@@ -133,6 +134,18 @@ public class BackupController {
            for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
                decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
            }
+           BackupSchedule backupSchedule = new BackupSchedule();
+           Map<String, String> scheduleParams = new HashMap<>();
+           scheduleParams.put("frequency", (String) request.get("frequency"));
+           scheduleParams.put("day", (String) request.get("day"));
+           scheduleParams.put("time", (String) request.get("time"));
+           backupSchedule.setScheduleParams(scheduleParams);
+
+           backupSchedule.setDaysKeep2((String) request.get("daysKeep2"));
+           backupSchedule.setStorageType2(storageType);
+           backupSchedule.setType(type);
+           backupSchedule.setStorageTarget(target);
+
            Map<String, String> fileEncrypted = new HashMap<>();
            Map<String, String> ftpParams = new HashMap<>();
            ftpParams.put("ftpServer", decrypted.get("ftp_host"));

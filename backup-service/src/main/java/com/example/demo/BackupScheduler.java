@@ -48,12 +48,6 @@ import java.util.concurrent.TimeUnit;
 
                 String cronJob;
 
-                Map<String, String> decryptedMap = new HashMap<>();
-                for (Map.Entry<String, String> entry : schedule.getDbParams().entrySet()) {
-                    decryptedMap.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
-
-                }
-
                 Map<String, String> decryptedFtp = new HashMap<>();
                 if (schedule.getStorageParams2() == null) {
                     decryptedFtp.put("", "");
@@ -65,6 +59,11 @@ import java.util.concurrent.TimeUnit;
                     if ("database".equalsIgnoreCase(schedule.getType())) {
                         String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
 
+                        Map<String, String> decryptedMap = new HashMap<>();
+                        for (Map.Entry<String, String> entry : schedule.getDbParams().entrySet()) {
+                            decryptedMap.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
+
+                        }
                         cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s",
                                 cronExpression,
                                 scriptPath,

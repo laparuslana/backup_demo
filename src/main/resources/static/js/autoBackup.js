@@ -99,8 +99,8 @@ submitFile.addEventListener('click', (event) => {
         day: document.getElementById("fileDay").value,
         time: document.getElementById("fileTime").value,
         daysKeep2: document.getElementById("daysKeep").value,
-        storageType2: "ftp",
-        storageSettingId: document.getElementById("nameSelect2").value
+        storageType2: document.getElementById("file_storageType").value,
+        storageSettingId: document.getElementById("file_nameSelect").value
         };
 
     fetch("/api/backup/save", {

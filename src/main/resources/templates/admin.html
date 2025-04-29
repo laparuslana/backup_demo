@@ -250,6 +250,7 @@
             <label for="file_storageType"></label>
             <select id="file_storageType" name="file_storageType" onchange="loadNamesByType(this.value)">
                 <option value="FTP">FTP</option>
+                <option value="">Other...</option>
             </select>
 
             <div id="file_nameWrapper" style="display:none;">
@@ -274,6 +275,7 @@
             <label for="restore_storageType"></label>
             <select id="restore_storageType" name="restore_storageType" onchange="loadNamesByType(this.value)">
                 <option value="FTP">FTP</option>
+                <option value="">Other...</option>
             </select>
 
             <div id="restore_nameWrapper" style="display:none;">
@@ -332,18 +334,17 @@
 
                 document.getElementById("res_nameWrapper").style.display = "block";
 
-
         const file_nameSelect = document.getElementById("file_nameSelect");
         file_nameSelect.innerHTML = "";
 
         names.forEach(setting => {
             const option = document.createElement("option");
-            option.value=setting.name;
+            option.value=setting.id;
             option.textContent=setting.name;
             file_nameSelect.appendChild(option);
         });
 
-        document.getElementById("restore_nameWrapper").style.display = "block";
+        document.getElementById("file_nameWrapper").style.display = "block";
 
                 const restore_nameSelect = document.getElementById("restore_nameSelect");
                 restore_nameSelect.innerHTML = "";
