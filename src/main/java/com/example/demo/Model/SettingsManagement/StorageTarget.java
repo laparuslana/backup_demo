@@ -1,8 +1,8 @@
 package com.example.demo.Model.SettingsManagement;
 
+
 import com.example.demo.Security.JsonMapConverter;
 import jakarta.persistence.*;
-
 import java.util.Map;
 
 @Entity

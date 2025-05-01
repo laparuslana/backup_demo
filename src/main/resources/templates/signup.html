@@ -35,10 +35,6 @@
           <label for="">Confirm Password</label>
       </div>
 
-<!--<label>-->
-<!--    <input type="checkbox" id="isAdmin" name="isAdmin"/>Register as Admin-->
-<!--</label>-->
-
         <button id= "submit" type="submit">Sign Up</button>
       <div class="register">
         <p>Already have an account? <a href="/login">Log In</a></p>
@@ -52,7 +48,6 @@
   submitButttom.addEventListener('click',(event)=> {
       event.preventDefault();
 
-      // const isAdmin = document.getElementById("isAdmin").checked;
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('passwordcon').value;
@@ -62,7 +57,6 @@
           username,
           email,
           password
-          // isAdmin
       }
 
       if (password === confirmPassword) {

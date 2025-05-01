@@ -1,5 +1,6 @@
 package com.example.demo.Model.SettingsManagement;
 
+
 import com.example.demo.Model.UserManagement.MyAppUser;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

@@ -3,7 +3,6 @@ package com.example.demo.Model.Backup;
 import com.example.demo.Model.SettingsManagement.StorageTarget;
 import com.example.demo.Security.JsonMapConverter;
 import jakarta.persistence.*;
-
 import java.util.Map;
 
 @Entity

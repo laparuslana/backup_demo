@@ -3,13 +3,13 @@ package com.example.demo.Controller;
 import com.example.demo.Model.Backup.BackupRequest;
 import com.example.demo.Model.Backup.BackupSchedule;
 import com.example.demo.Model.Backup.BackupService;
+import com.example.demo.Model.SettingsManagement.StorageSettingsService;
 import com.example.demo.Model.SettingsManagement.StorageTarget;
 import com.example.demo.Model.SettingsManagement.StorageTargetRepository;
 import com.example.demo.Security.AesEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import java.util.*;
 import java.util.List;
 
@@ -31,6 +31,8 @@ public class BackupController {
     @Autowired
     private AesEncryptor aesEncryptor;
 
+    @Autowired
+    private StorageSettingsService storageSettingsService;
 
     @PostMapping(value = "/execute", consumes = "application/json")
     public ResponseEntity<Map<String, String>> executeBackup(@RequestBody BackupRequest request) throws Exception {
@@ -38,13 +40,11 @@ public class BackupController {
 
         String type = request.getStorageType();
         String name = request.getNameSelect();
+
         StorageTarget target = repository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Not Found"));
 
-        Map<String, String> decrypted = new HashMap<>();
-        for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
-            decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
-        }
+        Map<String, String> decrypted = storageSettingsService.getStorageParams(target);
 
         switch (type) {
             case "LOCAL" -> {
@@ -69,18 +69,14 @@ public class BackupController {
 
     public ResponseEntity<?> saveSettings(@RequestBody Map<String, Object> request) throws Exception {
        String type = (String) request.get("type");
+       String storageType = (String) request.get("storageType2");
+       Long storageId = Long.valueOf((String) request.get("storageSettingId"));
+       StorageTarget target = repository.findById(storageId)
+               .orElseThrow(() -> new RuntimeException("Not Found"));
+
+       Map<String, String> decrypted = storageSettingsService.getStorageParams(target);
 
        if ("database".equals(type)) {
-
-           String storageType = (String) request.get("storageType2");
-           Long storageId = Long.valueOf((String) request.get("storageSettingId"));
-           StorageTarget target = repository.findById(storageId)
-                   .orElseThrow(() -> new RuntimeException("Not Found"));
-
-           Map<String, String> decrypted = new HashMap<>();
-           for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
-               decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
-           }
 
            BackupSchedule backupSchedule = new BackupSchedule();
            backupSchedule.setType(type);
@@ -99,68 +95,54 @@ public class BackupController {
            }
            backupSchedule.setDbParams(encrypted);
 
-           Map<String, String> scheduleParams = new HashMap<>();
-           scheduleParams.put("frequency", (String) request.get("frequency"));
-           scheduleParams.put("day", (String) request.get("day"));
-           scheduleParams.put("time", (String) request.get("time"));
-           backupSchedule.setScheduleParams(scheduleParams);
+           getScheduleParams(request, backupSchedule);
 
            if ("LOCAL".equals(storageType)) {
                    backupSchedule.setBackupLocation2(decrypted.get("directory"));
                } else if ("FTP".equals(storageType)) {
-               Map<String, String> ftpEncrypted = new HashMap<>();
-                   Map<String, String> ftpParams = new HashMap<>();
-                   ftpParams.put("ftpServer", decrypted.get("ftp_host"));
-                   ftpParams.put("ftpUser", decrypted.get("ftp_user"));
-                   ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
-                   ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
-               for (Map.Entry<String, String> entry : ftpParams.entrySet()) {
-                   ftpEncrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
-               }
-
-               backupSchedule.setStorageParams2(ftpEncrypted);
-               }
+               getFtpEncrypted(decrypted, backupSchedule);
+           }
 
            backupService.save(backupSchedule);
 
        } else if ("file".equals(type)) {
-           String storageType = (String) request.get("storageType2");
 
-           Long storageId = Long.valueOf((String) request.get("storageSettingId"));
-           StorageTarget target = repository.findById(storageId)
-                   .orElseThrow(() -> new RuntimeException("Not Found"));
-
-           Map<String, String> decrypted = new HashMap<>();
-           for (Map.Entry<String, String> entry : target.getJsonParameters().entrySet()) {
-               decrypted.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
-           }
            BackupSchedule backupSchedule = new BackupSchedule();
-           Map<String, String> scheduleParams = new HashMap<>();
-           scheduleParams.put("frequency", (String) request.get("frequency"));
-           scheduleParams.put("day", (String) request.get("day"));
-           scheduleParams.put("time", (String) request.get("time"));
-           backupSchedule.setScheduleParams(scheduleParams);
+           getScheduleParams(request, backupSchedule);
 
            backupSchedule.setDaysKeep2((String) request.get("daysKeep2"));
            backupSchedule.setStorageType2(storageType);
            backupSchedule.setType(type);
            backupSchedule.setStorageTarget(target);
 
-           Map<String, String> fileEncrypted = new HashMap<>();
-           Map<String, String> ftpParams = new HashMap<>();
-           ftpParams.put("ftpServer", decrypted.get("ftp_host"));
-           ftpParams.put("ftpUser", decrypted.get("ftp_user"));
-           ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
-           ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
-           for (Map.Entry<String, String> entry : ftpParams.entrySet()) {
-               fileEncrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
-           }
-           backupSchedule.setStorageParams2(fileEncrypted);
+           getFtpEncrypted(decrypted, backupSchedule);
            backupSchedule.setFolderPath((String) request.get("folderPath"));
 
            backupService.save(backupSchedule);
        }
         return ResponseEntity.ok(Collections.singletonMap("message", "Saved settings"));
+    }
+
+    private void getFtpEncrypted(Map<String, String> decrypted, BackupSchedule backupSchedule) throws Exception {
+        Map<String, String> ftpEncrypted = new HashMap<>();
+        Map<String, String> ftpParams = new HashMap<>();
+        ftpParams.put("ftpServer", decrypted.get("ftp_host"));
+        ftpParams.put("ftpUser", decrypted.get("ftp_user"));
+        ftpParams.put("ftpPassword", decrypted.get("ftp_password"));
+        ftpParams.put("ftpDirectory", decrypted.get("ftp_directory"));
+        for (Map.Entry<String, String> entry : ftpParams.entrySet()) {
+            ftpEncrypted.put(entry.getKey(), aesEncryptor.encrypt(entry.getValue()));
+        }
+
+        backupSchedule.setStorageParams2(ftpEncrypted);
+    }
+
+    private void getScheduleParams(@RequestBody Map<String, Object> request, BackupSchedule backupSchedule) {
+        Map<String, String> scheduleParams = new HashMap<>();
+        scheduleParams.put("frequency", (String) request.get("frequency"));
+        scheduleParams.put("day", (String) request.get("day"));
+        scheduleParams.put("time", (String) request.get("time"));
+        backupSchedule.setScheduleParams(scheduleParams);
     }
 
     @GetMapping("/listDatabases")
