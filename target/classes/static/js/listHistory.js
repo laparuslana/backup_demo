@@ -1,5 +1,5 @@
 function loadBackupHistory() {
-    fetch("http://localhost:8080/req/history/backup")
+    fetch("/req/history/backup")
         .then(response => response.json())
         .then(data => {
 
@@ -31,7 +31,7 @@ function loadBackupHistory() {
 }
 
 function loadRestorePreviewHistory() {
-    fetch("http://localhost:8080/req/history/restore")
+    fetch("/req/history/restore")
         .then(response => response.json())
         .then(data => {
 
@@ -60,7 +60,7 @@ function loadRestorePreviewHistory() {
 }
 
 function loadBackupPreviewHistory() {
-    fetch("http://localhost:8080/req/history/backup")
+    fetch("/req/history/backup")
         .then(response => response.json())
         .then(data => {
 
@@ -89,7 +89,7 @@ function loadBackupPreviewHistory() {
 }
 
 function loadRestoreHistory() {
-    fetch("http://localhost:8080/req/history/restore")
+    fetch("/req/history/restore")
         .then(response => response.json())
         .then(data => {
 

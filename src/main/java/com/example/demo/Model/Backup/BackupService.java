@@ -64,7 +64,7 @@ public class BackupService {
             String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : null;
             String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
-            return String.format("bash src/main/resources/scripts/backupManually.sh %s %s %s %s %s %s %s %s %s %s %s",
+            return String.format("bash /opt/myapp/scripts/backupManually.sh %s %s %s %s %s %s %s %s %s %s %s",
                     databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, storageType, ftpServer, ftpUser, ftpPassword, ftpDirectory);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while extracting storage parameters", e);
@@ -135,7 +135,7 @@ public class BackupService {
         List<String> databases = new ArrayList<>();
         try {
             String[] command = {
-                    "/bin/bash", "src/main/resources/scripts/retrieveDatabases.sh",
+                    "/bin/bash", "/opt/myapp/scripts/retrieveDatabases.sh",
                     dbServer, dbUser, dbPassword
             };
 

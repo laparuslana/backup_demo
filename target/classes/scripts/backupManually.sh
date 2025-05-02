@@ -9,7 +9,7 @@ DAYS_TO_KEEP=$6
 STORAGE_TYPE=$7
 DATA=$(date +"%Y%m%d")
 
-if [ "$STORAGE_TYPE" != "ftp" ]; then
+if [ "$STORAGE_TYPE" != "FTP" ]; then
   mkdir -p "$BACKUP_DIR"
 fi
 FTP_SERVER=$8

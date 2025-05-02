@@ -156,13 +156,13 @@ function loadDatabases() {
 
 
 function selectArchives() {
-    const restore_storageType = document.getElementById("restore_storageType");
+    //const restore_storageType = document.getElementById("restore_storageType");
     const restore_nameSelect = document.getElementById("restore_nameSelect");
 
-    const type = restore_storageType.value;
+    //const type = restore_storageType.value;
     const nameSelect = restore_nameSelect.value;
 
-    fetch(`/api/restore/archive?type=${encodeURIComponent(type)}&nameSelect=${encodeURIComponent(nameSelect)}`)
+    fetch(`/api/restore/archive?nameSelect=${encodeURIComponent(nameSelect)}`)
         .then(response => response.json())
         .then(files => {
             const select = document.getElementById('restoreFile');

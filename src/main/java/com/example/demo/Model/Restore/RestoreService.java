@@ -20,7 +20,7 @@ public class RestoreService {
     private BafSettingsRepository bafSettingsRepository;
 
     public List<String> listBackupFilesFromFtp(String host, String user, String password, String directory) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/listFilesFtp.sh", host, user, password, directory);
+        ProcessBuilder pb = new ProcessBuilder("bash", "/opt/myapp/scripts/listFilesFtp.sh", host, user, password, directory);
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
@@ -43,7 +43,7 @@ public class RestoreService {
     }
 
     public List<String> listArchiveFilesFromFtp(String host, String user, String password, String directory) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/listArchivesFtp.sh", host, user, password, directory);
+        ProcessBuilder pb = new ProcessBuilder("bash", "/opt/myapp/scripts/listArchivesFtp.sh", host, user, password, directory);
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
@@ -69,7 +69,7 @@ public class RestoreService {
             StringBuilder output = new StringBuilder();
             String status;
 
-            ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/delete.sh", testDb, server, user, password);
+            ProcessBuilder pb = new ProcessBuilder("bash", "/opt/myapp/scripts/delete.sh", testDb, server, user, password);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -103,7 +103,7 @@ public class RestoreService {
             BafSettings baf = settings.get();
             bafPath = baf.getBafPath();
         }
-        ProcessBuilder pb = new ProcessBuilder("bash", "src/main/resources/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, infobase);
+        ProcessBuilder pb = new ProcessBuilder("bash", "/opt/myapp/scripts/switch.sh", bafPath, clusterAd, clusterUser, clusterPass, infobase);
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
@@ -175,7 +175,7 @@ public class RestoreService {
             String ftpPassword = storageParams != null ? storageParams.get("ftpPassword") : null;
             String ftpDirectory = storageParams != null ? storageParams.get("ftpDirectory") : null;
 
-            return String.format("bash src/main/resources/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s %s",
+            return String.format("bash /opt/myapp/scripts/restoreBackup.sh %s %s %s %s %s %s %b %s %s %s %s %s %s %s %s",
                     bafPath, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
                     ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath, storageType);
         } catch (Exception e) {
@@ -242,7 +242,7 @@ public class RestoreService {
         }
         try {
             String[] command = {
-                    "/bin/bash", "src/main/resources/scripts/listInfobases.sh",
+                    "/bin/bash", "/opt/myapp/scripts/listInfobases.sh",
                     bafPath, clusterAd, clusterUser, clusterPass
             };
 
@@ -263,7 +263,7 @@ public class RestoreService {
     }
 
     public String restoreFileDb(String restorePath, String restoreFile, String ftpHost, String ftpUser, String ftpPassword, String ftpDirectory) {
-      String command = String.format("bash src/main/resources/scripts/restoreFileDb.sh %s %s %s %s %s %s",
+      String command = String.format("bash /opt/myapp/scripts/restoreFileDb.sh %s %s %s %s %s %s",
                 restorePath, restoreFile, ftpHost, ftpUser, ftpPassword, ftpDirectory);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -1,25 +1,17 @@
 package com.example.demo;
 
-import com.fasterxml.jackson.databind.JsonNode;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
     @Service
     public class BackupScheduler {
@@ -57,16 +49,15 @@ import java.util.concurrent.TimeUnit;
                     }
                 }
                     if ("database".equalsIgnoreCase(schedule.getType())) {
-                        String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupAuto.sh";
+                        String scriptPath = "/opt/myapp/scripts/backupAuto.sh";
 
                         Map<String, String> decryptedMap = new HashMap<>();
                         for (Map.Entry<String, String> entry : schedule.getDbParams().entrySet()) {
                             decryptedMap.put(entry.getKey(), aesEncryptor.decrypt(entry.getValue()));
 
                         }
-                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s %s %s %s %s %s",
+                        cronJob = String.format("%s /bin/bash /opt/myapp/scripts/backupAuto.sh %s %s %s %s %s %s %s %s %s %s %s",
                                 cronExpression,
-                                scriptPath,
                                 schedule.getDatabaseName2(),
                                 decryptedMap.get("dbServer"),
                                 decryptedMap.get("dbUser"),
@@ -80,11 +71,10 @@ import java.util.concurrent.TimeUnit;
                                 decryptedFtp.get("ftpDirectory")
                         );
                     } else if ("file".equalsIgnoreCase(schedule.getType())) {
-                        String scriptPath = projectRoot + "/backup-service/src/main/resources/scripts/backupFileDb.sh";
+                        String scriptPath = "";
 
-                        cronJob = String.format("%s /bin/bash %s %s %s %s %s %s %s",
+                        cronJob = String.format("%s /bin/bash /opt/myapp/scripts/backupFileDb.sh %s %s %s %s %s %s",
                                 cronExpression,
-                                scriptPath,
                                 schedule.getFolderPath(),
                                 schedule.getDaysKeep2(),
                                 decryptedFtp.get("ftpServer"),
