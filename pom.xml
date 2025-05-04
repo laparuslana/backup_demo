@@ -8,8 +8,10 @@
 		<version>3.3.0</version>
 		<relativePath/>
 	</parent>
+	<packaging>pom</packaging>
 	<modules>
 		<module>backup-service</module>
+		<module>mainapp</module>
 	</modules>
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
