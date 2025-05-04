@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="mainapp" />
         <module name="backup-service" />
       </profile>
     </annotationProcessing>
@@ -14,7 +15,8 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="backup-service" options="-parameters" />
-      <module name="demo" options="-parameters" />
+      <module name="demo" options="" />
+      <module name="mainapp" options="-parameters" />
     </option>
   </component>
 </project>
