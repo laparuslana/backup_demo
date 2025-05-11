@@ -10,7 +10,7 @@ import jakarta.persistence.*;
 public class BafSettings {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     public Long getId() {
