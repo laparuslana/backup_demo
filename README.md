@@ -29,12 +29,13 @@ This is a specialized software solution for performing both manual and automated
 ---
 
 ## Installation
-1. **Install .deb package:**
+1. .deb package can be requested with email to laparuslana@gmail.com
+2. **Install .deb package:**
    ```bash
    sudo dpkg -i business_backup.deb
    sudo apt-get install -f
-2. **Run init-db.sql** if you don`t have newly installed MariaDB
-3. **Run script setup.sh** 
+3. **Run init-db.sql** if you don`t have newly installed MariaDB
+4. **Run script setup.sh** 
 
 ## Uninstallation
 To uninstall run the following commands:
