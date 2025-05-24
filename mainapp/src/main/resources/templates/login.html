@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="ua" >
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Увійти</title>
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <link rel="stylesheet" href="/css/style.css">
@@ -13,23 +13,23 @@
     <section>
         
         <form action="/req/login" method="post">
-            <h1>Login</h1>
+            <h1>Увійти</h1>
             <div class="dialog-row">
                 <label th:if="${param.error}" th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}" class="text-center redText"></label>                   
             </div>
             <div class="inputbox">
                 <ion-icon name="email-outline"></ion-icon>
-                <input name="username" id="username"type="name" required>
-                <label for="">username</label>
+                <input name="username" id="username" type="name" required>
+                <label for="">Iм'я користувача</label>
             </div>
             <div class="inputbox">
                 <ion-icon name="lock-closed-outline"></ion-icon>
                 <input name="password" type="password" id="password" required>
-                <label for="">Password</label>
+                <label for="">Пароль</label>
             </div>
-            <button>Log in</button>
+            <button>Увійти</button>
             <div class="register">
-                <p>Don't have a account?<a href="/req/signup"> Register!!</a></p>
+                <p>Немає облікового запису?<a href="/req/signup"> Реєстрація!</a></p>
             </div>
         </form>
     </section>

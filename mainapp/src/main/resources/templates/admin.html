@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ua">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Панель адміністратора</title>
     <link rel="stylesheet" href="/css/pages.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
@@ -22,135 +22,135 @@
 </head>
 <body>
 <div class="sidebar">
-    <a href="" onclick="showDashboard()">Dashboard</a>
-    <a href="#" onclick="showSection('settings')">Settings</a>
-    <a href="#" onclick="showSection('backup')">Backup</a>
-    <a href="#" onclick="showSection('recovery')">Recovery</a>
-    <a href="/logout">Log Out</a>
+    <a href="" onclick="showDashboard()">Головна панель</a>
+    <a href="#" onclick="showSection('settings')">Налаштування</a>
+    <a href="#" onclick="showSection('backup')">Резервне копіювання</a>
+    <a href="#" onclick="showSection('recovery')">Відновлення</a>
+    <a href="/logout">Вийти</a>
 </div>
 <div class="main" id="mainContent">
 </div>
 
 <div class="popup" id="backupPopup">
     <div class="popup-content">
-        <h3 style="color: #0f172a">Manually backup</h3>
+        <h3 style="color: #0f172a">Резервне копіювання вручну</h3>
         <form action="/api/backup/execute" method="post" id="backupForm">
 
-            <label for="dbServer">DB Server:</label>
-            <input type="text" id="dbServer" name="dbServer" placeholder="DB Server" required>
+            <label for="dbServer">Сервер БД:</label>
+            <input type="text" id="dbServer" name="dbServer" placeholder="Сервер БД" required>
 
-            <label for="dbUser">DB User:</label>
-            <input type="text" id="dbUser" name="dbUser" placeholder="DB User" required>
+            <label for="dbUser">Користувач БД:</label>
+            <input type="text" id="dbUser" name="dbUser" placeholder="Користувач БД" required>
 
-            <label for="dbPassword">DB Password:</label>
-            <input type="password" id="dbPassword" name="dbPassword" placeholder="DB Password" required>
+            <label for="dbPassword">Пароль БД:</label>
+            <input type="password" id="dbPassword" name="dbPassword" placeholder="Пароль БД" required>
 
-            <label for="databaseName">Choose database:</label>
+            <label for="databaseName">Виберіть базу даних:</label>
             <select id="databaseName" name="databaseName">
-                <option value="">Loading...</option>
+                <option value="">Завантаження...</option>
             </select>
 
-            <label for="storageType">Storage Type:</label>
+            <label for="storageType">Тип зберігання:</label>
             <select id="storageType" name="storageType" onchange="loadNamesByType(this.value)">
                 <option value="LOCAL">LOCAL</option>
                 <option value="FTP">FTP</option>
             </select>
 
             <div id="nameWrapper" style="display:none;">
-                <label for="nameSelect">Choose Saved Name:</label>
+                <label for="nameSelect">Виберіть збережене ім'я:</label>
                 <select id="nameSelect"></select>
             </div>
 
-            <button type="submit" id="submit" >Do backup</button>
+            <button type="submit" id="submit">Зробіть резервну копію</button>
         </form>
-        <button onclick="closePopup()">Close</button>
+        <button onclick="closePopup()">Закрити</button>
     </div>
 </div>
 
 <div class="popup" id="autoBackupPopup">
     <div class="popup-content">
-        <h3>Auto Backup</h3>
+        <h3>Автоматичне резервне копіювання</h3>
         <form action="/api/backup/save" method="post" id="autoBackupForm">
 
-            <label for="dbServer2">DB Server:</label>
-            <input type="text" id="dbServer2" name="dbServer2" placeholder="DB Server" required>
+            <label for="dbServer2">Сервер БД:</label>
+            <input type="text" id="dbServer2" name="dbServer2" placeholder="Сервер БД" required>
 
-            <label for="dbUser2">DB User:</label>
-            <input type="text" id="dbUser2" name="dbUser2" placeholder="DB User" required>
+            <label for="dbUser2">Користувач БД:</label>
+            <input type="text" id="dbUser2" name="dbUser2" placeholder="Користувач БД" required>
 
-            <label for="dbPassword2">DB Password:</label>
-            <input type="password" id="dbPassword2" name="dbPassword2" placeholder="DB Password" required>
+            <label for="dbPassword2">Пароль БД:</label>
+            <input type="password" id="dbPassword2" name="dbPassword2" placeholder="Пароль БД" required>
 
-            <label for="databaseName2">Choose database:</label>
+            <label for="databaseName2">Виберіть базу даних:</label>
             <select id="databaseName2" name="databaseName2">
-                <option value="">Loading...</option>
+                <option value="">Завантаження...</option>
             </select>
 
-            <label for="storageType2">Storage Type:</label>
+            <label for="storageType2">Тип зберігання:</label>
             <select id="storageType2" name="storageType2" onchange="loadNamesByType(this.value)">
                 <option value="LOCAL">LOCAL</option>
                 <option value="FTP">FTP</option>
             </select>
 
             <div id="nameWrapper2" style="display:none;">
-                <label for="nameSelect2">Choose Saved Name:</label>
+                <label for="nameSelect2">Виберіть збережене ім'я:</label>
                 <select id="nameSelect2"></select>
             </div>
 
-            <label for="daysKeep2">Days to keep backup:</label>
-            <input type="number" id="daysKeep2" name="daysKeep2" min="7" placeholder="Days To Keep" required>
+            <label for="daysKeep2">Дні для збереження резервної копії:</label>
+            <input type="number" id="daysKeep2" name="daysKeep2" min="7" placeholder="Дні для збереження" required>
 
-                <label for="frequency">Frequency:</label>
+                <label for="frequency">Частота:</label>
                 <select id="frequency" name="frequency">
-                    <option value="daily">Every Day</option>
-                    <option value="weekly">Every Week</option>
-                    <option value="monthly">Every Month</option>
+                    <option value="daily">Кожен день</option>
+                    <option value="weekly">Кожного тижня</option>
+                    <option value="monthly">Кожен місяць</option>
                 </select>
 
                 <div id="daySelection" style="display: none;">
-                    <label for="day">Day:</label>
+                    <label for="day">День:</label>
                     <select id="day" name="day"></select>
                 </div>
 
-                <label for="time">Time:</label>
+                <label for="time">Час:</label>
                 <input type="time" id="time" name="time" required>
 
-            <button type="submit" id="autosubmit">Do backup</button>
+            <button type="submit" id="autosubmit">Зробіть резервну копію</button>
         </form>
-        <button onclick="closeAutoPopup()">Close</button>
+        <button onclick="closeAutoPopup()">Закрити</button>
     </div>
 </div>
 <div class="popup" id="restorePopup">
     <div class="popup-content">
-        <h3>Manually restore backup</h3>
+        <h3>Відновити резервну копію вручну</h3>
         <form action="/api/restore/backup" method="post" id="restoreForm">
 
             <div class="checkbox-group">
                 <input type="checkbox" id="res_clusterAdmin">
-                <label for="res_clusterAdmin">Do you have cluster admin?</label>
+                <label for="res_clusterAdmin">У вас є адміністратор кластера?</label>
             </div>
 
             <div id="res_clusterCredentials" style="display: none;">
-                <label for="res_clusterUsername">Cluster Username:</label>
-                <input type="text" id="res_clusterUsername" placeholder="Cluster Username"><br>
+                <label for="res_clusterUsername">Ім'я користувача кластера:</label>
+                <input type="text" id="res_clusterUsername" placeholder="Ім'я користувача кластера"><br>
 
-                <label for="res_clusterPassword">Cluster Password:</label>
-                <input type="password" id="res_clusterPassword" placeholder="Cluster Password"><br>
+                <label for="res_clusterPassword">Пароль кластера:</label>
+                <input type="password" id="res_clusterPassword" placeholder="Пароль кластера"><br>
             </div>
 
-            <label for="restoreDbServer">Cluster Server:</label>
-            <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="DB Server" required>
+            <label for="restoreDbServer">Сервер БД:</label>
+            <input type="text" id="restoreDbServer" name="restoreDbServer" placeholder="Сервер БД" required>
 
-            <label for="testDbName">Test Database Name:</label>
+            <label for="testDbName">Назва тестової бази даних:</label>
             <input type="text" id="testDbName" name="testDbName" placeholder="e.g. test_restore_db" required>
 
-            <label for="restoreDbUser">DB User:</label>
-            <input type="text" id="restoreDbUser" name="restoreDbUser" placeholder="DB User" required>
+            <label for="restoreDbUser">Користувач БД:</label>
+            <input type="text" id="restoreDbUser" name="restoreDbUser" placeholder="Користувач БД" required>
 
-            <label for="restoreDbPassword">DB Password:</label>
-            <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="DB Password" required>
+            <label for="restoreDbPassword">Пароль БД:</label>
+            <input type="password" id="restoreDbPassword" name="restoreDbPassword" placeholder="Пароль БД" required>
 
-            <label for="storageType">Storage Type:</label>
+            <label for="storageType">Тип зберігання:</label>
             <label for="res_storageType"></label>
             <select id="res_storageType" name="res_storageType" onchange="loadNamesByType(this.value)">
                 <option value="LOCAL">LOCAL</option>
@@ -158,137 +158,137 @@
             </select>
 
             <div id="res_nameWrapper" style="display:none;">
-                <label for="res_nameSelect">Choose Saved Name:</label>
+                <label for="res_nameSelect">Виберіть Збережене ім'я:</label>
                 <select id="res_nameSelect"></select>
             </div>
 
-            <label for="backupFile">Select Backup File:</label>
+            <label for="backupFile">Виберіть Файл резервної копії:</label>
             <select id="backupFile" name="backupFile"></select>
 
-            <button type="submit" id="submitRestore">Restore Backup</button>
+            <button type="submit" id="submitRestore">Відновити резервну копію</button>
         </form>
-        <button onclick="closeRestorePopup()">Close</button>
+        <button onclick="closeRestorePopup()">Закрити</button>
     </div>
 </div>
 <div class="popup" id="manageRestorePopup">
     <div class="popup-content">
-        <h3>Manage Restored Backups</h3>
+        <h3>Керування відновленими резервними копіями</h3>
         <form id="manageRestoreForm" action="/api/restore/manage" method="post">
 
             <div class="checkbox-group">
                 <input type="checkbox" id="man_clusterAdmin">
-                <label for="man_clusterAdmin">Do you have cluster admin?</label>
+                <label for="man_clusterAdmin">У вас є адміністратор кластера?</label>
             </div>
 
             <div id="man_clusterCredentials" style="display: none;">
-                <label for="man_clusterUsername">Cluster Username:</label>
-                <input type="text" id="man_clusterUsername" placeholder="Cluster Username"><br>
+                <label for="man_clusterUsername">Ім'я користувача кластера:</label>
+                <input type="text" id="man_clusterUsername" placeholder="Ім'я користувача кластера"><br>
 
-                <label for="man_clusterPassword">Cluster Password:</label>
-                <input type="password" id="man_clusterPassword" placeholder="Cluster Password"><br>
+                <label for="man_clusterPassword">Пароль кластера:</label>
+                <input type="password" id="man_clusterPassword" placeholder="Пароль кластера"><br>
             </div>
 
-            <label for="man_dbServer">DB Server:</label>
-            <input type="text" id="man_dbServer" name="man_dbServer" placeholder="DB Server" required>
+            <label for="man_dbServer">Сервер БД:</label>
+            <input type="text" id="man_dbServer" name="man_dbServer" placeholder="Сервер БД" required>
 
-            <label for="man_dbUser">DB User:</label>
-            <input type="text" id="man_dbUser" name="man_dbUser" placeholder="DB User" required>
+            <label for="man_dbUser">Користувач БД:</label>
+            <input type="text" id="man_dbUser" name="man_dbUser" placeholder="Користувач БД" required>
 
-            <label for="man_dbPassword">DB Password:</label>
-            <input type="password" id="man_dbPassword" name="man_dbPassword" placeholder="DB Password" required>
+            <label for="man_dbPassword">Пароль БД:</label>
+            <input type="password" id="man_dbPassword" name="man_dbPassword" placeholder="Пароль БД" required>
 
-            <label for="selectTestDb">Select Database for delete:</label>
+            <label for="selectTestDb">Виберіть базу даних для видалення:</label>
             <select id="selectTestDb" name="selectTestDb" required>
-                <option value="">Loading...</option>
+                <option value="">Завантаження...</option>
             </select>
 
-            <button type="button" onclick="loadInfobases()">Choose database to switch from:</button>
+            <button type="button" onclick="loadInfobases()">Виберіть базу даних для переходу:</button>
             <select id="sourceDbName" name="sourceDbName" required>
-                <option value="">Loading...</option>
+                <option value="">Завантаження...</option>
             </select>
 
             <div class="checkbox-group">
                 <input type="checkbox" id="confirmAction" required>
-                <label for="confirmAction">I confirm that I reviewed the restored database and want to proceed.</label>
+                <label for="confirmAction">Я підтверджую, що переглянув відновлену базу даних і хочу продовжити.</label>
             </div>
 
-                <button type="submit" id="submitSwitch">Make Switch</button>
-                <button type="submit" id="submitDelete">Delete Restored Database</button>
+                <button type="submit" id="submitSwitch">Зробіть перемикач</button>
+                <button type="submit" id="submitDelete">Видалити відновлену базу даних</button>
 
         </form>
 
-        <button onclick="closeManageRestorePopup()">Close</button>
+        <button onclick="closeManageRestorePopup()">Закрити</button>
     </div>
 </div>
 <div class="popup" id="fileBackupPopup">
     <div class="popup-content">
-        <h3>Auto Backup</h3>
+        <h3>Автоматичне резервне копіювання</h3>
         <form action="/api/backup/save" method="post" id="fileBackupForm">
 
-            <label for="folderPath">Path to folder with File DB:</label>
+            <label for="folderPath">Шлях до папки з файловою базою даних:</label>
             <input type="text" id="folderPath" name="folderPath" placeholder="/opt/baf..." required>
 
-            <label for="daysKeep">Days to keep backup:</label>
-            <input type="number" id="daysKeep" name="daysKeep" min="7" placeholder="Days To Keep" required>
+            <label for="daysKeep">Дні для збереження резервної копії:</label>
+            <input type="number" id="daysKeep" name="daysKeep" min="7" placeholder="Дні для збереження" required>
 
-            <label for="fileFrequency">Frequency:</label>
+            <label for="fileFrequency">Частота:</label>
             <select id="fileFrequency" name="fileFrequency">
-                <option value="daily">Every Day</option>
-                <option value="weekly">Every Week</option>
-                <option value="monthly">Every Month</option>
+                <option value="daily">Кожен день</option>
+                <option value="weekly">Кожного тижня</option>
+                <option value="monthly">Кожен місяць</option>
             </select>
 
             <div id="fileDaySelection" style="display: none;">
-                <label for="fileDay">Day:</label>
+                <label for="fileDay">День:</label>
                 <select id="fileDay" name="fileDay"></select>
             </div>
 
-            <label for="fileTime">Time:</label>
+            <label for="fileTime">Час:</label>
             <input type="time" id="fileTime" name="fileTime" required>
 
-            <label for="storageType">Storage Type:</label>
+            <label for="storageType">Тип зберігання:</label>
             <label for="file_storageType"></label>
             <select id="file_storageType" name="file_storageType" onchange="loadNamesByType(this.value)">
                 <option value="FTP">FTP</option>
-                <option value="">Other...</option>
+                <option value="">Iнше...</option>
             </select>
 
             <div id="file_nameWrapper" style="display:none;">
-                <label for="file_nameSelect">Choose Saved Name:</label>
+                <label for="file_nameSelect">Виберіть збережене ім'я:</label>
                 <select id="file_nameSelect"></select>
             </div>
 
-            <button type="submit" id="filesubmit">Do backup</button>
+            <button type="submit" id="filesubmit">Зробіть резервну копію</button>
         </form>
-        <button onclick="closeFilePopup()">Close</button>
+        <button onclick="closeFilePopup()">Закрити</button>
     </div>
 </div>
 <div class="popup" id="fileRestorePopup">
     <div class="popup-content">
-        <h3>Manually restore backup</h3>
+        <h3>Відновити резервну копію вручну</h3>
         <form action="/api/restore/backup" method="post" id="fileRestoreForm">
 
-            <label for="restorePath">Restore Path:</label>
-            <input type="text" id="restorePath" name="restorePath" placeholder="Restore Path" required>
+            <label for="restorePath">Відновити шлях:</label>
+            <input type="text" id="restorePath" name="restorePath" placeholder="Відновити шлях" required>
 
-            <label for="storageType">Storage Type:</label>
+            <label for="storageType">Тип зберігання:</label>
             <label for="restore_storageType"></label>
             <select id="restore_storageType" name="restore_storageType" onchange="loadNamesByType(this.value)">
                 <option value="FTP">FTP</option>
-                <option value="">Other...</option>
+                <option value="">Iнше...</option>
             </select>
 
             <div id="restore_nameWrapper" style="display:none;">
-                <label for="restore_nameSelect">Choose Saved Name:</label>
+                <label for="restore_nameSelect">Виберіть збережене ім'я:</label>
                 <select id="restore_nameSelect"></select>
             </div>
 
-            <label for="restoreFile">Select Restore File:</label>
+            <label for="restoreFile">Виберіть файл для відновлення:</label>
             <select id="restoreFile" name="restoreFile"></select>
 
-            <button type="submit" id="submitFileRestore">Restore Backup</button>
+            <button type="submit" id="submitFileRestore">Відновити резервну копію</button>
         </form>
-        <button onclick="closeFileRestorePopup()">Close</button>
+        <button onclick="closeFileRestorePopup()">Закрити</button>
     </div>
 </div>
 <script>
@@ -367,29 +367,29 @@
         main.classList.add("dashboard");
         if (section === 'settings') {
             main.innerHTML = `
-                    <h2>User Settings</h2>
+                    <h2>Налаштування користувача</h2>
                     <table id="usersTable">
                     <thread>
                     <tr>
-                    <th>Username</th>
-                    <th>Role</th>
+                    <th>Ім'я користувача</th>
+                    <th>Роль</th>
 </tr>
 </thread>
 </table>
 <div class="button-group">
-                    <button onclick="addUser()">Add User</button>
-                    <button onclick="editUser()">Edit User</button>
-                    <button onclick="deleteUser()">Delete User</button>
+                    <button onclick="addUser()">Додати користувача</button>
+                    <button onclick="editUser()">Редагувати користувача</button>
+                    <button onclick="deleteUser()">Видалити користувача</button>
 </div>
 
-<h2>Storage Settings</h2>
+<h2>Налаштування зберігання</h2>
 <form action="/api/settings/storage-settings-save" method="post" id="storageSettingsForm">
-    <label>Name:</label>
+    <label>Ім'я:</label>
     <input type="text" id="name" name="name" required />
 
     <br><br>
 
-    <label>Storage Type:</label>
+    <label>Тип зберігання:</label>
     <select name="type" id="storageType" required>
     <option value="LOCAL">LOCAL</option>
     <option value="FTP">FTP</option>
@@ -397,22 +397,22 @@
 
 <div id="dynamicFields"></div>
 
-    <button type="button" onclick="saveStorageForm()">Save Settings</button>
+    <button type="button" onclick="saveStorageForm()">Зберегти</button>
 </form>
 
-                    <h2>BAF Settings</h2>
+                    <h2>BAF Налаштування</h2>
                     <form action="/api/settings/baf-settings-save" method="post" id="bafSettingsForm">
 
-                        <label>Type BAF:</label>
-                        <input type="radio" name="bafType" value="file" checked> File based
-                        <input type="radio" name="bafType" value="server"> Server based
+                        <label>Тип BAF:</label>
+                        <input type="radio" name="bafType" value="file" checked> Файловий
+                        <input type="radio" name="bafType" value="server"> Серверний
 
                         <br><br>
 
-                        <label>BAF Directory Path:</label>
+                        <label>Шлях каталогу BAF:</label>
                         <input type="text" id="bafPath" value="/path/to/baf/">
 
-                        <button type="button" onclick="saveBafSettings()">Save</button>
+                        <button type="button" onclick="saveBafSettings()">Зберегти</button>
 
                     </form>
                 `;
@@ -420,25 +420,25 @@
             attachFields();
 
         } else if (section === 'backup') {
-            main.innerHTML = '<h2>Backup</h2>' + (currentBafPath === 'file' ? `
+            main.innerHTML = '<h2>Резервне копіювання</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">
-                        <button onclick="openFilePopup()">File Database backup</button>
+                        <button onclick="openFilePopup()">Резервне копіювання бази даних файлів</button>
                     </div>
                 ` : `
                     <div class="button-group">
-                        <button onclick="openAutoPopup()">Automatic backup settings</button>
-                        <button onclick="openPopup()">Manually backup</button>
+                        <button onclick="openAutoPopup()">Налаштування автоматичного резервного копіювання</button>
+                        <button onclick="openPopup()">Резервне копіювання вручну</button>
                     </div>
                 `) + `
 <div id="progressContainer"></div>`
                 + `<div>
-    <h2>Database Backup Logs</h2>
-    <pre id="dbLogs" class="log-box">Loading...</pre>
+    <h2>Журнали резервного копіювання бази даних</h2>
+    <pre id="dbLogs" class="log-box">Завантаження...</pre>
 </div>
 
 <div>
-    <h2>File Backup Logs</h2>
-    <pre id="fileLogs" class="log-box">Loading...</pre>
+    <h2>Журнали резервного копіювання файлів</h2>
+    <pre id="fileLogs" class="log-box">Завантаження...</pre>
 </div>`;
 
             fetchAndShowProgress();
@@ -446,14 +446,14 @@
             monitorLogs();
 
         } else if (section === 'recovery') {
-            main.innerHTML = '<h2>Recovery</h2>' + (currentBafPath === 'file' ? `
+            main.innerHTML = '<h2>Відновлення</h2>' + (currentBafPath === 'file' ? `
                     <div class="button-group">
-                        <button onclick="openFileRestorePopup()">Restore File Database</button>
+                        <button onclick="openFileRestorePopup()">Відновити базу даних файлів</button>
                     </div>
                 ` : `
                     <div class="button-group">
-                        <button onclick="openRestorePopup()">Restore the copy</button>
-                        <button onclick="openManageRestorePopup()">Manage Restored Backups</button>
+                        <button onclick="openRestorePopup()">Відновити копію</button>
+                        <button onclick="openManageRestorePopup()">Керування відновленими резервними копіями</button>
                     </div>
                 `);
         }
@@ -463,33 +463,33 @@
         main.classList.remove("dashboard");
         main.innerHTML = `
         <div class="block" id="block1">
-        <h2>Backup History</h2>
+        <h2>Історія резервного копіювання</h2>
         <table id="backupPreviewTable" class="display">
         <thead>
             <tr>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Database Name</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Ім'я бази даних</th>
             </tr>
         </thead>
         <tbody></tbody>
         </table>
-        <a class="show-all-btn" href="/history">Show All</a>
+        <a class="show-all-btn" href="/history">Показати все</a>
         </div>
 
         <div class="block" id="block2">
-        <h2>Restore History</h2>
+        <h2>Відновити історію</h2>
         <table id="restorePreviewTable" class="display">
         <thead>
             <tr>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Backup File</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Файл резервної копії</th>
             </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <a class="show-all-btn" href="/history">Show All</a>
+        <a class="show-all-btn" href="/history">Показати все</a>
         </div>
         <div class="block" id="block3">
         <div class="chart-block">
@@ -497,9 +497,9 @@
         </div>
         </div>
         <div class="block" id="block4">
-        <h2>Active configuration</h2>
-        <p><strong>Type: </strong> <span id="bafTypeValue">Loading...</span></p>
-        <p><strong>Path: </strong> <span id="bafPathValue">Loading...</span></p>
+        <h2>Активна конфігурація</h2>
+        <p><strong>Тип:</strong> <span id="bafTypeValue">Завантаження...</span></p>
+        <p><strong>Шлях:</strong> <span id="bafPathValue">Завантаження...</span></p>
 </div>
 `;
         loadBackupPreviewHistory();

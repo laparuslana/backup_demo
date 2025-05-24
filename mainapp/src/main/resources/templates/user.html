@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ua">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Панель адміністратора</title>
     <link rel="stylesheet" href="/css/pages.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
@@ -13,10 +13,10 @@
 </head>
 <body>
 <div class="sidebar">
-    <a href="http://localhost:8080/req/history/download" >Download History</a>
-    <a href="#" onclick="contactAdmin()">Contact Admin</a>
-    <a href="#" onclick="openSettingsModal()">Settings</a>
-    <a href="/logout">Log Out</a>
+    <a href="http://localhost:8080/req/history/download">Історія завантажень</a>
+    <a href="#" onclick="contactAdmin()">Зверніться до адміністратора</a>
+    <a href="#" onclick="openSettingsModal()">Налаштування</a>
+    <a href="/logout">Вийти</a>
 </div>
 <div class="dashboard" id="mainContent">
 </div>
@@ -24,18 +24,18 @@
 <div id="settingsModal" class="popup" style="display: none;">
     <div class="popup-content">
         <span class="close" onclick="closeSettingsModal()">&times;</span>
-        <h2>Edit Profile</h2>
+        <h2>Редагувати профіль</h2>
 
-        <label>Change Username:</label>
-        <input type="text" id="newUsername" placeholder="Enter new username" />
+        <label>Змінити ім'я користувача:</label>
+        <input type="text" id="newUsername" placeholder="Введіть нове ім'я користувача" />
 
-        <label>Update Email:</label>
+        <label>Оновити електронну адресу:</label>
         <input type="email" id="newEmail" placeholder="Enter new email" />
 
-        <label>Change Password:</label>
-        <input type="password" id="newPassword" placeholder="Enter new password" />
+        <label>Змінити пароль:</label>
+        <input type="password" id="newPassword" placeholder="Введіть новий email" />
 
-        <button onclick="updateProfile()">Save Changes</button>
+        <button onclick="updateProfile()">Зберегти зміни</button>
     </div>
 </div>
 <script>
@@ -90,12 +90,12 @@
         <table id="backupTable" class="display">
         <thead>
             <tr>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Database Name</th>
-                <th>Backup Location</th>
-                <th>Retention Period</th>
-                <th>User</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Ім'я бази даних</th>
+                <th>Розташування резервної копії</th>
+                <th>Період зберігання</th>
+                <th>Користувач</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -103,11 +103,11 @@
         <table id="restoreTable" class="display">
         <thead>
             <tr>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Backup File</th>
-                <th>Source Database</th>
-                <th>User</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Файл резервної копії</th>
+                <th>Вихідна база даних</th>
+                <th>Користувач</th>
             </tr>
             </thead>
             <tbody></tbody>
