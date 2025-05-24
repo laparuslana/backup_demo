@@ -6,7 +6,7 @@ document.getElementById("frequency").addEventListener("change", function () {
 
     if (this.value === "weekly") {
         daySelection.style.display = "block";
-        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].forEach(day => {
+        ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].forEach(day => {
             let option = document.createElement("option");
             option.value = day;
             option.textContent = day;
@@ -53,12 +53,12 @@ submitButtom.addEventListener('click', (event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             return response.text();
         })
-        .then(data => alert("✅ Backup parameters saved!"))
-        .catch(error => alert("❌ Error saving backup parameters: " + error));
+        .then(data => alert("✅ Резервні параметри збережено!"))
+        .catch(error => alert("❌ Помилка збереження параметрів резервної копії: " + error));
 });
 
 document.getElementById("fileFrequency").addEventListener("change", function () {
@@ -69,7 +69,7 @@ document.getElementById("fileFrequency").addEventListener("change", function () 
 
     if (this.value === "weekly") {
         daySelection.style.display = "block";
-        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].forEach(day => {
+        ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].forEach(day => {
             let option = document.createElement("option");
             option.value = day;
             option.textContent = day;
@@ -112,10 +112,10 @@ submitFile.addEventListener('click', (event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             return response.text();
         })
         .then(data => alert("✅ File backup parameters saved!"))
-        .catch(error => alert("❌ Error saving file backup parameters: " + error));
+        .catch(error => alert("❌ Помилка збереження параметрів резервної копії файлу: " + error));
 });

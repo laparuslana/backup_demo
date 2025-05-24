@@ -37,7 +37,7 @@ public class RestoreService {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new IOException("FTP script failed with exit code: " + exitCode);
+            throw new IOException("Помилка FTP-скрипту з кодом завершення: " + exitCode);
         }
 
         return output;
@@ -60,7 +60,7 @@ public class RestoreService {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new IOException("FTP script failed with exit code: " + exitCode);
+            throw new IOException("Помилка FTP-скрипту з кодом завершення: " + exitCode);
         }
 
         return output;
@@ -82,9 +82,9 @@ public class RestoreService {
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                status = "✅ Test database deleted successfully!";
+                status = "✅ Тестова база даних успішно видалена!";
             } else {
-                status = "❌ Delete failed with exit code: " + exitCode;
+                status = "❌ Видалення не вдалося з кодом виходу: " + exitCode;
             }
 
             return status;
@@ -96,7 +96,7 @@ public class RestoreService {
         String bafPath = "";
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Користувача не знайдено"));
 
         Optional<BafSettings> settings = bafSettingsRepository.findByUserId(user.getId());
 
@@ -116,9 +116,9 @@ public class RestoreService {
 
         int exitCode = process.waitFor();
         if (exitCode == 0) {
-            status = "✅ Switch successfully!";
+            status = "✅ Переключено успішно!";
         } else {
-            status = "❌ Delete failed with exit code: " + exitCode;
+            status = "❌ Видалення не вдалося з кодом виходу: " + exitCode;
         }
 
         return status;
@@ -180,7 +180,7 @@ public class RestoreService {
                     bafPath, testDbName, dbServer, dbUser, dbPassword, backupFile, clusterAdmin, clusterUsername, clusterPassword,
                     ftpServer, ftpUser, ftpPassword, ftpDirectory, fullPath, storageType);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while extracting storage parameters", e);
+            throw new IllegalArgumentException("Помилка під час вилучення параметрів сховища", e);
         }
     }
 
@@ -199,20 +199,20 @@ public class RestoreService {
                 output.append(line).append("\n");
             }
             while ((line = stdError.readLine()) != null) {
-                output.append("ERROR: ").append(line).append("\n");
+                output.append("Помилка: ").append(line).append("\n");
             }
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                status = "Restore executed successfully!\n";
+                status = "Успішно!\n";
             } else {
-                status = "Restore failed with exit code: " + exitCode;
+                status = "Не вдалося відновити: " + exitCode;
             }
 
             logRestore(status, user, backupFile, sourceDatabase);
 
         } catch (IOException | InterruptedException e) {
-            status = "❌ Error executing backup: " + e.getMessage();
+            status = "❌ Помилка: " + e.getMessage();
             logRestore(status, user, backupFile, sourceDatabase);
         }
         return output.toString();
@@ -269,7 +269,7 @@ public class RestoreService {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new RuntimeException("Користувача не знайдено: " + username));
 
         String sourceDatabase = restoreFile.contains("_") ?
                 restoreFile.substring(0, restoreFile.indexOf('_')) : "unknown";
@@ -292,20 +292,20 @@ public class RestoreService {
                 output.append(line).append("\n");
             }
             while ((line = stdError.readLine()) != null) {
-                output.append("ERROR: ").append(line).append("\n");
+                output.append("Помилка: ").append(line).append("\n");
             }
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                status = "Restore executed successfully!\n";
+                status = "Успішно!\n";
             } else {
-                status = "Restore failed with exit code: " + exitCode;
+                status = "Не вдалося: " + exitCode;
             }
 
             logRestore(status, user, backupFile, sourceDatabase);
 
         } catch (IOException | InterruptedException e) {
-            status = "❌ Error executing backup: " + e.getMessage();
+            status = "❌ Помилка: " + e.getMessage();
             logRestore(status, user, backupFile, sourceDatabase);
         }
         return output.toString();

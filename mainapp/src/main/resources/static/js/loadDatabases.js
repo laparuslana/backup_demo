@@ -23,12 +23,12 @@ function loadDatabases() {
                         databaseNameSelect.appendChild(option);
                     });
                 } else {
-                    databaseNameSelect.innerHTML = `<option value="">NOTHING </option>`;
+                    databaseNameSelect.innerHTML = `<option value="">НІЧОГО</option>`;
                 }
             })
             .catch(err => {
-                console.error("Error fetching databases:", err);
-                databaseNameSelect.innerHTML = `<option value="">Error loading databases</option>`;
+                console.error("Помилка завантаження баз даних:", err);
+                databaseNameSelect.innerHTML = `<option value="">Помилка завантаження баз даних</option>`;
             });
     }
 
@@ -60,8 +60,8 @@ function loadDatabases() {
                 }
             })
             .catch(err => {
-                console.error("Error fetching databases:", err);
-                databaseNameSelect2.innerHTML = `<option value="">Error loading databases</option>`;
+                console.error("Помилка завантаження баз даних:", err);
+                databaseNameSelect2.innerHTML = `<option value="">Помилка завантаження баз даних</option>`;
             });
     }
 
@@ -94,8 +94,8 @@ function loadDatabases() {
                 }
             })
             .catch(err => {
-                console.error("Error fetching databases:", err);
-                selectDbName.innerHTML = `<option value="">Error loading databases</option>`;
+                console.error("Помилка завантаження баз даних:", err);
+                selectDbName.innerHTML = `<option value="">Помилка завантаження баз даних</option>`;
             });
     }
 
@@ -127,8 +127,8 @@ function loadDatabases() {
                 }
             })
             .catch(err => {
-                console.error("Error fetching databases:", err);
-                sourceDbName.innerHTML = `<option value="">Error loading databases</option>`;
+                console.error("Помилка завантаження баз даних:", err);
+                sourceDbName.innerHTML = `<option value="">Помилка завантаження баз даних</option>`;
             });
     }
 
@@ -151,15 +151,12 @@ function loadDatabases() {
             select.appendChild(option);
         });
     })
-    .catch(err => console.error('Error fetching backups:', err));
+    .catch(err => console.error('Помилка завантаження баз даних:', err));
 }
 
 
 function selectArchives() {
-    //const restore_storageType = document.getElementById("restore_storageType");
     const restore_nameSelect = document.getElementById("restore_nameSelect");
-
-    //const type = restore_storageType.value;
     const nameSelect = restore_nameSelect.value;
 
     fetch(`/api/restore/archive?nameSelect=${encodeURIComponent(nameSelect)}`)
@@ -174,5 +171,5 @@ function selectArchives() {
                 select.appendChild(option);
             });
         })
-        .catch(err => console.error('Error fetching backups:', err));
+        .catch(err => console.error('Помилка завантаження баз даних:', err));
 }

@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
             try {
                 Map<String, String> scheduleParams = schedule.getScheduleParams();
                 String cronExpression = convertToCron(scheduleParams.get("frequency"), scheduleParams.get("day"), scheduleParams.get("time"));
-                String projectRoot = Paths.get("").toAbsolutePath().toString();
 
                 String cronJob;
 

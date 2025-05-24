@@ -44,12 +44,12 @@ public class BackupService {
         } else if (Objects.equals(request.getStorageType(), "FTP")) {
             storagePath = request.getStorageParams().get("ftpDirectory");
         } else {
-            throw new IllegalArgumentException("Unsupported storage type: " + request.getStorageType());
+            throw new IllegalArgumentException("Непідтримуваний тип сховища: " + request.getStorageType());
         }
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new RuntimeException("Користувача не знайдено: " + username));
 
         String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod, user);
         return "STATUS" + logs;
@@ -67,7 +67,7 @@ public class BackupService {
             return String.format("bash /opt/myapp/scripts/backupManually.sh %s %s %s %s %s %s %s %s %s %s %s",
                     databaseName, dbServer, dbUser, dbPassword, backupLocation, retentionPeriod, storageType, ftpServer, ftpUser, ftpPassword, ftpDirectory);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while extracting storage parameters", e);
+            throw new IllegalArgumentException("Помилка під час вилучення параметрів сховища", e);
         }
     }
 
@@ -90,14 +90,14 @@ public class BackupService {
                 output.append(line).append("\n");
             }
             while ((line = stdError.readLine()) != null) {
-                output.append("ERROR: ").append(line).append("\n");
+                output.append("Помилка: ").append(line).append("\n");
             }
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                status = "Backup executed successfully!\n";
+                status = "Успішно!\n";
             } else {
-                status = "Backup failed with exit code: " + exitCode;
+                status = "Не вдалося: " + exitCode;
             }
 
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
@@ -105,7 +105,7 @@ public class BackupService {
 
 
         } catch (IOException | InterruptedException e) {
-            status = "❌ Error executing backup: " + e.getMessage();
+            status = "❌ Помилка: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
             ProgressSession.setProgress(new ProgressDTO(0, "Fail", databaseName, startTime, LocalDateTime.now(), backup_location));
         }

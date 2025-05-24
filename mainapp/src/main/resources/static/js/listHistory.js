@@ -27,7 +27,7 @@ function loadBackupHistory() {
 
             $('#backupTable').DataTable();
         })
-        .catch(error => console.error("Error fetching backup history:", error));
+        .catch(error => console.error("Помилка отримання історії резервного копіювання:", error));
 }
 
 function loadRestorePreviewHistory() {
@@ -56,7 +56,7 @@ function loadRestorePreviewHistory() {
 
             $('#restorePreviewTable').DataTable();
         })
-        .catch(error => console.error("Error fetching restore history:", error));
+        .catch(error => console.error("Помилка отримання історії:", error));
 }
 
 function loadBackupPreviewHistory() {
@@ -85,7 +85,7 @@ function loadBackupPreviewHistory() {
 
             $('#backupPreviewTable').DataTable();
         })
-        .catch(error => console.error("Error fetching backup history:", error));
+        .catch(error => console.error("Помилка отримання історії:", error));
 }
 
 function loadRestoreHistory() {
@@ -116,5 +116,5 @@ function loadRestoreHistory() {
 
                 $('#restoreTable').DataTable();
         })
-        .catch(error => console.error("Error fetching restore history:", error));
+        .catch(error => console.error("Помилка отримання історії:", error));
 }

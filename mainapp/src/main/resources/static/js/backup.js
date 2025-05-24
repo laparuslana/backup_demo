@@ -22,13 +22,13 @@ submitButttom.addEventListener('click', (event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             startProgressAutoUpdate();
             return response.text();
         })
-        .then(data => alert("✅ Backup started successfully!"))
-        .catch(error => alert("❌ Error starting backup: " + error));
+        .then(data => alert("✅ Резервне копіювання розпочато успішно!"))
+        .catch(error => alert("❌ Помилка запуску резервного копіювання: " + error));
 });
 
 

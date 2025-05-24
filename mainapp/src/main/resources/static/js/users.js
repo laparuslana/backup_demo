@@ -15,28 +15,28 @@ function addUser() {
     let username, email, password, role;
 
     while (!username) {
-        username = prompt("Enter new username:");
+        username = prompt("Введіть нове ім'я користувача:");
         if (username === null) return;
     }
 
     while (!email || !email.includes("@")) {
-        email = prompt("Enter user email:");
+        email = prompt("Введіть адресу електронної пошти користувача:");
         if (email === null) return;
-        if (!validateEmail(email)) alert("Invalid email! Please enter a valid email.");
+        if (!validateEmail(email)) alert("Недійсна електронна адреса! Будь ласка, введіть дійсну електронну адресу.");
     }
 
     while (!password || password.length < 6) {
-        password = prompt("Enter user password (at least 6 characters):");
+        password = prompt("Введіть пароль користувача (принаймні 6 символів):");
         if (password === null) return;
-        if (!validatePassword(password)) alert("Password must be at least 6 characters long!");
+        if (!validatePassword(password)) alert("Пароль має містити щонайменше 6 символів!");
     }
 
     while (true) {
-        role = prompt("Enter role (USER or ADMIN):");
+        role = prompt("Введіть роль (USER or ADMIN):");
         if (role === null) return;
         role = role.toUpperCase();
         if (role === "USER" || role === "ADMIN") break;
-        alert("Invalid role! Only USER or ADMIN allowed.");
+        alert("Недійсна роль! Тільки USER або ADMIN дозволено.");
     }
 
     fetch('/req/users/add', {
@@ -49,42 +49,42 @@ function addUser() {
             alert(data.message);
             loadAllUsers();
         })
-        .catch(error => alert("Error: " + error));
+        .catch(error => alert("Помилка: " + error));
 }
 
 function editUser() {
     let userName, newUsername, newEmail, newPassword, newRole;
 
     while (!userName) {
-        userName = prompt("Enter Username to edit:");
+        userName = prompt("Введіть ім'я користувача для редагування:");
         if (userName === null) return;
     }
 
     while (!newUsername) {
-        newUsername = prompt("Enter new username:");
+        newUsername = prompt("Введіть нове ім'я користувача:");
         if (newUsername === null) return;
     }
 
     while (!newEmail || !newEmail.includes("@")) {
-        newEmail = prompt("Enter new email:");
+        newEmail = prompt("Введіть новий email:");
         if (newEmail === null) return;
-        if (!newEmail.includes("@")) alert("Invalid email! Please enter a valid email.");
+        if (!newEmail.includes("@")) alert("Недійсна електронна адреса! Будь ласка, введіть дійсну електронну адресу.");
     }
 
     while (true) {
-        newPassword = prompt("Enter new password (leave empty to keep current):");
+        newPassword = prompt("Введіть новий пароль (залиште порожнім, щоб зберегти актуальний):");
         if (newPassword === null) return;
         if (newPassword === "") break;
-        if (newPassword.length < 6) alert("Password must be at least 6 characters long!");
+        if (newPassword.length < 6) alert("Пароль має містити щонайменше 6 символів!");
         else break;
     }
 
     while (true) {
-        newRole = prompt("Enter new role (USER or ADMIN):");
+        newRole = prompt("Введіть нову роль (USER or ADMIN):");
         if (newRole === null) return;
         newRole = newRole.toUpperCase();
         if (newRole === "USER" || newRole === "ADMIN") break;
-        alert("Invalid role! Only USER or ADMIN allowed.");
+        alert("Недійсна роль! Тільки USER або ADMIN дозволено.");
     }
 
     fetch(`/req/users/edit/${userName}`, {
@@ -97,11 +97,11 @@ function editUser() {
             alert(data.message);
             loadAllUsers();
         })
-        .catch(error => alert("Error: " + error));
+        .catch(error => alert("Помилка: " + error));
 }
 
 function deleteUser() {
-    let userName = prompt("Enter Username to delete:");
+    let userName = prompt("Введіть ім'я користувача для видалення:");
     if (userName) {
         fetch(`/req/users/delete/${userName}`, {
             method: 'DELETE'
@@ -110,6 +110,6 @@ function deleteUser() {
                 alert(data.message);
                 loadAllUsers();
             })
-            .catch(error => alert("Error: " + error));
+            .catch(error => alert("Помилка: " + error));
     }
 }

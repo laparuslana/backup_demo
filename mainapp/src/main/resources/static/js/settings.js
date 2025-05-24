@@ -27,12 +27,12 @@ function saveStorageForm() {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Server returned error");
+                    throw new Error("Сервер повернув помилку");
                 }
             return response.text();
 })
-            .then(data => alert("✅ Baf settings saved!"))
-    .catch(error => alert("❌ Error saving settings: " + error));
+            .then(data => alert("✅ Налаштування BAF збережено!"))
+    .catch(error => alert("❌ Помилка збереження налаштувань: " + error));
 }
 
 
@@ -53,12 +53,12 @@ function saveBafSettings() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             return response.text();
         })
-        .then(data => alert("✅ Storage settings saved!"))
-        .catch(error => alert("❌ Error saving settings: " + error));
+        .then(data => alert("✅ Налаштування збережено!"))
+        .catch(error => alert("❌ Помилка збереження налаштувань: " + error));
 
 }
 
@@ -76,13 +76,13 @@ function getActivityStats() {
                     labels,
                     datasets: [
                         {
-                            label: 'Backups',
+                            label: 'Резервне копіювання',
                             data: backupCounts,
                             borderColor: 'blue',
                             fill: false
                         },
                         {
-                            label: 'Restores',
+                            label: 'Відновлення',
                             data: restoreCounts,
                             borderColor: 'green',
                             fill: false
@@ -99,7 +99,7 @@ let currentBafPath= '';
 function loadActiveSettings() {
     return fetch('/api/settings/get-baf-settings')
         .then(res => {
-            if (!res.ok) throw new Error('Failed to fetch BAF settings');
+            if (!res.ok) throw new Error('Не вдалося отримати налаштування BAF');
             return res.json();
         })
         .then(data => {
@@ -107,5 +107,5 @@ function loadActiveSettings() {
             document.getElementById("bafTypeValue").textContent = data.bafType || '';
             document.getElementById("bafPathValue").textContent = data.bafPath || '';
         })
-        .catch(err => console.error('Error loading BAF settings:', err));
+        .catch(err => console.error('Помилка завантаження налаштувань BAF:', err));
 }

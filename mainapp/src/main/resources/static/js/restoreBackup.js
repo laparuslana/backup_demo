@@ -28,16 +28,16 @@ submitButom.addEventListener('click', async(event) => {
     try {
         const response = await fetch(checkDbExistsUrl);
         if (!response.ok) {
-            throw new Error("Failed to check databases");
+            throw new Error("Не вдалося перевірити бази даних");
         }
 
         const databases = await response.json();
         if (databases.includes(restoreData.testDbName)) {
-            alert(`❌ Database "${restoreData.testDbName}" already exists on the server.`);
+            alert(`❌ Database "${restoreData.testDbName}" вже існує на сервері.`);
             return;
         }
     } catch (err) {
-        alert(`❌ Error checking database existence: ${err.message}`);
+        alert(`❌ Помилка перевірки існування бази даних:: ${err.message}`);
         return;
     }
     if (!validateDbName(restoreData.testDbName)) {
@@ -53,12 +53,12 @@ submitButom.addEventListener('click', async(event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             return response.text();
         })
-        .then(data => alert("✅ Restore started successfully!"))
-        .catch(error => alert("❌ Error starting restore: " + error));
+        .then(data => alert("✅ Відновлення розпочато успішно!"))
+        .catch(error => alert("❌ Помилка запуску відновлення: " + error));
 });
 
 
@@ -84,12 +84,12 @@ submitRestore.addEventListener('click', async(event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
             return response.text();
         })
-        .then(data => alert("✅ Restore started successfully!"))
-        .catch(error => alert("❌ Error starting restore: " + error));
+        .then(data => alert("✅ Відновлення розпочато успішно!"))
+        .catch(error => alert("❌ Помилка запуску відновлення: " + error));
 });
 
 const submitButton = document.getElementById("submitDelete");
@@ -103,7 +103,7 @@ submitButton.addEventListener('click', (event) => {
     const confirmAction = document.getElementById("confirmAction").checked;
 
     if (!confirmAction) {
-        alert("❗ Please confirm the action before deleting.");
+        alert("❗ Будь ласка, підтвердіть дію перед видаленням.");
         return;
     }
 
@@ -116,15 +116,15 @@ submitButton.addEventListener('click', (event) => {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
-            alert("✅ Delete started successfully!")
+            alert("✅ Видалення розпочато успішно!")
             return response.json();
         })
         .then(data => {
             alert(data.message);
         })
-        .catch(error => alert("❌ Error starting delete: " + error));
+        .catch(error => alert("❌ Помилка запуску видалення: " + error));
 });
 
 document.getElementById("man_clusterAdmin").addEventListener("change", function () {
@@ -149,7 +149,7 @@ submitButon.addEventListener('click', (event) => {
     }
 
     if (!confirmAction) {
-        alert("❗ Please confirm the action before deleting.");
+        alert("❗ Будь ласка, підтвердіть дію.");
         return;
     }
 
@@ -162,15 +162,15 @@ submitButon.addEventListener('click', (event) => {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Server returned error");
+                throw new Error("Сервер повернув помилку");
             }
-            alert("✅ Switch started successfully!")
+            alert("✅ Перемикання розпочато успішно!")
             return response.json();
         })
         .then(data => {
             alert(data.message);
 })
-        .catch(error => alert("❌ Error starting delete: " + error));
+        .catch(error => alert("❌ Помилка початку перемикання: " + error));
 });
 
 
