@@ -34,8 +34,11 @@ This is a specialized software solution for performing both manual and automated
    ```bash
    sudo dpkg -i business_backup.deb
    sudo apt-get install -f
-3. **Run init-db.sql** if you don`t have newly installed MariaDB
-4. **Run script setup.sh** 
+3. **Run init-db.sql**
+   3.1 Enter yout root password if MariaDB not newly installed
+   3.2 Enter `backup_baf` as application's database
+   3.3 Enter DB user and password for application 
+5. **Run script setup.sh** 
 
 ## Uninstallation
 To uninstall run the following commands:
@@ -47,6 +50,10 @@ To uninstall run the following commands:
       sudo systemctl disable backup-service
       sudo rm /etc/systemd/system/backup-service.service
       sudo rm -rf /opt/myapp
+      sudo rm -rf /opt/backup-service
+
+// if Mariadb was installed for this application 
+      sudo apt purge --remove mariadb-server mariadb-client mariadb-common mariadb-* -y
       sudo systemctl daemon-reload
 
 
