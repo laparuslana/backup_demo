@@ -41,7 +41,7 @@
     height: 100%;
     background: linear-gradient(90deg, #007BFF, #00C6FF);
     width: 0%;
-    transition: width 0.5s ease;
+    transition: width 1s ease-in-out;
 }
 
 #progressContainer {

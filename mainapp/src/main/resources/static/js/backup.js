@@ -24,10 +24,10 @@ submitButttom.addEventListener('click', (event) => {
             if (!response.ok) {
                 throw new Error("Сервер повернув помилку");
             }
+            alert("✅ Резервне копіювання розпочато успішно!");
             startProgressAutoUpdate();
             return response.text();
         })
-        .then(data => alert("✅ Резервне копіювання розпочато успішно!"))
         .catch(error => alert("❌ Помилка запуску резервного копіювання: " + error));
 });
 
@@ -43,7 +43,7 @@ function startProgressAutoUpdate() {
 
     progressInterval = setInterval(() => {
         fetchAndShowProgress();
-    }, 3000);
+    }, 4000);
 }
 
 function fetchAndShowProgress() {
@@ -61,12 +61,11 @@ function fetchAndShowProgress() {
 
             const progressHtml = `
         <div class="progress-bar">
-            <div class="progress-fill" style="width: ${progress.percent}%; transition: width 0.5s;"></div>
+            <div class="progress-fill" style="width: ${progress.percent}%; transition: width 1s;"></div>
         </div>
         <p>${progress.percent}% ${progress.status}</p>
         <small>Database: ${progress.databaseName} | Backup Location: ${progress.backupLocation}</small>
         <small>Started: ${progress.startTime} | Updated: ${progress.updateTime}</small>
-
     `;
             document.getElementById('progressContainer').innerHTML = progressHtml;
 

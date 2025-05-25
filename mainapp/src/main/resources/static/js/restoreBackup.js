@@ -86,9 +86,9 @@ submitRestore.addEventListener('click', async(event) => {
             if (!response.ok) {
                 throw new Error("Сервер повернув помилку");
             }
+            alert("✅ Відновлення розпочато успішно!");
             return response.text();
         })
-        .then(data => alert("✅ Відновлення розпочато успішно!"))
         .catch(error => alert("❌ Помилка запуску відновлення: " + error));
 });
 

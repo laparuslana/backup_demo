@@ -3,6 +3,8 @@ function loadAllUsers() {
         .then(response => response.json())
         .then(users => {
             const tableBody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
+
+            tableBody.innerHTML= '';
             users.forEach(user => {
                 const row = tableBody.insertRow();
                 row.insertCell(0).textContent = user.username;

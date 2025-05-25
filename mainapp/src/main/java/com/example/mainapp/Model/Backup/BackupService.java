@@ -88,10 +88,31 @@ public class BackupService {
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
+
+                if (line.startsWith("[PROGRESS]")) {
+                    try {
+                        String[] parts = line.split(" ", 3);
+                        int percent = Integer.parseInt(parts[1]);
+                        ProgressSession.setProgress(new ProgressDTO(percent, "Processing...", databaseName, startTime, LocalDateTime.now(), backup_location));
+
+                        Thread.sleep(10000);
+                    } catch (Exception e) {
+
+                    }
+                }
             }
+
+//            while ((line = reader.readLine()) != null) {
+//                output.append(line).append("\n");
+//            }
             while ((line = stdError.readLine()) != null) {
                 output.append("Помилка: ").append(line).append("\n");
+                ProgressSession.setProgress(new ProgressDTO(0, "❌ Помилка: " + line, databaseName, startTime, LocalDateTime.now(), backup_location));
             }
+
+//            while ((line = stdError.readLine()) != null) {
+//                output.append("Помилка: ").append(line).append("\n");
+//            }
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {

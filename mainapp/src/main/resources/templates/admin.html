@@ -369,12 +369,12 @@
             main.innerHTML = `
                     <h2>Налаштування користувача</h2>
                     <table id="usersTable">
-                    <thread>
+                    <thead>
                     <tr>
                     <th>Ім'я користувача</th>
                     <th>Роль</th>
 </tr>
-</thread>
+</thead>
 </table>
 <div class="button-group">
                     <button onclick="addUser()">Додати користувача</button>
@@ -424,22 +424,20 @@
                     <div class="button-group">
                         <button onclick="openFilePopup()">Резервне копіювання бази даних файлів</button>
                     </div>
-                ` : `
+                ` + `<div>
+                        <h2>Журнали резервного копіювання файлів</h2>
+                        <pre id="fileLogs" class="log-box">Завантаження...</pre>
+                     </div>` : `
                     <div class="button-group">
                         <button onclick="openAutoPopup()">Налаштування автоматичного резервного копіювання</button>
                         <button onclick="openPopup()">Резервне копіювання вручну</button>
                     </div>
+                ` + `<div>
+                        <h2>Журнали резервного копіювання бази даних</h2>
+                        <pre id="dbLogs" class="log-box">Завантаження...</pre>
+                     </div>
                 `) + `
-<div id="progressContainer"></div>`
-                + `<div>
-    <h2>Журнали резервного копіювання бази даних</h2>
-    <pre id="dbLogs" class="log-box">Завантаження...</pre>
-</div>
-
-<div>
-    <h2>Журнали резервного копіювання файлів</h2>
-    <pre id="fileLogs" class="log-box">Завантаження...</pre>
-</div>`;
+<div id="progressContainer"></div>`;
 
             fetchAndShowProgress();
             setInterval(monitorLogs, 60000);
