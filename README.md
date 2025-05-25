@@ -35,10 +35,10 @@ This is a specialized software solution for performing both manual and automated
    sudo dpkg -i business_backup.deb
    sudo apt-get install -f
 3. **Run init-db.sql**
-   3.1 Enter yout root password if MariaDB not newly installed
-   3.2 Enter `backup_baf` as application's database
-   3.3 Enter DB user and password for application 
-5. **Run script setup.sh** 
+   1. Enter yout root password if MariaDB not newly installed
+   2. Enter `backup_baf` as application's database
+   3. Enter DB user and password for application 
+4. **Run script setup.sh** 
 
 ## Uninstallation
 To uninstall run the following commands:
