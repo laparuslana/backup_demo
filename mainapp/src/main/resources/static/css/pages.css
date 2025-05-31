@@ -60,47 +60,6 @@
     font-size: 12px;
 }
 
-/*#progressContainer {*/
-/*    width: 100%;*/
-/*    max-width: 500px;*/
-/*    margin: 20px auto;*/
-/*    padding: 15px;*/
-/*    background-color: #ffffff;*/
-/*    border: 2px solid #007BFF;*/
-/*    border-radius: 12px;*/
-/*    box-shadow: 0 4px 8px rgba(0,0,0,0.1);*/
-/*    text-align: center;*/
-/*    font-family: Arial, sans-serif;*/
-/*}*/
-
-/*.progress-bar {*/
-/*    width: 100%;*/
-/*    height: 25px;*/
-/*    background-color: #e0e0e0;*/
-/*    border-radius: 12px;*/
-/*    overflow: hidden;*/
-/*    margin-bottom: 10px;*/
-/*}*/
-
-/*.progress-fill {*/
-/*    height: 100%;*/
-/*    background: linear-gradient(90deg, #007BFF, #00C6FF);*/
-/*    width: 0%;*/
-/*    transition: width 1s ease-in-out;*/
-/*}*/
-
-/*#progressContainer {*/
-/*    margin: 5px 0;*/
-/*    font-size: 16px;*/
-/*    color: #333;*/
-/*}*/
-
-/*#progressContainer small {*/
-/*    display: block;*/
-/*    margin-top: 10px;*/
-/*    color: #666;*/
-/*    font-size: 12px;*/
-/*}*/
 .progress-message {
     text-align: center;
     padding: 20px;

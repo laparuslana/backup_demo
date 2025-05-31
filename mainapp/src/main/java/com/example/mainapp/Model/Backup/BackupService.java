@@ -5,6 +5,7 @@ import com.example.mainapp.Model.SettingsManagement.ProgressDTO;
 import com.example.mainapp.Model.SettingsManagement.ProgressSession;
 import com.example.mainapp.Model.UserManagement.MyAppUser;
 import com.example.mainapp.Model.UserManagement.MyAppUserRepository;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -25,35 +29,35 @@ public class BackupService {
     @Autowired
     private MyAppUserRepository myAppUserRepository;
 
-    public String startBackup(BackupRequest request) {
-        String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
-
-        String command = buildBackupCommand(
-                request.getDatabaseName(),
-                request.getDbServer(),
-                request.getDbUser(),
-                request.getDbPassword(),
-                request.getBackupLocation(),
-                retentionPeriod,
-                request.getStorageType(),
-                request.getStorageParams()
-        );
-        String storagePath;
-        if (Objects.equals(request.getStorageType(), "LOCAL")) {
-            storagePath = request.getBackupLocation();
-        } else if (Objects.equals(request.getStorageType(), "FTP")) {
-            storagePath = request.getStorageParams().get("ftpDirectory");
-        } else {
-            throw new IllegalArgumentException("Непідтримуваний тип сховища: " + request.getStorageType());
-        }
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        MyAppUser user = myAppUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Користувача не знайдено: " + username));
-
-        String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod, user);
-        return "STATUS" + logs;
-    }
+//    public String startBackup(BackupRequest request) {
+//        String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
+//
+//        String command = buildBackupCommand(
+//                request.getDatabaseName(),
+//                request.getDbServer(),
+//                request.getDbUser(),
+//                request.getDbPassword(),
+//                request.getBackupLocation(),
+//                retentionPeriod,
+//                request.getStorageType(),
+//                request.getStorageParams()
+//        );
+//        String storagePath;
+//        if (Objects.equals(request.getStorageType(), "LOCAL")) {
+//            storagePath = request.getBackupLocation();
+//        } else if (Objects.equals(request.getStorageType(), "FTP")) {
+//            storagePath = request.getStorageParams().get("ftpDirectory");
+//        } else {
+//            throw new IllegalArgumentException("Непідтримуваний тип сховища: " + request.getStorageType());
+//        }
+//
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//        MyAppUser user = myAppUserRepository.findByUsername(username)
+//                .orElseThrow(() -> new RuntimeException("Користувача не знайдено: " + username));
+//
+//        String logs = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod, user);
+//        return "STATUS" + logs;
+//    }
 
 
     private String buildBackupCommand(String databaseName, String dbServer, String dbUser, String dbPassword, String backupLocation, String retentionPeriod, String storageType, Map<String, String> storageParams) {
@@ -71,136 +75,326 @@ public class BackupService {
         }
     }
 
-    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
-        LocalDateTime initStartTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String startTime = initStartTime.format(formatter);
+        private final ExecutorService backupExecutor = Executors.newCachedThreadPool();
 
-        ProgressSession.setProgress(new ProgressDTO(0, "Початок копіювання...", databaseName, startTime, LocalDateTime.now(), backup_location));
+        public String startBackup(BackupRequest request) {
+            String retentionPeriod = request.getRetentionPeriod() != null ? request.getRetentionPeriod() : "30";
+            String command = buildBackupCommand(
+                    request.getDatabaseName(),
+                    request.getDbServer(),
+                    request.getDbUser(),
+                    request.getDbPassword(),
+                    request.getBackupLocation(),
+                    retentionPeriod,
+                    request.getStorageType(),
+                    request.getStorageParams()
+            );
 
-        StringBuilder output = new StringBuilder();
-        String status;
-
-        int[] simulatedProgress = {0};
-        boolean[] hasRealProgress = {false};
-        boolean[] shouldStop = {false};
-
-        try {
-            Process process = Runtime.getRuntime().exec(command);
-
-            Thread progressThread = new Thread(() -> {
-                while (!shouldStop[0] && simulatedProgress[0] < 90) {
-                    try {
-                        Thread.sleep(2000);
-                        if (!hasRealProgress[0] && !shouldStop[0]) {
-                            synchronized (simulatedProgress) {
-                                simulatedProgress[0] += 2;
-                                ProgressSession.setProgress(new ProgressDTO(
-                                        simulatedProgress[0],
-                                        "Обробка... (оцінка)",
-                                        databaseName,
-                                        startTime,
-                                        LocalDateTime.now(),
-                                        backup_location
-                                ));
-                            }
-                        }
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            });
-            progressThread.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-            Thread stdoutThread = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        output.append(line).append("\n");
-
-                        if (line.startsWith("[PROGRESS]")) {
-                            try {
-                                String[] parts = line.split(" ", 3);
-                                int percent = Integer.parseInt(parts[1]);
-                                synchronized (simulatedProgress) {
-                                    hasRealProgress[0] = true;
-                                    simulatedProgress[0] = percent;
-                                }
-                                ProgressSession.setProgress(new ProgressDTO(
-                                        percent,
-                                        "Обробка...",
-                                        databaseName,
-                                        startTime,
-                                        LocalDateTime.now(),
-                                        backup_location
-                                ));
-                            } catch (Exception e) {
-                                System.err.println("Failed to parse progress: " + e.getMessage());
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    System.err.println("Error reading stdout: " + e.getMessage());
-                }
-            });
-            stdoutThread.start();
-
-            Thread stderrThread = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = stdError.readLine()) != null) {
-                        output.append("Помилка: ").append(line).append("\n");
-                        synchronized (simulatedProgress) {
-                            ProgressSession.setProgress(new ProgressDTO(
-                                    simulatedProgress[0],
-                                    "❌ Помилка: " + line,
-                                    databaseName,
-                                    startTime,
-                                    LocalDateTime.now(),
-                                    backup_location
-                            ));
-                        }
-                    }
-                } catch (IOException e) {
-                    System.err.println("Error reading stderr: " + e.getMessage());
-                }
-            });
-            stderrThread.start();
-
-            int exitCode = process.waitFor();
-
-            shouldStop[0] = true;
-            progressThread.interrupt();
-
-            try {
-                stdoutThread.join(5000);
-                stderrThread.join(5000);
-                progressThread.join(1000);
-            } catch (InterruptedException e) {
-
-            }
-
-            if (exitCode == 0) {
-                status = "Успішно!\n";
-                ProgressSession.setProgress(new ProgressDTO(100, "✅ Готово", databaseName, startTime, LocalDateTime.now(), backup_location));
+            String storagePath;
+            if (Objects.equals(request.getStorageType(), "LOCAL")) {
+                storagePath = request.getBackupLocation();
+            } else if (Objects.equals(request.getStorageType(), "FTP")) {
+                storagePath = request.getStorageParams().get("ftpDirectory");
             } else {
-                status = "Не вдалося: " + exitCode;
-                ProgressSession.setProgress(new ProgressDTO(0, "❌ Не вдалося", databaseName, startTime, LocalDateTime.now(), backup_location));
+                throw new IllegalArgumentException("Непідтримуваний тип сховища: " + request.getStorageType());
             }
 
-            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            MyAppUser user = myAppUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Користувача не знайдено: " + username));
 
-        } catch (IOException | InterruptedException e) {
-            status = "❌ Помилка: " + e.getMessage();
-            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
-            ProgressSession.setProgress(new ProgressDTO(0, "❌ Невдача", databaseName, startTime, LocalDateTime.now(), backup_location));
+            final String[] logs = new String[1];
+            backupExecutor.submit(() -> {
+                try {
+                    logs[0] = executeBackupCommand(command, request.getDatabaseName(), storagePath, retentionPeriod, user);
+                    System.out.println("Backup completed: " + logs[0]);
+                } catch (Exception e) {
+                    System.err.println("Backup failed: " + e.getMessage());
+
+                    ProgressSession.setProgress(new ProgressDTO(0, "❌ Помилка: " + e.getMessage(),
+                            request.getDatabaseName(),
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                            LocalDateTime.now(),
+                            storagePath));
+                }
+            });
+return "STATUS" + logs[0];
         }
 
-        return output.toString();
-    }
+        private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
+            LocalDateTime initStartTime = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String startTime = initStartTime.format(formatter);
+
+            ProgressSession.setProgress(new ProgressDTO(0, "Початок копіювання...", databaseName, startTime, LocalDateTime.now(), backup_location));
+
+            StringBuilder output = new StringBuilder();
+            String status;
+
+            int[] simulatedProgress = {0};
+            boolean[] hasRealProgress = {false};
+            boolean[] shouldStop = {false};
+
+            try {
+                Process process = Runtime.getRuntime().exec(command);
+
+                Thread progressThread = new Thread(() -> {
+                    while (!shouldStop[0] && simulatedProgress[0] < 90) {
+                        try {
+                            Thread.sleep(2000);
+                            if (!hasRealProgress[0] && !shouldStop[0]) {
+                                synchronized (simulatedProgress) {
+                                    simulatedProgress[0] += 2;
+                                    ProgressSession.setProgress(new ProgressDTO(
+                                            simulatedProgress[0],
+                                            "Обробка... (оцінка)",
+                                            databaseName,
+                                            startTime,
+                                            LocalDateTime.now(),
+                                            backup_location
+                                    ));
+                                }
+                            }
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                });
+                progressThread.start();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+
+                Thread stdoutThread = new Thread(() -> {
+                    try {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            output.append(line).append("\n");
+
+                            if (line.startsWith("[PROGRESS]")) {
+                                try {
+                                    String[] parts = line.split(" ", 3);
+                                    int percent = Integer.parseInt(parts[1]);
+                                    synchronized (simulatedProgress) {
+                                        hasRealProgress[0] = true;
+                                        simulatedProgress[0] = percent;
+                                    }
+                                    ProgressSession.setProgress(new ProgressDTO(
+                                            percent,
+                                            "Обробка...",
+                                            databaseName,
+                                            startTime,
+                                            LocalDateTime.now(),
+                                            backup_location
+                                    ));
+                                } catch (Exception e) {
+                                    System.err.println("Failed to parse progress: " + e.getMessage());
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Error reading stdout: " + e.getMessage());
+                    }
+                });
+                stdoutThread.start();
+
+                Thread stderrThread = new Thread(() -> {
+                    try {
+                        String line;
+                        while ((line = stdError.readLine()) != null) {
+                            output.append("Помилка: ").append(line).append("\n");
+                            synchronized (simulatedProgress) {
+                                ProgressSession.setProgress(new ProgressDTO(
+                                        simulatedProgress[0],
+                                        "❌ Помилка: " + line,
+                                        databaseName,
+                                        startTime,
+                                        LocalDateTime.now(),
+                                        backup_location
+                                ));
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Error reading stderr: " + e.getMessage());
+                    }
+                });
+                stderrThread.start();
+
+                int exitCode = process.waitFor();
+
+                shouldStop[0] = true;
+                progressThread.interrupt();
+
+                try {
+                    stdoutThread.join(5000);
+                    stderrThread.join(5000);
+                    progressThread.join(1000);
+                } catch (InterruptedException e) {
+
+                }
+
+                if (exitCode == 0) {
+                    status = "Успішно!\n";
+                    ProgressSession.setProgress(new ProgressDTO(100, "✅ Готово", databaseName, startTime, LocalDateTime.now(), backup_location));
+                } else {
+                    status = "Не вдалося: " + exitCode;
+                    ProgressSession.setProgress(new ProgressDTO(0, "❌ Не вдалося", databaseName, startTime, LocalDateTime.now(), backup_location));
+                }
+
+                logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+
+            } catch (IOException | InterruptedException e) {
+                status = "❌ Помилка: " + e.getMessage();
+                logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+                ProgressSession.setProgress(new ProgressDTO(0, "❌ Невдача", databaseName, startTime, LocalDateTime.now(), backup_location));
+            }
+
+            return output.toString();
+        }
+
+        @PreDestroy
+        public void cleanup() {
+            backupExecutor.shutdown();
+            try {
+                if (!backupExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    backupExecutor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                backupExecutor.shutdownNow();
+            }
+        }
+
+//    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
+//        LocalDateTime initStartTime = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String startTime = initStartTime.format(formatter);
+//
+//        ProgressSession.setProgress(new ProgressDTO(0, "Початок копіювання...", databaseName, startTime, LocalDateTime.now(), backup_location));
+//
+//        StringBuilder output = new StringBuilder();
+//        String status;
+//
+//        int[] simulatedProgress = {0};
+//        boolean[] hasRealProgress = {false};
+//        boolean[] shouldStop = {false};
+//
+//        try {
+//            Process process = Runtime.getRuntime().exec(command);
+//
+//            Thread progressThread = new Thread(() -> {
+//                while (!shouldStop[0] && simulatedProgress[0] < 90) {
+//                    try {
+//                        Thread.sleep(2000);
+//                        if (!hasRealProgress[0] && !shouldStop[0]) {
+//                            synchronized (simulatedProgress) {
+//                                simulatedProgress[0] += 2;
+//                                ProgressSession.setProgress(new ProgressDTO(
+//                                        simulatedProgress[0],
+//                                        "Обробка... (оцінка)",
+//                                        databaseName,
+//                                        startTime,
+//                                        LocalDateTime.now(),
+//                                        backup_location
+//                                ));
+//                            }
+//                        }
+//                    } catch (InterruptedException e) {
+//                        break;
+//                    }
+//                }
+//            });
+//            progressThread.start();
+//
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+//
+//            Thread stdoutThread = new Thread(() -> {
+//                try {
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        output.append(line).append("\n");
+//
+//                        if (line.startsWith("[PROGRESS]")) {
+//                            try {
+//                                String[] parts = line.split(" ", 3);
+//                                int percent = Integer.parseInt(parts[1]);
+//                                synchronized (simulatedProgress) {
+//                                    hasRealProgress[0] = true;
+//                                    simulatedProgress[0] = percent;
+//                                }
+//                                ProgressSession.setProgress(new ProgressDTO(
+//                                        percent,
+//                                        "Обробка...",
+//                                        databaseName,
+//                                        startTime,
+//                                        LocalDateTime.now(),
+//                                        backup_location
+//                                ));
+//                            } catch (Exception e) {
+//                                System.err.println("Failed to parse progress: " + e.getMessage());
+//                            }
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    System.err.println("Error reading stdout: " + e.getMessage());
+//                }
+//            });
+//            stdoutThread.start();
+//
+//            Thread stderrThread = new Thread(() -> {
+//                try {
+//                    String line;
+//                    while ((line = stdError.readLine()) != null) {
+//                        output.append("Помилка: ").append(line).append("\n");
+//                        synchronized (simulatedProgress) {
+//                            ProgressSession.setProgress(new ProgressDTO(
+//                                    simulatedProgress[0],
+//                                    "❌ Помилка: " + line,
+//                                    databaseName,
+//                                    startTime,
+//                                    LocalDateTime.now(),
+//                                    backup_location
+//                            ));
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    System.err.println("Error reading stderr: " + e.getMessage());
+//                }
+//            });
+//            stderrThread.start();
+//
+//            int exitCode = process.waitFor();
+//
+//            shouldStop[0] = true;
+//            progressThread.interrupt();
+//
+//            try {
+//                stdoutThread.join(5000);
+//                stderrThread.join(5000);
+//                progressThread.join(1000);
+//            } catch (InterruptedException e) {
+//
+//            }
+//
+//            if (exitCode == 0) {
+//                status = "Успішно!\n";
+//                ProgressSession.setProgress(new ProgressDTO(100, "✅ Готово", databaseName, startTime, LocalDateTime.now(), backup_location));
+//            } else {
+//                status = "Не вдалося: " + exitCode;
+//                ProgressSession.setProgress(new ProgressDTO(0, "❌ Не вдалося", databaseName, startTime, LocalDateTime.now(), backup_location));
+//            }
+//
+//            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+//
+//        } catch (IOException | InterruptedException e) {
+//            status = "❌ Помилка: " + e.getMessage();
+//            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+//            ProgressSession.setProgress(new ProgressDTO(0, "❌ Невдача", databaseName, startTime, LocalDateTime.now(), backup_location));
+//        }
+//
+//        return output.toString();
+//    }
 
 //    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
 //        LocalDateTime initStartTime = LocalDateTime.now();

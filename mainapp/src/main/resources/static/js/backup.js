@@ -24,9 +24,12 @@ submitButttom.addEventListener('click', (event) => {
             if (!response.ok) {
                 throw new Error("Сервер повернув помилку");
             }
-            alert("✅ Резервне копіювання розпочато успішно!");
+                return response.json();
+            })
+        .then(data => {
+            alert("✅ " + data.message);
             startProgressAutoUpdate();
-            return response.text();
+
         })
         .catch(error => alert("❌ Помилка запуску резервного копіювання: " + error));
 });

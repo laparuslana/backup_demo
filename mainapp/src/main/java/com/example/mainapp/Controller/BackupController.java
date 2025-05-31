@@ -61,7 +61,7 @@ public class BackupController {
         }
 
         backupService.startBackup(request);
-        response.put("message", "Backup started");
+        response.put("message", "Резервне копіювання розпочато успішно!");
         return ResponseEntity.ok(response);
     }
 
