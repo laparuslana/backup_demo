@@ -75,64 +75,189 @@ public class BackupService {
         LocalDateTime initStartTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String startTime = initStartTime.format(formatter);
-        ProgressSession.setProgress(new ProgressDTO(0, "Backup...", databaseName, startTime, LocalDateTime.now(), backup_location));
+
+        ProgressSession.setProgress(new ProgressDTO(0, "Початок копіювання...", databaseName, startTime, LocalDateTime.now(), backup_location));
 
         StringBuilder output = new StringBuilder();
         String status;
 
+        int[] simulatedProgress = {0};
+        boolean[] hasRealProgress = {false};
+        boolean[] shouldStop = {false};
+
         try {
             Process process = Runtime.getRuntime().exec(command);
+
+            Thread progressThread = new Thread(() -> {
+                while (!shouldStop[0] && simulatedProgress[0] < 90) {
+                    try {
+                        Thread.sleep(2000);
+                        if (!hasRealProgress[0] && !shouldStop[0]) {
+                            synchronized (simulatedProgress) {
+                                simulatedProgress[0] += 2;
+                                ProgressSession.setProgress(new ProgressDTO(
+                                        simulatedProgress[0],
+                                        "Обробка... (оцінка)",
+                                        databaseName,
+                                        startTime,
+                                        LocalDateTime.now(),
+                                        backup_location
+                                ));
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            });
+            progressThread.start();
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+            Thread stdoutThread = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        output.append(line).append("\n");
 
-                if (line.startsWith("[PROGRESS]")) {
-                    try {
-                        String[] parts = line.split(" ", 3);
-                        int percent = Integer.parseInt(parts[1]);
-                        ProgressSession.setProgress(new ProgressDTO(percent, "Processing...", databaseName, startTime, LocalDateTime.now(), backup_location));
-
-                        Thread.sleep(10000);
-                    } catch (Exception e) {
-
+                        if (line.startsWith("[PROGRESS]")) {
+                            try {
+                                String[] parts = line.split(" ", 3);
+                                int percent = Integer.parseInt(parts[1]);
+                                synchronized (simulatedProgress) {
+                                    hasRealProgress[0] = true;
+                                    simulatedProgress[0] = percent;
+                                }
+                                ProgressSession.setProgress(new ProgressDTO(
+                                        percent,
+                                        "Обробка...",
+                                        databaseName,
+                                        startTime,
+                                        LocalDateTime.now(),
+                                        backup_location
+                                ));
+                            } catch (Exception e) {
+                                System.err.println("Failed to parse progress: " + e.getMessage());
+                            }
+                        }
                     }
+                } catch (IOException e) {
+                    System.err.println("Error reading stdout: " + e.getMessage());
                 }
-            }
+            });
+            stdoutThread.start();
 
-//            while ((line = reader.readLine()) != null) {
-//                output.append(line).append("\n");
-//            }
-            while ((line = stdError.readLine()) != null) {
-                output.append("Помилка: ").append(line).append("\n");
-                ProgressSession.setProgress(new ProgressDTO(0, "❌ Помилка: " + line, databaseName, startTime, LocalDateTime.now(), backup_location));
-            }
-
-//            while ((line = stdError.readLine()) != null) {
-//                output.append("Помилка: ").append(line).append("\n");
-//            }
+            Thread stderrThread = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = stdError.readLine()) != null) {
+                        output.append("Помилка: ").append(line).append("\n");
+                        synchronized (simulatedProgress) {
+                            ProgressSession.setProgress(new ProgressDTO(
+                                    simulatedProgress[0],
+                                    "❌ Помилка: " + line,
+                                    databaseName,
+                                    startTime,
+                                    LocalDateTime.now(),
+                                    backup_location
+                            ));
+                        }
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error reading stderr: " + e.getMessage());
+                }
+            });
+            stderrThread.start();
 
             int exitCode = process.waitFor();
+
+            shouldStop[0] = true;
+            progressThread.interrupt();
+
+            try {
+                stdoutThread.join(5000);
+                stderrThread.join(5000);
+                progressThread.join(1000);
+            } catch (InterruptedException e) {
+
+            }
+
             if (exitCode == 0) {
                 status = "Успішно!\n";
+                ProgressSession.setProgress(new ProgressDTO(100, "✅ Готово", databaseName, startTime, LocalDateTime.now(), backup_location));
             } else {
                 status = "Не вдалося: " + exitCode;
+                ProgressSession.setProgress(new ProgressDTO(0, "❌ Не вдалося", databaseName, startTime, LocalDateTime.now(), backup_location));
             }
 
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
-            ProgressSession.setProgress(new ProgressDTO(100, "Done", databaseName, startTime, LocalDateTime.now(), backup_location));
-
 
         } catch (IOException | InterruptedException e) {
             status = "❌ Помилка: " + e.getMessage();
             logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
-            ProgressSession.setProgress(new ProgressDTO(0, "Fail", databaseName, startTime, LocalDateTime.now(), backup_location));
+            ProgressSession.setProgress(new ProgressDTO(0, "❌ Невдача", databaseName, startTime, LocalDateTime.now(), backup_location));
         }
 
         return output.toString();
     }
+
+//    private String executeBackupCommand(String command, String databaseName, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
+//        LocalDateTime initStartTime = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String startTime = initStartTime.format(formatter);
+//        ProgressSession.setProgress(new ProgressDTO(0, "Копіювання...", databaseName, startTime, LocalDateTime.now(), backup_location));
+//
+//        StringBuilder output = new StringBuilder();
+//        String status;
+//
+//        try {
+//            Process process = Runtime.getRuntime().exec(command);
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+//
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                output.append(line).append("\n");
+//
+//                if (line.startsWith("[PROGRESS]")) {
+//                    try {
+//                        String[] parts = line.split(" ", 3);
+//                        int percent = Integer.parseInt(parts[1]);
+//                        ProgressSession.setProgress(new ProgressDTO(percent, "Обробка...", databaseName, startTime, LocalDateTime.now(), backup_location));
+//
+//                        Thread.sleep(30000);
+//                    } catch (Exception e) {
+//
+//                    }
+//                }
+//            }
+//
+//            while ((line = stdError.readLine()) != null) {
+//                output.append("Помилка: ").append(line).append("\n");
+//                ProgressSession.setProgress(new ProgressDTO(0, "❌ Помилка: " + line, databaseName, startTime, LocalDateTime.now(), backup_location));
+//            }
+//
+//
+//            int exitCode = process.waitFor();
+//            if (exitCode == 0) {
+//                status = "Успішно!\n";
+//            } else {
+//                status = "Не вдалося: " + exitCode;
+//            }
+//
+//            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+//            ProgressSession.setProgress(new ProgressDTO(100, "Готово", databaseName, startTime, LocalDateTime.now(), backup_location));
+//
+//
+//        } catch (IOException | InterruptedException e) {
+//            status = "❌ Помилка: " + e.getMessage();
+//            logBackup(databaseName, status, backup_location, retentionPeriod, myAppUserId);
+//            ProgressSession.setProgress(new ProgressDTO(0, "Невдача", databaseName, startTime, LocalDateTime.now(), backup_location));
+//        }
+//
+//        return output.toString();
+//    }
 
     private void logBackup(String databaseName, String status, String backup_location, String retentionPeriod, MyAppUser myAppUserId) {
         BackupHistory backupHistory = new BackupHistory();
