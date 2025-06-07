@@ -12,6 +12,8 @@ FTP_SERVER=$8
 FTP_USER=$9
 FTP_PASSWORD="${10}"
 FTP_DIRECTORY="${11}"
+LOCAL_SUCCESS=false
+FTP_SUCCESS=false
 
 export PGPASSWORD="$DB_PASSWORD"
 
@@ -44,6 +46,7 @@ bye
 EOF
     if [ $? -eq 0 ]; then
         echo "[PROGRESS] 80 FTP upload successful"
+        FTP_SUCCESS=true
     else
         echo "[PROGRESS] 0 FTP upload failed"
         exit 1
@@ -56,6 +59,7 @@ else
         exit 1
     fi
     echo "[PROGRESS] 70 Local pg_dump completed"
+    LOCAL_SUCCESS=true
 
     BACKUP_COUNT=$(find "$BACKUP_DIR" -type f -name "*.backup" | wc -l)
     if [ "$BACKUP_COUNT" -gt 3 ]; then
@@ -66,4 +70,8 @@ else
     fi
 fi
 
-ls -l "$BACKUP_DIR/" > /dev/null 2>&1
+if [ "$LOCAL_SUCCESS" = true ] || [ "$FTP_SUCCESS" = true ]; then
+  exit 0
+else
+  exit 2
+fi
